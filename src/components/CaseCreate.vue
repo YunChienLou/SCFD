@@ -1,17 +1,6 @@
 <template>
   <div class="my-5 caseCreate">
     <form @submit.prevent="onSubmit" class="">
-      <!-- <div class="row m-2">
-                <label class="col-4 form-label">出入狀態</label>
-                <select class="col form-control" v-model="form.status">
-                    <option value="">請選擇</option>
-                    <option value="協勤">協勤</option>
-                    <option value="退勤" >退勤</option>
-                    <option value="救護">救護</option>
-                    <option value="返隊">返隊</option>
-                    <option value="常訓">常訓</option>
-                </select>
-            </div> -->
       <div
         id="carouselExampleIndicators"
         class="carousel slide"

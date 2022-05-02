@@ -2,9 +2,11 @@ import { createRouter, createWebHistory } from "vue-router";
 import login from "../views/login.vue";
 import Home from "../views/Home.vue";
 import Dashboard from "../views/Dashboard.vue";
+import Search from "../views/Search.vue";
 import List from "../views/List.vue";
 import LoginStatus from "../views/LoginStatus.vue";
 import Edit from "../views/Edit.vue";
+
 
 const routes = [
   {
@@ -23,6 +25,11 @@ const routes = [
     component: Dashboard,
   },
   {
+    path: "/search",
+    name: "Search",
+    component: Search,
+  },
+  {
     path: "/list",
     name: "List",
     component: List,
@@ -37,6 +44,21 @@ const routes = [
     name: "Edit",
     component: Edit,
   },
+  {
+    path:"/admin",
+    name:"admin",
+    component:()=>import('../views/Admin.vue'),
+    children:[
+      {
+        path:"admin/memberList",
+        component:()=>import('../views/Admin.vue'),
+      },
+      {
+        path:"admin/editList",
+        component:()=>import('../views/Admin.vue'),
+      },
+    ]
+  }
 ];
 
 const router = createRouter({

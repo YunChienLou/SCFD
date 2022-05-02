@@ -6,8 +6,14 @@
     <h4>{{ userData.name }} {{ userData.rank }}</h4>
     <h3>{{ userData.emtlevel }}</h3>
     <h2 class="caseNumber">共累計 : {{ targetCases.length }} 件救護</h2>
-    <button class="btn btn-danger mb-2" @click.prevent="logoutUser">
+    <button class="btn btn-danger mb-2 me-2" @click.prevent="logoutUser">
       登出
+    </button>
+    <button v-if="uid.uid == 'R3S5c6JQEWZzVDGqMXCGCV2bNrg1'" class="btn btn-primary mb-2 me-2" >
+      下載當期救護紀錄
+    </button>
+    <button v-if="uid.uid == 'R3S5c6JQEWZzVDGqMXCGCV2bNrg1'" class="btn btn-success mb-2" >
+      編輯分隊名單資料
     </button>
   </div>
 
