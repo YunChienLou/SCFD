@@ -9,12 +9,37 @@
     <button class="btn btn-danger mb-2 me-2" @click.prevent="logoutUser">
       登出
     </button>
-    <button v-if="uid.uid == 'R3S5c6JQEWZzVDGqMXCGCV2bNrg1'" class="btn btn-primary mb-2 me-2" >
+    <button
+      v-if="uid.uid == 'R3S5c6JQEWZzVDGqMXCGCV2bNrg1'"
+      class="btn btn-primary mb-2 me-2"
+      @click="downloadExcel()"
+    >
       下載當期救護紀錄
     </button>
-    <button v-if="uid.uid == 'R3S5c6JQEWZzVDGqMXCGCV2bNrg1'" class="btn btn-success mb-2" >
+    <button
+      v-if="uid.uid == 'R3S5c6JQEWZzVDGqMXCGCV2bNrg1'"
+      class="btn btn-success mb-2"
+    >
       編輯分隊名單資料
     </button>
+    <div class="row m-2">
+      <label class="col-4 form-label">開始時間</label>
+      <input
+        class="col form-control"
+        type="datetime-local"
+        v-model="startTime"
+        required
+      />
+    </div>
+    <div class="row m-2">
+      <label class="col-4 form-label">結束時間</label>
+      <input
+        class="col form-control"
+        type="datetime-local"
+        v-model="endTime"
+        required
+      />
+    </div>
   </div>
 
   <div
@@ -469,7 +494,9 @@
           </tr>
         </thead> -->
         <tbody>
-            <tr v-for="(name, value , index) in vital" :key="index"><td>{{value}} {{name}} </td></tr>
+          <tr v-for="(name, value, index) in vital" :key="index">
+            <td>{{ value }} {{ name }}</td>
+          </tr>
         </tbody>
       </table>
       <h5 class="card-title badge transBg p-2 text-wrap">
@@ -513,9 +540,14 @@
 <script>
 import Footer from "../components/Footer.vue";
 import Status from "../components/Status.vue";
-import { loadUser, logoutUser, loadCasesTarget, deleteCase } from "@/firebase";
 
-import { reactive } from "@vue/reactivity";
+import { loadUser, logoutUser, loadCasesTarget, deleteCase } from "@/firebase";
+import { JSONToExcelConvertor } from "../util/downlaodCase";
+// import {
+//   getSpecificCase
+//  } from "../util/downlaodCase";
+
+import { reactive, ref } from "@vue/reactivity";
 
 import { watch } from "@vue/runtime-core";
 import firebase from "firebase/app";
@@ -538,6 +570,9 @@ export default {
     const uid = reactive({ uid: "" });
     const route = useRoute();
     const targetCases = loadCasesTarget("uid", route.params.uid);
+    const json_data = ref();
+    const endTime = ref();
+    const startTime = ref();
 
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
@@ -549,12 +584,26 @@ export default {
       }
     });
 
+    const downloadExcel = () => {
+      JSONToExcelConvertor(
+        targetCases,
+        "FileName",
+        "title",
+        "",
+        10);
+    };
+
     const forUserData = async () => {
       var user = await loadUser(uid.uid);
       userData.name = user.name;
       userData.rank = user.rank;
       userData.emtlevel = user.emtlevel;
       userData.unit = user.unit;
+    };
+
+    const btnSpecificCase = async () => {
+      console.log(targetCases);
+      console.log("執行抓取", btnSpecificCase);
     };
 
     watch(uid, forUserData);
@@ -576,6 +625,11 @@ export default {
       targetCases,
       classAppend,
       deleteCase,
+      json_data,
+      btnSpecificCase,
+      endTime,
+      startTime,
+      downloadExcel,
     };
   },
 };

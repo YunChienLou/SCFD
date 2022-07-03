@@ -1,6 +1,448 @@
 <template>
-  <div class="caseList">
-    <h1 class="fw-bold m-4">即時救護案件</h1>
+  <div class="container searchComponent" id="Search">
+    <form class="mt-5 row g-3">
+      <div class="col-4">
+        <select
+          class="form-select"
+          aria-label="Default select"
+          v-model="keyCatagory"
+        >
+          <option selected>選擇搜索項目</option>
+          <option value="who">姓名</option>
+          <option value="time">時間</option>
+          <option value="unit">單位</option>
+          <option value="onScene">現場狀況</option>
+          <option value="otherContent">案件補述</option>
+        </select>
+      </div>
+      <div class="col-5">
+        <input
+          v-if="keyCatagory === 'treatment'"
+          type="text"
+          class="form-control"
+          placeholder="關鍵字"
+          v-model="keyValue"
+        />
+        <div class="onScene" v-if="keyCatagory === 'onScene'">
+          <!-- Button trigger modal -->
+          <button
+            type="button"
+            class="col btn btn-primary"
+            data-bs-toggle="modal"
+            data-bs-target="#SceneModal"
+          >
+            勾選條件
+          </button>
+
+          <!-- Modal -->
+          <div
+            class="modal fade text-dark"
+            id="SceneModal"
+            tabindex="-1"
+            aria-labelledby="exampleModalLabel"
+            aria-hidden="true"
+          >
+            <div
+              class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
+            >
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLabel">
+                    現場狀況(可複選)
+                  </h5>
+                  <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                  ></button>
+                </div>
+                <div class="modal-body">
+                  <div class="list-group">
+                    <label class="fs-4 fw-bold">非創傷</label>
+                    <ul class="p-0">
+                      <li class="list-group-item">
+                        <input
+                          type="checkbox"
+                          value="呼吸問題（喘／呼吸急促）"
+                          v-model="keyValue"
+                        />呼吸問題（喘／呼吸急促）
+                      </li>
+                      <li class="list-group-item">
+                        <input
+                          type="checkbox"
+                          value="呼吸道問題（異物哽塞）"
+                          v-model="keyValue"
+                        />呼吸道問題（異物哽塞）
+                      </li>
+                      <li class="list-group-item">
+                        <input
+                          type="checkbox"
+                          value="胸痛／悶"
+                          v-model="keyValue"
+                        />胸痛／悶
+                      </li>
+                      <li class="list-group-item">
+                        <input
+                          type="checkbox"
+                          value="腹痛"
+                          v-model="keyValue"
+                        />腹痛
+                      </li>
+                      <li class="list-group-item">
+                        <p>一般疾病</p>
+                        <ul class="list-group">
+                          <li class="list-group-item list-group-item-secondary">
+                            <input
+                              type="checkbox"
+                              value="頭痛／頭暈／昏倒／昏厥"
+                              v-model="keyValue"
+                            />頭痛／頭暈／昏倒／昏厥
+                          </li>
+                          <li class="list-group-item list-group-item-secondary">
+                            <input
+                              type="checkbox"
+                              value="發燒"
+                              v-model="keyValue"
+                            />發燒
+                          </li>
+                          <li class="list-group-item list-group-item-secondary">
+                            <input
+                              type="checkbox"
+                              value="噁心／嘔吐／腹瀉"
+                              v-model="keyValue"
+                            />噁心／嘔吐／腹瀉
+                          </li>
+                          <li class="list-group-item list-group-item-secondary">
+                            <input
+                              type="checkbox"
+                              value="肢體無力"
+                              v-model="keyValue"
+                            />肢體無力
+                          </li>
+                        </ul>
+                      </li>
+                      <li class="list-group-item">
+                        <input
+                          type="checkbox"
+                          value="疑似毒藥物中毒"
+                          v-model="keyValue"
+                        />疑似毒藥物中毒
+                      </li>
+                      <li class="list-group-item">
+                        <input
+                          type="checkbox"
+                          value="疑似一氧化碳中毒"
+                          v-model="keyValue"
+                        />疑似一氧化碳中毒
+                      </li>
+                      <li class="list-group-item">
+                        <input
+                          type="checkbox"
+                          value="癲癇／抽搐"
+                          v-model="keyValue"
+                        />癲癇／抽搐
+                      </li>
+                      <li class="list-group-item">
+                        <input
+                          type="checkbox"
+                          value="路倒"
+                          v-model="keyValue"
+                        />路倒
+                      </li>
+                      <li class="list-group-item">
+                        <input
+                          type="checkbox"
+                          value="行為急症/精神異常"
+                          v-model="keyValue"
+                        />行為急症/精神異常
+                      </li>
+                      <li class="list-group-item">
+                        <input
+                          type="checkbox"
+                          value="孕婦急產"
+                          v-model="keyValue"
+                        />孕婦急產
+                      </li>
+                      <li class="list-group-item">
+                        <input
+                          type="checkbox"
+                          value="溺水"
+                          v-model="keyValue"
+                        />溺水
+                      </li>
+                      <li class="list-group-item">
+                        <input
+                          type="checkbox"
+                          value="到院前心肺功能停止"
+                          v-model="keyValue"
+                        />到院前心肺功能停止
+                      </li>
+                      <li class="list-group-item">
+                        <input
+                          type="checkbox"
+                          value="其他非創傷機轉"
+                          v-model="keyValue"
+                        />其他
+                      </li>
+                    </ul>
+                    <label class="fs-4 fw-bold">創傷</label>
+                    <ul class="p-0">
+                      <li class="list-group-item">
+                        <p>一般外傷</p>
+                        <ul class="list-group">
+                          <li class="list-group-item list-group-item-secondary">
+                            <input
+                              type="checkbox"
+                              value="頭部外傷"
+                              v-model="keyValue"
+                            />頭部外傷
+                          </li>
+                          <li class="list-group-item list-group-item-secondary">
+                            <input
+                              type="checkbox"
+                              value="胸部外傷"
+                              v-model="keyValue"
+                            />胸部外傷
+                          </li>
+                          <li class="list-group-item list-group-item-secondary">
+                            <input
+                              type="checkbox"
+                              value="腹部外傷"
+                              v-model="keyValue"
+                            />腹部外傷
+                          </li>
+                          <li class="list-group-item list-group-item-secondary">
+                            <input
+                              type="checkbox"
+                              value="背部外傷"
+                              v-model="keyValue"
+                            />背部外傷
+                          </li>
+                          <li class="list-group-item list-group-item-secondary">
+                            <input
+                              type="checkbox"
+                              value="肢體外傷"
+                              v-model="keyValue"
+                            />肢體外傷
+                          </li>
+                        </ul>
+                      </li>
+                      <div class="list-group-item">
+                        <p>受傷機轉</p>
+                        <ul class="list-group">
+                          <li class="list-group-item list-group-item-secondary">
+                            <input
+                              type="checkbox"
+                              value="因交通事故"
+                              v-model="keyValue"
+                            />因交通事故
+                          </li>
+                          <li class="list-group-item list-group-item-secondary">
+                            <input
+                              type="checkbox"
+                              value="非交通事故"
+                              v-model="keyValue"
+                            />非交通事故
+                          </li>
+                        </ul>
+                      </div>
+                      <div class="list-group-item">
+                        <p>事故類別(以傷病患為主)</p>
+                        <ul class="list-group">
+                          <li class="list-group-item list-group-item-secondary">
+                            <input
+                              type="checkbox"
+                              value="汽車"
+                              v-model="keyValue"
+                            />汽車
+                          </li>
+                          <li class="list-group-item list-group-item-secondary">
+                            <input
+                              type="checkbox"
+                              value="機車"
+                              v-model="keyValue"
+                            />機車
+                          </li>
+                          <li class="list-group-item list-group-item-secondary">
+                            <input
+                              type="checkbox"
+                              value="腳踏車"
+                              v-model="keyValue"
+                            />腳踏車
+                          </li>
+                          <li class="list-group-item list-group-item-secondary">
+                            <input
+                              type="checkbox"
+                              value="行人"
+                              v-model="keyValue"
+                            />行人
+                          </li>
+                          <li class="list-group-item list-group-item-secondary">
+                            <input
+                              type="checkbox"
+                              value="其他交通事故"
+                              v-model="keyValue"
+                            />其他
+                          </li>
+                        </ul>
+                      </div>
+                      <li class="list-group-item">
+                        <input
+                          type="checkbox"
+                          value="墜落傷"
+                          v-model="keyValue"
+                        />墜落傷
+                      </li>
+                      <li class="list-group-item">
+                        <input
+                          type="checkbox"
+                          value="肢體疼痛"
+                          v-model="keyValue"
+                        />肢體疼痛
+                      </li>
+                      <li class="list-group-item">
+                        <input
+                          type="checkbox"
+                          value="挫傷"
+                          v-model="keyValue"
+                        />挫傷
+                      </li>
+                      <li class="list-group-item">
+                        <input
+                          type="checkbox"
+                          value="血腫"
+                          v-model="keyValue"
+                        />血腫
+                      </li>
+                      <li class="list-group-item">
+                        <input
+                          type="checkbox"
+                          value="穿刺傷"
+                          v-model="keyValue"
+                        />穿刺傷
+                      </li>
+                      <li class="list-group-item">
+                        <input
+                          type="checkbox"
+                          value="燒燙傷"
+                          v-model="keyValue"
+                        />燒燙傷
+                      </li>
+                      <li class="list-group-item">
+                        <input
+                          type="checkbox"
+                          value="電擊傷"
+                          v-model="keyValue"
+                        />電擊傷
+                      </li>
+                      <li class="list-group-item">
+                        <input
+                          type="checkbox"
+                          value="生物咬螫傷"
+                          v-model="keyValue"
+                        />生物咬螫傷
+                      </li>
+                      <li class="list-group-item">
+                        <input
+                          type="checkbox"
+                          value="到院前心肺功能停止"
+                          v-model="keyValue"
+                        />到院前心肺功能停止
+                      </li>
+                      <li class="list-group-item">
+                        <input
+                          type="checkbox"
+                          value="其他創傷機轉"
+                          v-model="keyValue"
+                        />其他
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal"
+                  >
+                    關閉
+                  </button>
+                  <!-- <button type="button" class="btn btn-primary">儲存</button> -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <input
+          v-if="keyCatagory == 'who' || keyCatagory == 'otherContent'"
+          type="text"
+          class="form-control"
+          placeholder="關鍵字"
+          v-model="keyValue"
+        />
+        <select
+          class="form-select"
+          aria-label="Default select"
+          v-model="keyValue"
+          v-if="keyCatagory == 'unit'"
+        >
+          <option>選擇搜索項目</option>
+          <option value="蘆洲">蘆洲</option>
+          <option value="成功">成功</option>
+          <option value="三重">三重</option>
+          <option value="重陽">重陽</option>
+          <option value="慈福">慈福</option>
+          <option value="二重">二重</option>
+          <option value="龍源">龍源</option>
+          <option value="淡水">淡水</option>
+          <option value="竹圍">竹圍</option>
+          <option value="三芝">三芝</option>
+          <option value="滬尾">滬尾</option>
+        </select>
+        <div class="timePeriodSelector" v-if="keyCatagory === 'time'">
+          <input
+            type="datetime-local"
+            class="form-control"
+            id="inputPassword2"
+            placeholder="關鍵字"
+            v-model="keyValue"
+          />
+          <input
+            type="datetime-local"
+            class="form-control"
+            id="inputPassword2"
+            placeholder="關鍵字"
+            v-model="keyValue"
+          />
+        </div>
+      </div>
+      <div class="col-3">
+        <button
+          type="submit"
+          class="btn btn-danger mb-3"
+          @click.prevent="do_unit_search()"
+          v-if="keyCatagory == 'unit'"
+        >
+          搜索
+        </button>
+        <button
+          type="submit"
+          class="btn btn-primary mb-3"
+          @click.prevent="do_search()"
+          v-else
+        >
+          搜索
+        </button>
+      </div>
+    </form>
+    <hr />
+    <div class="row" v-if="searchList.length <= 0">
+      <div class="h1 text-center">未搜索到任何項目</div>
+    </div>
+    <div class="" v-else>
+      關鍵字: "{{ keyValue }}" ；共搜索到{{ searchList.length }}個結果
+    </div>
     <div
       class="card text-white bg-dark m-4 rounded-3"
       v-for="{
@@ -19,7 +461,7 @@
         tp,
         vital,
         hospital,
-      } in cases"
+      } in searchList"
       :key="id"
     >
       <div class="card-header transBg fw-bold fs-4">
@@ -454,10 +896,10 @@
           </thead>
           <tbody>
             <tr>
-              <td>{{ vital.Bp.Systolic }}/{{ vital.Bp.Diastolic }}</td>
-              <td>{{ vital.SpO2 }}</td>
-              <td>{{ vital.Hr }}</td>
-              <td>{{ vital.BodyTemp }}</td>
+              <td>{{ vital?.Bp.Systolic }}/{{ vital?.Bp.Diastolic }}</td>
+              <td>{{ vital?.SpO2 }}</td>
+              <td>{{ vital?.Hr }}</td>
+              <td>{{ vital?.BodyTemp }}</td>
             </tr>
           </tbody>
         </table>
@@ -499,33 +941,62 @@
     </div>
   </div>
 </template>
-
 <script>
-import { useLoadCases, deleteCase } from "@/firebase";
-// import { onMounted } from '@vue/runtime-core';
+import { loadUnitCases, loadWhoCases, loadOtherContentCases } from "@/firebase";
+import { reactive, ref } from "@vue/reactivity";
 
 export default {
   setup() {
-    const cases = useLoadCases();
-    const classAppend = (selectedParts, value) => {
+    const keyCatagory = ref("who");
+    const keyValue = ref("");
+    const searchList = reactive([]);
+
+    const do_search = async () => {
+      searchList.length = 0;
+      let temp;
+      switch (keyCatagory.value) {
+        case "who":
+          temp = await loadWhoCases(keyValue.value);
+          searchList.push(...temp);
+          break;
+        case "otherContent":
+          temp = await loadOtherContentCases(keyValue.value);
+          searchList.push(...temp);
+          break;
+      }
+    };
+
+    const do_unit_search = async () => {
+      searchList.length = 0;
+      let temp;
+      temp = await loadUnitCases(keyValue.value);
+      searchList.push(...temp);
+    };
+
+    const classAppend = (selectedParts = [], value) => {
       var partsArray = selectedParts.map((a) => a.whatPart);
       var target = value;
       var exsist = partsArray.includes(target);
-      // 回傳true or false
       return {
-        // "cls-1": exsist,
+        "cls-1": exsist,
         "cls-2": exsist,
       };
     };
-    return { cases, deleteCase, classAppend };
+
+    return {
+      do_unit_search,
+      keyCatagory,
+      keyValue,
+      do_search,
+      searchList,
+      classAppend,
+    };
   },
 };
 </script>
-
 <style>
-.caseList {
-  opacity: 0.8;
-  z-index: 3;
+.searchComponent {
+  min-height: 90vh;
 }
 .cls-1 {
   fill: #f8f9fa;
@@ -538,19 +1009,5 @@ export default {
   stroke: #f92626;
   stroke-miterlimit: 10;
   stroke-width: 3px;
-}
-.transBg {
-  background: linear-gradient(
-    110deg,
-    rgba(13, 110, 253, 0.5),
-    rgba(13, 110, 253, 0)
-  );
-}
-.transBg2 {
-  background: linear-gradient(
-    110deg,
-    rgba(108, 117, 125, 1),
-    rgba(108, 117, 125, 0)
-  );
 }
 </style>

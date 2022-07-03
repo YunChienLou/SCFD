@@ -7,7 +7,6 @@ import List from "../views/List.vue";
 import LoginStatus from "../views/LoginStatus.vue";
 import Edit from "../views/Edit.vue";
 
-
 const routes = [
   {
     path: "/",
@@ -45,20 +44,20 @@ const routes = [
     component: Edit,
   },
   {
-    path:"/admin",
-    name:"admin",
-    component:()=>import('../views/Admin.vue'),
-    children:[
+    path: "/admin",
+    name: "admin",
+    component: () => import("../views/Admin.vue"),
+    children: [
       {
-        path:"admin/memberList",
-        component:()=>import('../views/Admin.vue'),
+        path: "admin/memberList",
+        component: () => import("../views/MemberList.vue"),
       },
       {
-        path:"admin/editList",
-        component:()=>import('../views/Admin.vue'),
+        path: "admin/editList",
+        component: () => import("../views/EditMemberList.vue"),
       },
-    ]
-  }
+    ],
+  },
 ];
 
 const router = createRouter({

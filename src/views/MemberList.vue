@@ -1,8 +1,5 @@
 <template>
   <Status :uid="uid.uid" :userData="userData" />
-  <div class="home">
-    <SearchComponent />
-  </div>
   <Footer />
 </template>
 
@@ -10,7 +7,6 @@
 // @ is an alias to /src
 import Status from "../components/Status.vue";
 import Footer from "../components/Footer.vue";
-import SearchComponent from "../components/SearchComponent.vue";
 
 import { loadUser } from "@/firebase";
 import { reactive } from "@vue/reactivity";
@@ -22,7 +18,6 @@ export default {
   name: "Home",
   components: {
     Status,
-    SearchComponent,
     Footer,
   },
   setup() {
@@ -63,8 +58,5 @@ export default {
 <style scoped>
 .home {
   opacity: 0.8;
-}
-#Search {
-  z-index: 3 !important;
 }
 </style>

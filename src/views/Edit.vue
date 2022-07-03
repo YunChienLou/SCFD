@@ -1107,7 +1107,7 @@
 <script>
 import { reactive, computed, onMounted, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { getCase, updateCases ,loadFirefighters} from "@/firebase";
+import { getCase, updateCases, loadFirefighters } from "@/firebase";
 
 export default {
   setup() {

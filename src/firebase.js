@@ -89,6 +89,60 @@ export const loadCasesTarget = (subject, value) => {
   // 最後回傳收繳資料的矩陣
 };
 
+export const loadWhoCases = async (value) => {
+  var targetCases = [];
+  const snapshot = await dailyCases.orderBy("time", "desc").get();
+  snapshot.forEach((item) => {
+    if (item.data().who.indexOf(value) >= 0) {
+      targetCases.push(item.data());
+    }
+  });
+  return targetCases;
+};
+
+export const loadUnitCases = async (value) => {
+  var targetCases = [];
+  const snapshot = await dailyCases
+    .orderBy("time", "desc")
+    .where("unit", "==", value)
+    .get();
+  snapshot.forEach((item) => {
+    targetCases.push(item.data());
+  });
+  return targetCases;
+};
+
+export const loadOtherContentCases = async (value) => {
+  var targetCases = [];
+  // 記錄們(每個以物件為單位) 存放的陣列
+  const snapshot = await dailyCases.orderBy("time", "desc").get();
+  snapshot.forEach((item) => {
+    if (item.data().otherContent?.indexOf(value) >= 0) {
+      targetCases.push(item.data());
+    }
+  });
+  return targetCases;
+  // 最後回傳收繳資料的矩陣
+};
+
+export const loadSpecArrayCases = async (subject, value) => {
+  var targetCases = [];
+  // 記錄們(每個以物件為單位) 存放的陣列
+  const snapshot = await dailyCases
+    .where(subject, "array-contains", value)
+    .get()
+    .get();
+  snapshot.docs.forEach((item) => {
+    targetCases.push(item.data());
+    targetCases.sort(function (a, b) {
+      return new Date(b.time) - new Date(a.time);
+    });
+  });
+  console.log(targetCases);
+  return targetCases;
+  // 最後回傳收繳資料的矩陣
+};
+
 // 登入邏輯
 
 export const loginUser = (email, password) => {
