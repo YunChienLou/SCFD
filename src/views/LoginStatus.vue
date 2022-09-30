@@ -19,14 +19,18 @@
       <ul
         class="dropdown-menu dropdown-menu-dark"
         aria-labelledby="dropdownMenuButton1"
-        v-if="uid.uid == 'R3S5c6JQEWZzVDGqMXCGCV2bNrg1'"
       >
         <li>
           <button class="dropdown-item" href="#" @click="downloadExcel()">
             下載個人救護紀錄
           </button>
         </li>
-        <li>
+        <li
+          v-if="
+            uid.uid == 'R3S5c6JQEWZzVDGqMXCGCV2bNrg1' ||
+            uid.uid == '2ElnldsjlwXighUZq5PTgXzALtG2'
+          "
+        >
           <button
             class="dropdown-item"
             href="#"
@@ -36,7 +40,12 @@
             下載分隊當期救護紀錄
           </button>
         </li>
-        <li>
+        <li
+          v-if="
+            uid.uid == 'R3S5c6JQEWZzVDGqMXCGCV2bNrg1' ||
+            uid.uid == '2ElnldsjlwXighUZq5PTgXzALtG2'
+          "
+        >
           <router-link class="dropdown-item" to="/admin"
             >管理者頁面
           </router-link>

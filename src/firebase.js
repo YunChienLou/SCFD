@@ -67,7 +67,7 @@ export const deleteUser = async (id) => {
       console.log("User delete successfully", result);
     });
     // refresh route to origin page
-    // return router.go();
+    return router.go();
   }
 };
 
