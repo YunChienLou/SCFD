@@ -1,12 +1,12 @@
 <template>
-  <Status :uid="uid.uid" :userData="userData" />
-  <Footer />
+  <ManageUnit />
 </template>
 
 <script>
 // @ is an alias to /src
-import Status from "../components/Status.vue";
-import Footer from "../components/Footer.vue";
+// import Status from "../components/Status.vue";
+// import Footer from "../components/Footer.vue";
+import ManageUnit from "../components/ManageUnit.vue";
 
 import { loadUser } from "@/firebase";
 import { reactive } from "@vue/reactivity";
@@ -15,10 +15,9 @@ import firebase from "firebase/app";
 import router from "../router";
 
 export default {
-  name: "Home",
+  name: "MemberList",
   components: {
-    Status,
-    Footer,
+    ManageUnit,
   },
   setup() {
     const userData = reactive({

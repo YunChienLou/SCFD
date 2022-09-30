@@ -36,13 +36,6 @@
           <li class="nav-item p-3">
             <router-link
               class="text-decoration-none text-white fw-bold fs-4"
-              to="/dashboard"
-              >區域統計表</router-link
-            >
-          </li>
-          <li class="nav-item p-3">
-            <router-link
-              class="text-decoration-none text-white fw-bold fs-4"
               to="/search"
               >案件查詢</router-link
             >

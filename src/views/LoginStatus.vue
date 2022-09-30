@@ -6,39 +6,58 @@
     <h4>{{ userData.name }} {{ userData.rank }}</h4>
     <h3>{{ userData.emtlevel }}</h3>
     <h2 class="caseNumber">共累計 : {{ targetCases.length }} 件救護</h2>
+    <div class="dropdown mb-3">
+      <button
+        class="btn btn-success dropdown-toggle"
+        type="button"
+        id="dropdownMenuButton1"
+        data-bs-toggle="dropdown"
+        aria-expanded="false"
+      >
+        下載 / 編輯隊員資料
+      </button>
+      <ul
+        class="dropdown-menu dropdown-menu-dark"
+        aria-labelledby="dropdownMenuButton1"
+        v-if="uid.uid == 'R3S5c6JQEWZzVDGqMXCGCV2bNrg1'"
+      >
+        <li>
+          <button class="dropdown-item" href="#" @click="downloadExcel()">
+            下載個人救護紀錄
+          </button>
+        </li>
+        <li>
+          <button
+            class="dropdown-item"
+            href="#"
+            :disabled="!startTime || !endTime"
+            @click="excelForUnit()"
+          >
+            下載分隊當期救護紀錄
+          </button>
+        </li>
+        <li>
+          <router-link class="dropdown-item" to="/admin"
+            >管理者頁面
+          </router-link>
+        </li>
+      </ul>
+    </div>
     <button class="btn btn-danger mb-2 me-2" @click.prevent="logoutUser">
       登出
-    </button>
-    <button
-      v-if="uid.uid == 'R3S5c6JQEWZzVDGqMXCGCV2bNrg1'"
-      class="btn btn-primary mb-2 me-2"
-      @click="downloadExcel()"
-    >
-      下載當期救護紀錄
-    </button>
-    <button
-      v-if="uid.uid == 'R3S5c6JQEWZzVDGqMXCGCV2bNrg1'"
-      class="btn btn-success mb-2"
-    >
-      編輯分隊名單資料
     </button>
     <div class="row m-2">
       <label class="col-4 form-label">開始時間</label>
       <input
         class="col form-control"
-        type="datetime-local"
+        type="date"
         v-model="startTime"
         required
       />
     </div>
     <div class="row m-2">
       <label class="col-4 form-label">結束時間</label>
-      <input
-        class="col form-control"
-        type="datetime-local"
-        v-model="endTime"
-        required
-      />
+      <input class="col form-control" type="date" v-model="endTime" required />
     </div>
   </div>
 
@@ -485,14 +504,6 @@
         <i class="bi bi-info-circle"></i> 生命徵象 :
       </h5>
       <table class="table text-reset">
-        <!-- <thead>
-          <tr>
-            <th scope="col">血壓</th>
-            <th scope="col">血氧</th>
-            <th scope="col">心律</th>
-            <th scope="col">體溫</th>
-          </tr>
-        </thead> -->
         <tbody>
           <tr v-for="(name, value, index) in vital" :key="index">
             <td>{{ value }} {{ name }}</td>
@@ -541,12 +552,14 @@
 import Footer from "../components/Footer.vue";
 import Status from "../components/Status.vue";
 
-import { loadUser, logoutUser, loadCasesTarget, deleteCase } from "@/firebase";
+import {
+  loadUser,
+  logoutUser,
+  loadCasesTarget,
+  deleteCase,
+  loadUnitCasesByTimePeriod,
+} from "@/firebase";
 import { JSONToExcelConvertor } from "../util/downlaodCase";
-// import {
-//   getSpecificCase
-//  } from "../util/downlaodCase";
-
 import { reactive, ref } from "@vue/reactivity";
 
 import { watch } from "@vue/runtime-core";
@@ -569,10 +582,10 @@ export default {
     });
     const uid = reactive({ uid: "" });
     const route = useRoute();
-    const targetCases = loadCasesTarget("uid", route.params.uid);
     const json_data = ref();
     const endTime = ref();
     const startTime = ref();
+    const targetCases = loadCasesTarget("uid", route.params.uid);
 
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
@@ -587,10 +600,18 @@ export default {
     const downloadExcel = () => {
       JSONToExcelConvertor(
         targetCases,
-        "FileName",
-        "title",
-        "",
-        10);
+        userData.unit + "分隊_" + userData.name + "的救護紀錄"
+      );
+    };
+    const excelForUnit = async () => {
+      let unitCasesTimePeriod = await loadUnitCasesByTimePeriod(
+        startTime.value,
+        endTime.value
+      );
+      JSONToExcelConvertor(
+        unitCasesTimePeriod,
+        startTime.value + "至" + endTime.value + "救護紀錄"
+      );
     };
 
     const forUserData = async () => {
@@ -601,10 +622,7 @@ export default {
       userData.unit = user.unit;
     };
 
-    const btnSpecificCase = async () => {
-      console.log(targetCases);
-      console.log("執行抓取", btnSpecificCase);
-    };
+    const btnSpecificCase = async () => {};
 
     watch(uid, forUserData);
 
@@ -630,6 +648,7 @@ export default {
       endTime,
       startTime,
       downloadExcel,
+      excelForUnit,
     };
   },
 };

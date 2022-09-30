@@ -1,11 +1,10 @@
 import firebase from "firebase/app";
-import "firebase/firestore";
+// import "firebase/firestore";
 import "firebase/auth";
 import { ref, onUnmounted } from "vue";
 import router from "./router";
-
-// var firebase = require("firebase/app");
 require("firebase/firestore");
+require("firebase/functions");
 
 const config = {
   apiKey: "AIzaSyDuwKHzRSvtY6sLJ5QIn6YeQgnnlChXx20",
@@ -16,11 +15,13 @@ const config = {
   messagingSenderId: "642588500666",
   appId: "1:642588500666:web:5d7893ea746847bde31883",
 };
+
 const firebaseApp = firebase.initializeApp(config);
+const functions = firebaseApp.functions("asia-east1");
 const db = firebaseApp.firestore();
 const dailyCases = db.collection("cases");
+const users = db.collection("users");
 const orderCases = dailyCases.orderBy("time", "desc").limit(15);
-
 const auth = firebase.auth();
 
 // add doc to firebase collection
@@ -34,18 +35,39 @@ export const getCase = async (id) => {
   return Case.exists ? Case.data() : null;
 };
 
+export const getUser = async (id) => {
+  const User = await users.doc(id).get();
+  return User.exists ? User.data() : null;
+};
+
 export const updateCases = (id, Case) => {
   return dailyCases.doc(id).update(Case);
+};
+
+export const updateUser = (id, User) => {
+  return users.doc(id).update(User);
 };
 
 export const deleteCase = (id) => {
   var deleteBoolean = confirm("確認刪除?");
   if (deleteBoolean) {
     alert("成功刪除");
-    console.log("刪除" + id);
     dailyCases.doc(id).delete();
     // refresh route to origin page
     return router.go();
+  }
+};
+
+export const deleteUser = async (id) => {
+  var deleteBoolean = confirm("確認刪除?");
+  var deleteUser2 = functions.httpsCallable("deleteUser");
+  if (deleteBoolean) {
+    users.doc(id).delete();
+    await deleteUser2({ uid: id }).then((result) => {
+      console.log("User delete successfully", result);
+    });
+    // refresh route to origin page
+    // return router.go();
   }
 };
 
@@ -55,10 +77,17 @@ export const useLoadCases = () => {
   const close = orderCases.onSnapshot((snapshot) => {
     cases.value = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
   });
-  console.log("載入病例");
   onUnmounted(close);
+  return cases;
+};
 
-  console.log(cases);
+//load whole collection in
+export const useLoadUsers = () => {
+  const cases = ref([]);
+  const close = users.onSnapshot((snapshot) => {
+    cases.value = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  });
+  onUnmounted(close);
   return cases;
 };
 
@@ -70,7 +99,25 @@ export const loadCasesTarget = (subject, value) => {
     .where(subject, "==", value)
     .onSnapshot((snapshot) => {
       snapshot.forEach((doc) => {
-        targetCases.push({ id: doc.id, ...doc.data() });
+        // targetCases.push({ id: doc.id, ...doc.data() });
+        targetCases.push({
+          id: doc.id,
+          time: doc.data().time,
+          unit: doc.data().unit,
+          emtlevel: doc.data().emtlevel,
+          who: doc.data().who,
+          uid: doc.data().uid,
+          rank: doc.data().rank,
+          patient: doc.data().patient,
+          onScene: doc.data().onScene,
+          treatment: doc.data().treatment,
+          selectedParts: doc.data().selectedParts,
+          vital: doc.data().vital,
+          tp: doc.data().tp,
+          location: doc.data().location,
+          otherContent: doc.data().otherContent,
+          hospital: doc.data().hospital,
+        });
       });
       // 連上後端資料庫
       // 由時間排序 由先排到後
@@ -83,8 +130,10 @@ export const loadCasesTarget = (subject, value) => {
       // targetCases(存放的陣列)
     });
   //delete close when Unmounted
-  console.log("載入結果符合 " + subject + " = " + value + " 的病例");
-  console.log(targetCases);
+  console.log(
+    "載入結果符合 " + subject + " = " + value + " 的病例",
+    targetCases
+  );
   return targetCases;
   // 最後回傳收繳資料的矩陣
 };
@@ -108,6 +157,37 @@ export const loadUnitCases = async (value) => {
     .get();
   snapshot.forEach((item) => {
     targetCases.push(item.data());
+  });
+  return targetCases;
+};
+
+export const loadUnitCasesByTimePeriod = async (start, end) => {
+  var targetCases = [];
+  const snapshot = await dailyCases
+    .orderBy("time", "desc")
+    .where("time", ">=", start)
+    .where("time", "<", end)
+    .get();
+
+  snapshot.forEach((doc) => {
+    targetCases.push({
+      id: doc.id,
+      time: doc.data().time,
+      unit: doc.data().unit,
+      emtlevel: doc.data().emtlevel,
+      who: doc.data().who,
+      uid: doc.data().uid,
+      rank: doc.data().rank,
+      patient: doc.data().patient,
+      onScene: doc.data().onScene,
+      treatment: doc.data().treatment,
+      selectedParts: doc.data().selectedParts,
+      vital: doc.data().vital,
+      tp: doc.data().tp,
+      location: doc.data().location,
+      otherContent: doc.data().otherContent,
+      hospital: doc.data().hospital,
+    });
   });
   return targetCases;
 };
@@ -159,6 +239,7 @@ export const loginUser = (email, password) => {
       console.log(err.message);
     });
 };
+
 // 登出邏輯
 export const logoutUser = () => {
   auth.signOut().then(() => {
@@ -166,6 +247,49 @@ export const logoutUser = () => {
   });
   router.push("/");
 };
+
+// 創建帳號
+var secondaryApp = firebase.initializeApp(config, "Secondary");
+export const createUser = async (User) => {
+  let data = {
+    name: User.name,
+    emtlevel: User.emtlevel,
+    rank: User.rank,
+    unit: "三重",
+  };
+  let uid;
+  await secondaryApp
+    .auth()
+    .createUserWithEmailAndPassword(User.email, User.passwords)
+    .then((user) => {
+      uid = user.user.uid;
+      console.log("Successfully create", user, uid);
+      secondaryApp.auth().signOut();
+    })
+    .catch(() => {
+      console.log("fail create");
+    });
+  users.doc(uid).set(data);
+};
+
+//忘記密碼
+export const forgetPasswords = (email) => {
+  firebase
+    .auth()
+    .sendPasswordResetEmail(email)
+    .then(() => {
+      // Password reset email sent!
+      // ..
+      console.log("Password reset email sent!");
+    })
+    .catch((error) => {
+      var errorCode = error.code;
+      var errorMessage = error.message;
+      console.log("errorCode : ", errorCode, "errorMessage :", errorMessage);
+      // ..
+    });
+};
+
 // 載入用戶資料
 export const loadUser = async (uid) => {
   var output = await db
@@ -181,15 +305,6 @@ export const loadUser = async (uid) => {
 };
 //  警消名單載入
 export const loadFirefighters = () => {
-  // var output = await db
-  //   .collection("firefighters")
-  //   .get()
-  //   .then((doc) => {
-  //     console.log("firefighters",doc.docs)
-  //     return doc;
-  //   });
-  // console.log(output);
-  // return output;
   const firefighters = ref([]);
   const close = db.collection("firefighters").onSnapshot((snapshot) => {
     firefighters.value = snapshot.docs.map((doc) => ({
@@ -197,10 +312,7 @@ export const loadFirefighters = () => {
       ...doc.data(),
     }));
   });
-  console.log("載入警消名單");
   onUnmounted(close);
-
-  console.log(firefighters);
   return firefighters;
 };
 

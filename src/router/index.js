@@ -49,13 +49,13 @@ const routes = [
     component: () => import("../views/Admin.vue"),
     children: [
       {
-        path: "admin/memberList",
-        component: () => import("../views/MemberList.vue"),
+        path: "memberList",
+        component: () => import("../components/ManageUnit.vue"),
       },
-      {
-        path: "admin/editList",
-        component: () => import("../views/EditMemberList.vue"),
-      },
+      // {
+      //   path: "admin/editList",
+      //   component: () => import("../views/EditMemberList.vue"),
+      // },
     ],
   },
 ];

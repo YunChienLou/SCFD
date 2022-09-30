@@ -1,8 +1,14 @@
-<template class="">
+<template>
   <div class="bg-dark text-white mx-0 overflow-hidden">
     <div class="bg-filter" :data-text="uid"></div>
     <!-- 浮水印 -->
-    <router-view />
+    <div class="container">
+      <div class="row d-flex justify-content-center">
+        <div class="col-lg-6">
+          <router-view />
+        </div>
+      </div>
+    </div>
     <!-- 內容 -->
   </div>
 </template>

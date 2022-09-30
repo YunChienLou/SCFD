@@ -1,6 +1,6 @@
 <template>
   <div class="my-5 caseCreate">
-    <form @submit.prevent="onSubmit" class="">
+    <form @submit.prevent="onSubmit">
       <div
         id="carouselExampleIndicators"
         class="carousel slide"
@@ -328,7 +328,7 @@
         </div>
       </div>
       <div class="row m-2 mb-3">
-        <div class="col">
+        <div class="col-5">
           <label class="form-label col-2">B/P</label>
 
           <div class="row">
@@ -1171,8 +1171,8 @@ export default {
       } else {
         alert("錯誤!!! 該部位需輸入描述");
       }
-      console.log(selectedParts);
     };
+
     const onSubmit = async () => {
       await createCase({ ...form, selectedParts });
       // v-model傳進資料後，展開物件，丟進createCase()函試
@@ -1192,7 +1192,6 @@ export default {
       form.vital.BodyTemp = 35;
       // 輸入框歸零 從第0項 刪除到第(陣列數量)項
       selectedParts.splice(0, selectedParts.length);
-      console.log(selectedParts);
       // 跳出成功通知
     };
     // 更新部位暫時選擇之結果

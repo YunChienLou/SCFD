@@ -3,7 +3,7 @@
     <form class="mt-5 row g-3">
       <div class="col-4">
         <select
-          class="form-select"
+          class="form-select dropdown-menu-dark"
           aria-label="Default select"
           v-model="keyCatagory"
         >
@@ -11,7 +11,7 @@
           <option value="who">姓名</option>
           <option value="time">時間</option>
           <option value="unit">單位</option>
-          <option value="onScene">現場狀況</option>
+          <!-- <option value="onScene">現場狀況</option> -->
           <option value="otherContent">案件補述</option>
         </select>
       </div>
@@ -382,7 +382,7 @@
           v-model="keyValue"
         />
         <select
-          class="form-select"
+          class="form-select dropdown-menu-dark"
           aria-label="Default select"
           v-model="keyValue"
           v-if="keyCatagory == 'unit'"
@@ -402,18 +402,16 @@
         </select>
         <div class="timePeriodSelector" v-if="keyCatagory === 'time'">
           <input
-            type="datetime-local"
+            type="date"
             class="form-control"
             id="inputPassword2"
-            placeholder="關鍵字"
-            v-model="keyValue"
+            v-model="startTime"
           />
           <input
-            type="datetime-local"
+            type="date"
             class="form-control"
             id="inputPassword2"
-            placeholder="關鍵字"
-            v-model="keyValue"
+            v-model="endTime"
           />
         </div>
       </div>
@@ -428,20 +426,33 @@
         </button>
         <button
           type="submit"
+          class="btn btn-danger mb-3"
+          @click.prevent="do_time_period_search()"
+          v-if="keyCatagory == 'time'"
+        >
+          搜索
+        </button>
+        <button
+          type="submit"
           class="btn btn-primary mb-3"
           @click.prevent="do_search()"
-          v-else
+          v-if="keyCatagory == 'who' || keyCatagory == 'otherContent'"
         >
           搜索
         </button>
       </div>
     </form>
     <hr />
-    <div class="row" v-if="searchList.length <= 0">
+    <div class="row" v-if="searchList.length == 0">
       <div class="h1 text-center">未搜索到任何項目</div>
     </div>
+    <div class="row" v-if="searchList.length >= 0 && keyCatagory == 'time'">
+      時間區段: "{{ startTime }} ~ {{ endTime }}" ；共搜索到{{
+        searchList.length
+      }}個結果
+    </div>
     <div class="" v-else>
-      關鍵字: "{{ keyValue }}" ；共搜索到{{ searchList.length }}個結果
+      關鍵字: "{{ keyValueDisplay }}" ；共搜索到{{ searchList.length }}個結果
     </div>
     <div
       class="card text-white bg-dark m-4 rounded-3"
@@ -931,25 +942,28 @@
           後送醫院
         </h5>
         <p class="card-text">{{ hospital }}</p>
-        <!-- <div class="d-flex justify-content-between">
-          <router-link :to="`/edit/${id}`">
-            <button class="btn btn-light">修改</button>
-          </router-link>
-          <button class="btn btn-danger" @click="deleteCase(id)">刪除</button>
-        </div> -->
       </div>
     </div>
   </div>
 </template>
 <script>
-import { loadUnitCases, loadWhoCases, loadOtherContentCases } from "@/firebase";
+import {
+  loadUnitCases,
+  loadWhoCases,
+  loadOtherContentCases,
+  loadUnitCasesByTimePeriod,
+} from "@/firebase";
 import { reactive, ref } from "@vue/reactivity";
+import { watch } from "@vue/runtime-core";
 
 export default {
   setup() {
     const keyCatagory = ref("who");
     const keyValue = ref("");
+    const keyValueDisplay = ref("");
     const searchList = reactive([]);
+    const startTime = ref();
+    const endTime = ref();
 
     const do_search = async () => {
       searchList.length = 0;
@@ -964,15 +978,28 @@ export default {
           searchList.push(...temp);
           break;
       }
+      keyValueDisplay.value = keyValue.value;
     };
 
     const do_unit_search = async () => {
       searchList.length = 0;
       let temp;
       temp = await loadUnitCases(keyValue.value);
+      keyValueDisplay.value = keyValue.value;
       searchList.push(...temp);
     };
 
+    const do_time_period_search = async () => {
+      searchList.length = 0;
+      let temp;
+      keyValueDisplay.value = startTime.value + " ~ " + endTime.value;
+      temp = await loadUnitCasesByTimePeriod(startTime.value, endTime.value);
+      searchList.push(...temp);
+    };
+
+    watch(keyCatagory, () => {
+      keyValueDisplay.value = "";
+    });
     const classAppend = (selectedParts = [], value) => {
       var partsArray = selectedParts.map((a) => a.whatPart);
       var target = value;
@@ -987,9 +1014,13 @@ export default {
       do_unit_search,
       keyCatagory,
       keyValue,
+      startTime,
+      endTime,
+      keyValueDisplay,
       do_search,
       searchList,
       classAppend,
+      do_time_period_search,
     };
   },
 };

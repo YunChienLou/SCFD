@@ -436,7 +436,6 @@
               >
                 {{ parts.whatPart }}<br />{{ parts.whatHappen }}
               </li>
-              <!-- <li class="list-group-item"></li> -->
             </div>
           </div>
         </div>
@@ -489,12 +488,6 @@
           後送醫院
         </h5>
         <p class="card-text">{{ hospital }}</p>
-        <!-- <div class="d-flex justify-content-between">
-          <router-link :to="`/edit/${id}`">
-            <button class="btn btn-light">修改</button>
-          </router-link>
-          <button class="btn btn-danger" @click="deleteCase(id)">刪除</button>
-        </div> -->
       </div>
     </div>
   </div>
@@ -502,7 +495,6 @@
 
 <script>
 import { useLoadCases, deleteCase } from "@/firebase";
-// import { onMounted } from '@vue/runtime-core';
 
 export default {
   setup() {

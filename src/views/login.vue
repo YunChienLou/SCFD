@@ -48,9 +48,7 @@
             <div class="form-group d-flex align-items-center">
               <div class="w-100">
                 <label class="checkbox-wrap checkbox-primary mb-0"
-                  >儲存密碼
-                  <input type="checkbox" checked />
-                  <span class="checkmark"></span>
+                  >忘記密碼?
                 </label>
               </div>
               <div class="w-100 d-flex justify-content-end">
@@ -73,7 +71,7 @@
 
 <script>
 import Footer from "../components/Footer.vue";
-import { loginUser } from "@/firebase";
+import { loginUser, forgetPasswords } from "@/firebase";
 
 export default {
   name: "login",
@@ -83,7 +81,9 @@ export default {
   setup() {
     const loginEmail = "";
     const loginPassword = "";
-
+    const forgetPassword = () => {
+      forgetPasswords(loginEmail);
+    };
     // const onSubmit = async ()=>{
     //   await loginUser(loginEmail,loginPassword)
     // }
@@ -92,6 +92,7 @@ export default {
       loginEmail,
       loginPassword,
       loginUser,
+      forgetPassword,
     };
   },
 };

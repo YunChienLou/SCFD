@@ -1,12 +1,24 @@
-import XLSX from "xlsx";
+import * as XLSX from "xlsx";
 // JSONData爲導出的json數據,fileName爲導出的文件名,title爲導出的第一行標題,filter爲過濾字段,rowLength爲標題長度
-export function JSONToExcelConvertor(
-  JSONData,
-  FileName,
-  title,
-  filter,
-  rowlength
-) {
+export function JSONToExcelConvertor(JSONData, FileName) {
+  const title = [
+    "案件流水號",
+    "時間",
+    "分隊",
+    "emt級別",
+    "姓名",
+    "使用者ID",
+    "級職",
+    "患者人數",
+    "現場狀況",
+    "處置項目",
+    "患部",
+    "生命徵象",
+    "執行警消",
+    "報案地址",
+    "案情補述",
+    "後送醫院",
+  ];
   if (!JSONData) {
     return;
   }
@@ -19,8 +31,8 @@ export function JSONToExcelConvertor(
   var row = "<tr>";
   if (title) {
     // 使用標題項
-    for (let index = 0; index < title.length; index++) {
-        row += "<th align='center'>" + title[i] + "</th>"; // 將標題新增到row中
+    for (let i = 0; i < title.length; i++) {
+      row += "<th align='center'>" + title[i] + "</th>"; // 將標題新增到row中
     }
   } else {
     // 不使用標題項
@@ -28,56 +40,26 @@ export function JSONToExcelConvertor(
       row += "<th align='center'>" + i + "</th>";
     }
   }
-
   excel += row + "</tr>";
+  row = "";
   // 設置數據
-  for (let index1 = 0; index < arrData.length; index1++) {
-    if (index1 === arrData.length - 1) {
-      row = "<tr>";
-    } else {
-     row = "";
-    }
-    for (var index in arrData[i]) {
-      // 判斷是否有過濾行
-      if (filter) {
-        var value = "";
-        if (filter.indexOf(index) === -1) {
-          // 過濾掉符合關鍵字的數據
-          for (var k = 0; k < arrData.length / rowlength; k++) {
-            // 循環到一個標題長度換一次行,否則數組會在一行
-            if (i === rowlength - 1) {
-              for (var j = k * rowlength; j < (k + 1) * rowlength; j++) {
-                if (
-                  arrData[j].type === "radio-group" ||
-                  arrData[j].type === "checkbox-group" ||
-                  arrData[j].type === "select"
-                ) {
-                  // 如果爲這三種格式,則他們的值儲存在values中
-                  var groupLenght = arrData[j].values.length;
-                  for (var q = 0; q < groupLenght; q++) {
-                    if (arrData[j].values[q].selected === true) {
-                      // 獲取被選中的值
-                      value = value + arrData[j].values[q].label;
-                    }
-                  }
-                } else {
-                  value = arrData[j].value == null ? "" : arrData[j].value;
-                }
-                row += `<td>` + value + "</td>";
-                value = "";
-              }
-            }
-            excel += row + "</tr>";
-            row = "";
-          }
-        }
+  for (let index1 = 0; index1 < arrData.length; index1++) {
+    // row = "<tr>"
+    for (var index in arrData[index1]) {
+      let value1;
+      if (index == "vital" || index == "selectedParts") {
+        value1 =
+          arrData[index1][index] == null
+            ? ""
+            : JSON.stringify(arrData[index1][index]);
       } else {
-        // 不過濾的邏輯
-        // var value = arrData[i][index] == null ? '' : arrData[i][index]
-        // // eslint-disable-next-line quotes
-        // row += "<td align='center'>" + value + '</td>'
+        value1 = arrData[index1][index] == null ? "" : arrData[index1][index];
       }
+      // eslint-disable-next-line quotes
+      row += "<td align='center'>" + value1 + "</td>";
     }
+    excel += "<tr>" + row + "</tr>";
+    row = "";
   }
 
   excel += "</table>";
