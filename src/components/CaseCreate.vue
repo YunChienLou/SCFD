@@ -328,9 +328,8 @@
         </div>
       </div>
       <div class="row m-2 mb-3">
-        <div class="col-5">
+        <div class="col-8">
           <label class="form-label col-2">B/P</label>
-
           <div class="row">
             <div class="col-6 pe-0">
               <input
@@ -356,12 +355,15 @@
             v-model="form.vital.SpO2"
           />
         </div>
+      </div>
+      <div class="row m-2 mb-3">
         <div class="col">
           <label class="form-label col-2">H/R</label>
           <input
             class="col form-control"
             type="number"
             v-model="form.vital.Hr"
+            required
           />
         </div>
         <div class="col">
@@ -1138,12 +1140,12 @@ export default {
       emtlevel: userData.emtlevel,
       vital: {
         Bp: {
-          Systolic: 0,
-          Diastolic: 0,
+          Systolic: Number,
+          Diastolic: Number,
         },
-        Hr: 0,
-        SpO2: 0,
-        BodyTemp: 35,
+        Hr: Number,
+        SpO2: Number,
+        BodyTemp: Number,
       },
       hospital: "",
     });
@@ -1184,12 +1186,12 @@ export default {
       form.location = "";
       form.tp = "";
       form.otherContent = "";
-      form.vital.Bp.Systolic = 0;
-      form.vital.Bp.Diastolic = 0;
-      form.vital.Hr = 0;
-      form.vital.SpO2 = 0;
+      form.vital.Bp.Systolic = Number;
+      form.vital.Bp.Diastolic = Number;
+      form.vital.Hr = Number;
+      form.vital.SpO2 = Number;
       form.hospital = "";
-      form.vital.BodyTemp = 35;
+      form.vital.BodyTemp = Number;
       // 輸入框歸零 從第0項 刪除到第(陣列數量)項
       selectedParts.splice(0, selectedParts.length);
       // 跳出成功通知

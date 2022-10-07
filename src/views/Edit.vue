@@ -1,7 +1,7 @@
 <template>
   <div class="edit">
     <h2 class="text-center p-3 bg-danger">修改頁面</h2>
-    <form @submit.prevent="update">
+    <form @submit.prevent="update" class="mb-5">
       <div
         id="carouselExampleIndicators"
         class="carousel slide"
@@ -357,6 +357,8 @@
             required
           />
         </div>
+      </div>
+      <div class="row m-2 mb-3">
         <div class="col">
           <label class="form-label col-2">H/R</label>
           <input
@@ -1097,7 +1099,7 @@
           <option>拒送</option>
         </select>
       </div>
-      <div class="d-grid mt-4 gap-2">
+      <div class="d-grid my-4 mb-5">
         <button class="btn btn-primary mx-2" type="submit">送出</button>
       </div>
     </form>

@@ -51,8 +51,13 @@ export const updateUser = (id, User) => {
 export const deleteCase = (id) => {
   var deleteBoolean = confirm("確認刪除?");
   if (deleteBoolean) {
+    dailyCases
+      .doc(id)
+      .delete()
+      .then((msg) => {
+        console.log(msg);
+      });
     alert("成功刪除");
-    dailyCases.doc(id).delete();
     // refresh route to origin page
     return router.go();
   }
