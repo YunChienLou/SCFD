@@ -300,7 +300,10 @@
       <div class="text-center">
         <label class="">受傷部位</label>
         <div class="row m-2">
-          <table class="table table-dark table-striped">
+          <table
+            class="table table-dark table-striped"
+            v-if="selectedParts.length != 0"
+          >
             <thead>
               <tr>
                 <th>受傷部位</th>
@@ -320,7 +323,13 @@
                   {{ whatHappen }}
                 </td>
                 <td>
-                  <button @click="deleBodyPart(id)" type="button">刪除</button>
+                  <button
+                    class="btn btn-danger"
+                    @click="deleBodyPart(id)"
+                    type="button"
+                  >
+                    刪除
+                  </button>
                 </td>
               </tr>
             </tbody>
@@ -336,6 +345,7 @@
                 class="col form-control"
                 type="number"
                 v-model="form.vital.Bp.Systolic"
+                required
               />
             </div>
             <div class="col-6 pe-0">
@@ -343,6 +353,7 @@
                 class="col form-control"
                 type="number"
                 v-model="form.vital.Bp.Diastolic"
+                required
               />
             </div>
           </div>
@@ -353,6 +364,7 @@
             class="col form-control"
             type="number"
             v-model="form.vital.SpO2"
+            required
           />
         </div>
       </div>
@@ -373,6 +385,7 @@
             type="number"
             step="0.1"
             v-model="form.vital.BodyTemp"
+            required
           />
         </div>
       </div>
@@ -390,7 +403,7 @@
 
         <!-- Modal -->
         <div
-          class="modal fade text-dark"
+          class="modal fade text-dark h-50 mt-5"
           id="exampleModal"
           tabindex="-1"
           aria-labelledby="exampleModalLabel"
@@ -699,9 +712,8 @@
 
         <!-- Modal -->
         <div
-          class="modal fade text-dark"
+          class="modal fade text-dark h-50 mt-5"
           id="SceneModal"
-          tabindex="-1"
           aria-labelledby="exampleModalLabel"
           aria-hidden="true"
         >
@@ -891,7 +903,7 @@
                         </li>
                       </ul>
                     </li>
-                    <div class="list-group-item">
+                    <li class="list-group-item">
                       <p>受傷機轉</p>
                       <ul class="list-group">
                         <li class="list-group-item list-group-item-secondary">
@@ -909,8 +921,8 @@
                           />非交通事故
                         </li>
                       </ul>
-                    </div>
-                    <div class="list-group-item">
+                    </li>
+                    <li class="list-group-item">
                       <p>事故類別(以傷病患為主)</p>
                       <ul class="list-group">
                         <li class="list-group-item list-group-item-secondary">
@@ -949,7 +961,7 @@
                           />其他
                         </li>
                       </ul>
-                    </div>
+                    </li>
                     <li class="list-group-item">
                       <input
                         type="checkbox"
@@ -1051,14 +1063,36 @@
         <!-- <input class="col form-control" type="text" v-model="form.who" /> -->
         <p class="col form-control mb-0" type="text">{{ userData.name }}</p>
       </div>
-      <div class="row m-2">
+      <div class="row m-2"></div>
+      <!-- <div class="row m-2">
         <label class="col-4 form-label">執行警消</label>
-        <select class="form-select col" v-model="form.tp" required>
-          <option selected>點擊展開警消名單</option>
-          <option v-for="fireMan in firefighters" :key="fireMan.id">
+        <select class="col form-select" v-model="form.tp" required>
+          <option class="fs-3" v-for="fireMan in firefighters" :key="fireMan.id">
             {{ fireMan.name }}
           </option>
         </select>
+      </div> -->
+
+      <div class="row m-2 overflow-auto">
+        <div class="col-4">
+          <label class="">執行警消</label>
+          <hr />
+          <span class="badge bg-primary m-1" v-for="tp in form.tp" :key="tp">{{
+            tp
+          }}</span>
+        </div>
+
+        <ul class="col p-0 h-25 firefighter-list">
+          <li
+            class="list-group-item text-center"
+            v-for="fireMan in firefighters"
+            :key="fireMan.id"
+          >
+            <input type="checkbox" :value="fireMan.name" v-model="form.tp" />{{
+              fireMan.name
+            }}
+          </li>
+        </ul>
       </div>
       <div class="row m-2">
         <label class="col-4 form-label">載送人數</label>
@@ -1097,6 +1131,7 @@
           <option>榮總</option>
           <option>雙和</option>
           <option>亞東</option>
+          <option>部立台北</option>
           <option>其他醫院</option>
           <option>拒送</option>
         </select>
@@ -1109,29 +1144,35 @@
 </template>
 
 <script>
-import { createCase, loadFirefighters } from "@/firebase";
-import { reactive, toRef, toRefs, watch } from "vue";
-
+import { createCase, loadFirefightersByUnit } from "@/firebase";
+import { reactive, toRef, toRefs, watch, ref } from "vue";
+import { unitNameEnum } from "@/util/Enum";
 export default {
-  props: {
-    uid: Object,
-    userData: Object,
-  },
+  props: ["uid", "userData"],
   setup(props) {
     const userData = toRefs(props.userData);
     const userId = toRef(props.uid, "uid");
-    console.log(userId);
-    console.log(userData.name);
-    const firefighters = loadFirefighters();
+    const firefighters = ref([]);
+    // const unitChinese = ref();
+
+    const afterGetUnit = () => {
+      let unit = props.userData.unit;
+      let enumValue = unitNameEnum[unit];
+      loadFirefightersByUnit(enumValue).then((list) => {
+        firefighters.value = list;
+      });
+    };
+
     var countId = 0;
     var selectedParts = reactive([]);
+
     const form = reactive({
       treatment: [],
       onScene: [],
       time: "",
       patient: "",
       location: "",
-      tp: "",
+      tp: [],
       uid: userId,
       otherContent: "",
       who: userData.name,
@@ -1149,6 +1190,7 @@ export default {
       },
       hospital: "",
     });
+
     //先創造一個空物件，等待v-model傳進資料
     const deleBodyPart = (id) => {
       // find index of parts wanna delete
@@ -1178,7 +1220,6 @@ export default {
     const onSubmit = async () => {
       await createCase({ ...form, selectedParts });
       // v-model傳進資料後，展開物件，丟進createCase()函試
-      alert("成功上傳");
       form.treatment = [];
       form.onScene = [];
       form.time = "";
@@ -1213,6 +1254,8 @@ export default {
     };
     // 監測selectedParts是否變動 變動執行更新
     watch(selectedParts, updateParts);
+    watch(props.userData, afterGetUnit);
+
     return {
       form,
       onSubmit,
@@ -1244,5 +1287,42 @@ export default {
 }
 .modal-backdrop {
   z-index: -1;
+}
+.firefighter-list {
+  max-height: 200px;
+  margin-bottom: 10px;
+  overflow: scroll;
+  -webkit-overflow-scrolling: touch;
+}
+.form-control {
+  background-color: #212529;
+  color: #ffffff;
+}
+.list-group-item {
+  background: #212529;
+  border: #ffffff 1px solid;
+  border-radius: 5px;
+  color: #ffffff;
+}
+.form-select {
+  background: #212529;
+  color: #ffffff;
+}
+div.modal-body > div.list-group > ul > li.list-group-item {
+  background-color: #eeeeee;
+  color: #232323;
+}
+div.modal-body > div.list-group > ul > li.list-group-item {
+  background-color: #eeeeee;
+  color: #232323;
+}
+div.modal-body
+  > div.list-group
+  > ul
+  > li.list-group-item
+  > ul.list-group
+  > li.list-group-item {
+  background-color: #eeeeee;
+  color: #232323;
 }
 </style>

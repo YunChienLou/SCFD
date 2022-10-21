@@ -1,72 +1,74 @@
 <template>
   <Status :uid="uid.uid" :userData="userData" />
+  <div style="height: 100px"></div>
   <div class="loginStatus text-center bg-dark m-4 rounded-3 transBg2">
     <i class="bi bi-person-circle" style="font-size: 6rem"></i>
     <h1>{{ userData.unit }}分隊</h1>
     <h4>{{ userData.name }} {{ userData.rank }}</h4>
     <h3>{{ userData.emtlevel }}</h3>
     <h2 class="caseNumber">共累計 : {{ targetCases.length }} 件救護</h2>
-    <div class="dropdown mb-3">
-      <button
-        class="btn btn-success dropdown-toggle"
-        type="button"
-        id="dropdownMenuButton1"
-        data-bs-toggle="dropdown"
-        aria-expanded="false"
-      >
-        下載 / 編輯隊員資料
+    <div class="d-flex justify-content-center">
+      <div class="dropdown mb-3">
+        <button
+          class="btn btn-primary dropdown-toggle"
+          type="button"
+          id="dropdownMenuButton1"
+          data-bs-toggle="dropdown"
+          aria-expanded="false"
+        >
+          <span class="mb-0" v-if="adminMode == true">下載/編輯隊員資料</span>
+          <span v-else>下載資料</span>
+        </button>
+        <ul
+          class="dropdown-menu dropdown-menu-dark"
+          aria-labelledby="dropdownMenuButton1"
+        >
+          <li>
+            <button class="dropdown-item" href="#" @click="downloadExcel()">
+              下載個人救護紀錄
+            </button>
+          </li>
+          <li v-if="adminMode == true">
+            <button
+              class="dropdown-item"
+              href="#"
+              :disabled="!startTime || !endTime"
+              @click="excelForUnit()"
+            >
+              下載分隊當期救護紀錄
+            </button>
+          </li>
+          <li v-if="adminMode == true">
+            <router-link class="dropdown-item" to="/admin"
+              >管理者頁面
+            </router-link>
+          </li>
+        </ul>
+      </div>
+      <button class="btn btn-danger mb-3 me-2" @click.prevent="logoutUser">
+        登出
       </button>
-      <ul
-        class="dropdown-menu dropdown-menu-dark"
-        aria-labelledby="dropdownMenuButton1"
-      >
-        <li>
-          <button class="dropdown-item" href="#" @click="downloadExcel()">
-            下載個人救護紀錄
-          </button>
-        </li>
-        <li
-          v-if="
-            uid.uid == 'R3S5c6JQEWZzVDGqMXCGCV2bNrg1' ||
-            uid.uid == '2ElnldsjlwXighUZq5PTgXzALtG2'
-          "
-        >
-          <button
-            class="dropdown-item"
-            href="#"
-            :disabled="!startTime || !endTime"
-            @click="excelForUnit()"
-          >
-            下載分隊當期救護紀錄
-          </button>
-        </li>
-        <li
-          v-if="
-            uid.uid == 'R3S5c6JQEWZzVDGqMXCGCV2bNrg1' ||
-            uid.uid == '2ElnldsjlwXighUZq5PTgXzALtG2'
-          "
-        >
-          <router-link class="dropdown-item" to="/admin"
-            >管理者頁面
-          </router-link>
-        </li>
-      </ul>
     </div>
-    <button class="btn btn-danger mb-2 me-2" @click.prevent="logoutUser">
-      登出
-    </button>
-    <div class="row m-2">
-      <label class="col-4 form-label">開始時間</label>
-      <input
-        class="col form-control"
-        type="date"
-        v-model="startTime"
-        required
-      />
-    </div>
-    <div class="row m-2">
-      <label class="col-4 form-label">結束時間</label>
-      <input class="col form-control" type="date" v-model="endTime" required />
+
+    <div class="datepicker" v-if="adminMode == true">
+      <div class="row m-2">
+        <label class="col-4 form-label">開始時間</label>
+        <input
+          class="col form-control"
+          type="date"
+          v-model="startTime"
+          required
+        />
+      </div>
+      <div class="row m-2">
+        <label class="col-4 form-label">結束時間</label>
+        <input
+          class="col form-control"
+          type="date"
+          v-model="endTime"
+          required
+        />
+      </div>
     </div>
   </div>
 
@@ -92,7 +94,7 @@
     :key="id"
   >
     <div class="card-header transBg fw-bold fs-4">
-      {{ time }}<br />
+      {{ dateFormate(time) }}<br />
       {{ unit }}{{ emtlevel }} {{ who }} {{ rank }} <br />患者人數 :
       {{ patient }}
     </div>
@@ -537,7 +539,10 @@
         報案地址 :
       </h5>
       <p class="card-text">{{ location }}</p>
-      <h5 class="card-title badge transBg p-2 text-wrap">
+      <h5
+        class="card-title badge transBg p-2 text-wrap"
+        v-if="otherContent != null || otherContent != ''"
+      >
         <i class="bi bi-geo-alt"></i>
         案情補述 :
       </h5>
@@ -555,6 +560,7 @@
       </div>
     </div>
   </div>
+
   <Footer />
 </template>
 <script>
@@ -571,7 +577,7 @@ import {
 import { JSONToExcelConvertor } from "../util/downlaodCase";
 import { reactive, ref } from "@vue/reactivity";
 
-import { watch } from "@vue/runtime-core";
+import { watch, inject } from "@vue/runtime-core";
 import firebase from "firebase/app";
 import router from "../router";
 import { useRoute } from "vue-router";
@@ -589,17 +595,32 @@ export default {
       emtlevel: "",
       unit: "",
     });
+    const dateFormate = inject("dateFormate");
     const uid = reactive({ uid: "" });
     const route = useRoute();
     const json_data = ref();
     const endTime = ref();
     const startTime = ref();
+    const adminMode = ref(false);
     const targetCases = loadCasesTarget("uid", route.params.uid);
+    const $UserAPI = inject("$UserAPI");
+    const token = ref("");
 
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
         uid.uid = user.uid;
-        console.log("登入 帳號 : " + user.uid);
+        user.getIdToken().then((idToken) => {
+          console.log(idToken);
+          let data = {
+            data: {
+              token: idToken,
+            },
+          };
+          token.value = idToken;
+          $UserAPI.verifyUser(data, token.value).then((res) => {
+            adminMode.value = res.data.result.result;
+          });
+        });
       } else {
         console.log("無登入");
         router.push("/");
@@ -650,6 +671,7 @@ export default {
       userData,
       uid,
       targetCases,
+      dateFormate,
       classAppend,
       deleteCase,
       json_data,
@@ -658,6 +680,7 @@ export default {
       startTime,
       downloadExcel,
       excelForUnit,
+      adminMode,
     };
   },
 };

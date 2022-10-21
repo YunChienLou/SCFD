@@ -1,5 +1,6 @@
 <template>
   <Status :uid="uid.uid" :userData="userData" />
+  <div style="height: 100px"></div>
   <div class="home">
     <SearchComponent />
   </div>

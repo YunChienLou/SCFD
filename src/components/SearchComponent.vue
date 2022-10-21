@@ -476,7 +476,7 @@
       :key="id"
     >
       <div class="card-header transBg fw-bold fs-4">
-        {{ time }}<br />{{ unit }}{{ emtlevel }} {{ who }} {{ rank
+        {{ dateFormate(time) }}<br />{{ unit }}{{ emtlevel }} {{ who }} {{ rank
         }}<br />患者人數 : {{ patient }}
       </div>
       <div class="card-body transBg2">
@@ -954,7 +954,7 @@ import {
   loadUnitCasesByTimePeriod,
 } from "@/firebase";
 import { reactive, ref } from "@vue/reactivity";
-import { watch } from "@vue/runtime-core";
+import { watch ,inject} from "@vue/runtime-core";
 
 export default {
   setup() {
@@ -964,7 +964,7 @@ export default {
     const searchList = reactive([]);
     const startTime = ref();
     const endTime = ref();
-
+    const dateFormate = inject("dateFormate")
     const do_search = async () => {
       searchList.length = 0;
       let temp;
@@ -1019,6 +1019,7 @@ export default {
       keyValueDisplay,
       do_search,
       searchList,
+      dateFormate,
       classAppend,
       do_time_period_search,
     };

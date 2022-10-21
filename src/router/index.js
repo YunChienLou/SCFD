@@ -52,10 +52,11 @@ const routes = [
         path: "memberList",
         component: () => import("../components/ManageUnit.vue"),
       },
-      // {
-      //   path: "admin/editList",
-      //   component: () => import("../views/EditMemberList.vue"),
-      // },
+      {
+        path: "editFireFighters",
+        component: () => import("../views/EditFireFighters.vue"),
+        props: (route) => ({ query: route.query.userData }),
+      },
     ],
   },
 ];

@@ -321,7 +321,13 @@
                   {{ whatHappen }}
                 </td>
                 <td>
-                  <button @click="deleBodyPart(id)" type="button">刪除</button>
+                  <button
+                    class="btn btn-danger"
+                    @click="deleBodyPart(id)"
+                    type="button"
+                  >
+                    刪除
+                  </button>
                 </td>
               </tr>
             </tbody>
@@ -893,7 +899,7 @@
                         </li>
                       </ul>
                     </li>
-                    <div class="list-group-item">
+                    <li class="list-group-item">
                       <p>受傷機轉</p>
                       <ul class="list-group">
                         <li class="list-group-item list-group-item-secondary">
@@ -911,8 +917,8 @@
                           />非交通事故
                         </li>
                       </ul>
-                    </div>
-                    <div class="list-group-item">
+                    </li>
+                    <li class="list-group-item">
                       <p>事故類別(以傷病患為主)</p>
                       <ul class="list-group">
                         <li class="list-group-item list-group-item-secondary">
@@ -951,7 +957,7 @@
                           />其他
                         </li>
                       </ul>
-                    </div>
+                    </li>
                     <li class="list-group-item">
                       <input
                         type="checkbox"
@@ -1048,14 +1054,27 @@
           required
         />
       </div>
-      <div class="row m-2">
-        <label class="col-4 form-label">執行警消</label>
-        <select class="form-select col" v-model="form.tp" required>
-          <option selected>點擊展開警消名單</option>
-          <option v-for="fireMan in firefighters" :key="fireMan.id">
-            {{ fireMan.name }}
-          </option>
-        </select>
+      <div class="row m-2 overflow-auto">
+        <div class="col-4">
+          <label class="">執行警消</label>
+          <hr />
+          <span class="badge bg-primary m-1" v-for="tp in form.tp" :key="tp">{{
+            tp
+          }}</span>
+        </div>
+
+        <ul class="col p-0 h-25 firefighter-list">
+          {{form.tp}}
+          <li
+            class="list-group-item text-center"
+            v-for="fireMan in firefighters"
+            :key="fireMan.id"
+          >
+            <input type="checkbox" :value="fireMan.name" v-model="form.tp" />{{
+              fireMan.name
+            }}
+          </li>
+        </ul>
       </div>
       <div class="row m-2">
         <label class="col-4 form-label">載送人數</label>
@@ -1107,9 +1126,10 @@
 </template>
 
 <script>
-import { reactive, computed, onMounted, watch } from "vue";
+import { reactive, computed, onMounted, watch, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { getCase, updateCases, loadFirefighters } from "@/firebase";
+import { getCase, updateCases, loadFirefightersByUnit } from "@/firebase";
+import { unitNameEnum } from "@/util/Enum";
 
 export default {
   setup() {
@@ -1120,7 +1140,15 @@ export default {
     // 資料挖空格
     var countId = 0;
     var selectedParts = reactive([]);
-    const firefighters = loadFirefighters();
+    const firefighters = ref([]);
+    const unitRef = ref();
+
+    const afterGetUnit = () => {
+      let enumValue = unitNameEnum[unitRef.value];
+      loadFirefightersByUnit(enumValue).then((list) => {
+        firefighters.value = list;
+      });
+    };
 
     const form = reactive({
       time: "",
@@ -1131,7 +1159,7 @@ export default {
       treatment: "",
       onScene: "",
       uid: "",
-      tp: "",
+      tp: [],
       otherContent: "",
       vital: {
         Bp: {
@@ -1165,12 +1193,11 @@ export default {
           whatHappen: partsDescrip,
         });
         console.log(selectedParts);
-      } else {
-        alert("錯誤!!! 該部位需輸入描述");
       }
     };
     onMounted(async () => {
       const Case = await getCase(caseId.value);
+      unitRef.value = Case.unit;
       const acessParts = Case.selectedParts;
       //用string 資料得到目標ID CASE的資料
       form.time = Case.time;
@@ -1209,12 +1236,11 @@ export default {
       }
     };
     watch(selectedParts, updateParts);
+    watch(unitRef, afterGetUnit);
     // 新填入的資料
 
     const update = async () => {
       await updateCases(caseId.value, { ...form, selectedParts });
-      // 成功更新
-      alert("成功更新");
       // 等資料更新上去 再往下走
       router.push(`/LoginStatus/${form.uid}`);
       // 更新完資料 回到首頁"/"

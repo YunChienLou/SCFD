@@ -1,11 +1,36 @@
+import axios from "axios";
 import firebase from "firebase/app";
-// import "firebase/firestore";
 import "firebase/auth";
 import { ref, onUnmounted } from "vue";
 import router from "./router";
 require("firebase/firestore");
 require("firebase/functions");
 
+const urlBase = "https://asia-east1-scfd-app.cloudfunctions.net/";
+
+const user = {
+  deleteUser: (data, token) => {
+    return axios.post(urlBase + "deleteUser", data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+  },
+
+  verifyUser: (data, token) => {
+    return axios.post(urlBase + "verifyAdmin", data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+  },
+};
+
+export default { user };
+
+// 即將廢除 改 axios post method call api
 const config = {
   apiKey: "AIzaSyDuwKHzRSvtY6sLJ5QIn6YeQgnnlChXx20",
   // 連上FIREBASE才知道連去哪一個專案
@@ -24,9 +49,20 @@ const users = db.collection("users");
 const orderCases = dailyCases.orderBy("time", "desc").limit(15);
 const auth = firebase.auth();
 
+// Cloud Function test
+
 // add doc to firebase collection
 export const createCase = (Case) => {
-  return dailyCases.add(Case);
+  return dailyCases
+    .add(Case)
+    .then((docRef) => {
+      console.log("Document written with ID: ", docRef.id);
+      alert("上傳成功");
+    })
+    .catch((error) => {
+      console.error("Error adding document: ", error);
+      alert("上傳失敗");
+    });
 };
 
 // get specific doc that match id
@@ -41,23 +77,37 @@ export const getUser = async (id) => {
 };
 
 export const updateCases = (id, Case) => {
-  return dailyCases.doc(id).update(Case);
+  return dailyCases
+    .doc(id)
+    .update(Case)
+    .then((docRef) => {
+      console.log("Document updating with ID: ", docRef);
+      alert("更新成功");
+    })
+    .catch((error) => {
+      console.error("Error updating document: ", error);
+      alert("更新失敗");
+    });
 };
 
 export const updateUser = (id, User) => {
   return users.doc(id).update(User);
 };
 
-export const deleteCase = (id) => {
+export const deleteCase = async (id) => {
   var deleteBoolean = confirm("確認刪除?");
   if (deleteBoolean) {
-    dailyCases
+    await dailyCases
       .doc(id)
       .delete()
       .then((msg) => {
         console.log(msg);
+        alert("刪除成功");
+      })
+      .catch((error) => {
+        console.log(error);
+        alert("刪除失敗");
       });
-    alert("成功刪除");
     // refresh route to origin page
     return router.go();
   }
@@ -135,10 +185,10 @@ export const loadCasesTarget = (subject, value) => {
       // targetCases(存放的陣列)
     });
   //delete close when Unmounted
-  console.log(
-    "載入結果符合 " + subject + " = " + value + " 的病例",
-    targetCases
-  );
+  // console.log(
+  //   "載入結果符合 " + subject + " = " + value + " 的病例",
+  //   targetCases
+  // );
   return targetCases;
   // 最後回傳收繳資料的矩陣
 };
@@ -235,7 +285,7 @@ export const loginUser = (email, password) => {
     .signInWithEmailAndPassword(email, password)
     .then((cred) => {
       router.push("/loginstatus/" + cred.user.uid);
-      console.log(cred.user.email + " has log in !!!");
+      console.log(cred.user + " has log in !!!");
     })
     .catch((err) => {
       var loginErrSection = document.getElementById("loginErrSection");
@@ -243,6 +293,19 @@ export const loginUser = (email, password) => {
         '<div class="alert alert-danger mt-3">' + err.message + "</div>";
       console.log(err.message);
     });
+};
+
+// Auth before api calls
+
+export const verifyIsAdmin = (idToken) => {
+  var verifyAdmin = functions.httpsCallable("verifyAdmin");
+  return verifyAdmin({ token: idToken });
+  // .then((result) => {
+  //   console.log("verifyIsAdmin",result.data);
+  // })
+  // .catch((error) => {
+  //   console.log("verifyIsAdmin error", error);
+  // });
 };
 
 // 登出邏輯
@@ -305,9 +368,9 @@ export const loadUser = async (uid) => {
       var data = doc.data();
       return data;
     });
-  console.log(output);
   return output;
 };
+
 //  警消名單載入
 export const loadFirefighters = () => {
   const firefighters = ref([]);
@@ -319,6 +382,37 @@ export const loadFirefighters = () => {
   });
   onUnmounted(close);
   return firefighters;
+};
+
+export const loadFirefightersByUnit = async (unit) => {
+  const firefighters = [];
+  const unitId = await getCollectionId(unit);
+
+  const snapshot = await db
+    .collection(unit + "/" + unitId + "/firefighters")
+    .get();
+  snapshot.forEach((doc) => {
+    if (Object.keys(doc.data()) != 0) {
+      firefighters.push({ id: doc.id, ...doc.data() });
+    }
+  });
+  console.log("loadFirefightersByUnit Complete", firefighters);
+  return firefighters.length > 0 ? firefighters : null;
+};
+
+export const createFirefightersByUnit = () => {};
+
+const getCollectionId = async (collection_name) => {
+  var id;
+  await db
+    .collection(collection_name)
+    .get()
+    .then((docs) => {
+      docs.forEach((doc) => {
+        id = doc.id;
+      });
+    });
+  return id;
 };
 
 // get uid

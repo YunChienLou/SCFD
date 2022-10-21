@@ -1,13 +1,21 @@
 <template>
   <Status :uid="uid.uid" :userData="userData" />
+  <div style="height: 100px"></div>
   <div class="admin">
     <ul class="nav nav-tabs mt-3">
       <li class="nav-item">
-        <router-link class="nav-link" to="/admin">管理首頁</router-link>
+        <router-link class="nav-link text-white" to="/admin"
+          >管理首頁</router-link
+        >
       </li>
       <li class="nav-item">
-        <router-link class="nav-link" to="/admin/memberList"
+        <router-link class="nav-link text-white" to="/admin/memberList"
           >管理分隊成員</router-link
+        >
+      </li>
+      <li class="nav-item">
+        <router-link class="nav-link text-white" to="/admin/editFireFighters"
+          >管理警消成員</router-link
         >
       </li>
     </ul>
@@ -24,7 +32,7 @@
         </blockquote>
       </div>
     </div>
-    <router-view></router-view>
+    <router-view :userData="userData"></router-view>
   </div>
   <Footer />
 </template>
@@ -64,6 +72,7 @@ export default {
         router.push("/");
       }
     });
+
     const route = useRoute();
     const url = computed(() => {
       return route.path;

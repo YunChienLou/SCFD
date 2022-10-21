@@ -1,6 +1,6 @@
 <template>
   <div class="d-flex justify-content-between align-items-center">
-    <div class="h1 mt-3">管理分隊成員</div>
+    <div class="h1 mt-3">管理警消成員</div>
     <div class="mt-3 me-4">
       <button
         type="button"
@@ -17,22 +17,22 @@
       <tr>
         <th scope="col">No.</th>
         <th scope="col">姓名</th>
-        <th scope="col">級職</th>
-        <th scope="col">emt</th>
-        <th scope="col">編輯</th>
+        <!-- <th scope="col">級職</th>
+        <th scope="col">emt</th> -->
+        <th class="text-center me-3" scope="col">編輯</th>
       </tr>
     </thead>
     <tbody>
-      <tr v-for="(user, index) in users" :key="user.id">
+      <tr v-for="(user, index) in firefighters" :key="user.id">
         <th scope="row">{{ index + 1 }}</th>
         <td>{{ user.name }}</td>
-        <td>{{ user.rank }}</td>
-        <td>{{ user.emtlevel }}</td>
-        <td>
+        <!-- <td>{{ user.rank }}</td>
+        <td>{{ user.emtlevel }}</td> -->
+        <td class="text-end">
           <!-- Button trigger modal -->
           <button
             type="button"
-            class="btn btn-secondary"
+            class="btn btn-secondary me-1"
             data-bs-toggle="modal"
             data-bs-target="#editUserModal"
             @click="getUserData(user.id)"
@@ -41,7 +41,7 @@
           </button>
           <button
             type="button"
-            class="btn btn-danger"
+            class="btn btn-danger me-3"
             @click="deleUser(user.id)"
           >
             刪除
@@ -251,23 +251,35 @@
 
 <script>
 import {
-  useLoadUsers,
   deleteUser,
   updateUser,
   getUser,
   createUser,
+  loadFirefightersByUnit,
 } from "@/firebase";
 import { reactive, ref } from "@vue/reactivity";
-import { inject } from "@vue/runtime-core";
+import { unitNameEnum } from "@/util/Enum";
+import { watch } from "@vue/runtime-core";
 export default {
-  setup() {
-    const users = useLoadUsers();
+  props: ["userData"],
+  setup(props) {
+    const firefighters = ref([]);
+    const afterGetUnit = () => {
+      let unit = props.userData.unit;
+      let enumValue = unitNameEnum[unit];
+      loadFirefightersByUnit(enumValue).then((list) => {
+        firefighters.value = list;
+      });
+    };
+    if (props.userData.unit != "") {
+      afterGetUnit();
+    }
+
     const nameInput = ref();
     const targetUserId = ref();
     const rankInput = ref();
     const emtInput = ref();
-    const $UserAPI = inject("$UserAPI");
-    $UserAPI;
+
     const passwordVerifie = ref(false);
     const create = reactive({
       name: "",
@@ -303,14 +315,15 @@ export default {
     const deleUser = (id) => {
       deleteUser(id);
     };
+    watch(props.userData, afterGetUnit);
     return {
-      users,
       create,
       nameInput,
       rankInput,
       emtInput,
       targetUserId,
       passwordVerifie,
+      firefighters,
       getUserData,
       editUser,
       deleUser,

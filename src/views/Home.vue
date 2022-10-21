@@ -1,5 +1,6 @@
 <template>
   <Status :uid="uid.uid" :userData="userData" />
+  <div style="height: 100px"></div>
   <div class="home mx-sm-5">
     <h1 class="text-center pt-3">
       <strong>救護紀錄表</strong>

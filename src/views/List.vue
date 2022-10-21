@@ -1,5 +1,6 @@
 <template>
   <Status :uid="uid.uid" :userData="userData" />
+  <div style="height: 100px"></div>
   <CaseList class="mx-3" />
   <Footer />
 </template>
@@ -22,7 +23,6 @@ export default {
     Footer,
     Status,
   },
-  // emits:["passID"],
   setup() {
     const userData = reactive({
       name: "",

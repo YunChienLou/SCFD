@@ -1,5 +1,5 @@
 <template>
-  <nav class="navbar navbar-dark transBg2">
+  <nav class="navbar fixed-top navbar-dark navBg2">
     <div class="container-fluid">
       <a class="navbar-brand fw-bold">救護義消系統</a>
       <span>{{ userData.name }} {{ userData.rank }}</span>
@@ -26,9 +26,9 @@
           <!-- <li class="nav-item">
             <router-link to="/dashboard">區域統計表</router-link>
           </li> -->
-          <li class="nav-item p-3">
+          <li class="nav-item p-3 ">
             <router-link
-              class="text-decoration-none text-white fw-bold fs-4"
+              class="nav-link text-white fw-bold fs-4"
               to="/list"
               >即時救護案件</router-link
             >
@@ -66,11 +66,14 @@ export default {
 .navbar {
   z-index: 3;
 }
-.transBg2 {
-  background: linear-gradient(
-    240deg,
+.navBg2 {
+  /* background: linear-gradient(
+    110deg,
     rgba(108, 117, 125, 1),
-    rgba(108, 117, 125, 0)
-  );
+    rgba(0, 53, 107, 0.5)
+  ); */
+  background-color: #212121;
+  border-bottom: rgb(13, 110, 253) 3px solid;
+  box-shadow: 0px 6px 30px 5px rgba(13, 109, 253, 0.614);
 }
 </style>
