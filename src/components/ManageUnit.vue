@@ -12,44 +12,57 @@
       </button>
     </div>
   </div>
-  <table class="table table-dark table-striped">
-    <thead>
-      <tr>
-        <th scope="col">No.</th>
-        <th scope="col">姓名</th>
-        <th scope="col">級職</th>
-        <th scope="col">emt</th>
-        <th scope="col">編輯</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="(user, index) in users" :key="user.id">
-        <th scope="row">{{ index + 1 }}</th>
-        <td>{{ user.name }}</td>
-        <td>{{ user.rank }}</td>
-        <td>{{ user.emtlevel }}</td>
-        <td>
-          <!-- Button trigger modal -->
-          <button
-            type="button"
-            class="btn btn-secondary"
-            data-bs-toggle="modal"
-            data-bs-target="#editUserModal"
-            @click="getUserData(user.id)"
-          >
-            修改
-          </button>
-          <button
-            type="button"
-            class="btn btn-danger"
-            @click="deleUser(user.id)"
-          >
-            刪除
-          </button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="d-flex align-items-center justify-content-center">
+    <div v-if="isLoading" class="text-center mt-5 text-white">
+      <div class="h1 text-center">資料處理中 .....</div>
+      <div
+        class="spinner-border text-primary"
+        style="width: 5rem; height: 5rem"
+        role="status"
+      >
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+    <table v-else class="table table-dark table-striped">
+      <thead>
+        <tr>
+          <th scope="col">No.</th>
+          <th scope="col">姓名</th>
+          <th scope="col">級職</th>
+          <th scope="col">emt</th>
+          <th scope="col">編輯</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(user, index) in users" :key="user.id">
+          <th scope="row">{{ index + 1 }}</th>
+          <td>{{ user.name }}</td>
+          <td>{{ user.rank }}</td>
+          <td>{{ user.emtlevel }}</td>
+          <td>
+            <!-- Button trigger modal -->
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-toggle="modal"
+              data-bs-target="#editUserModal"
+              @click="getUserData(user.id, index)"
+            >
+              修改
+            </button>
+            <button
+              type="button"
+              class="btn btn-danger"
+              @click="deleUser(user.id)"
+            >
+              刪除
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
   <!-- Modal -->
   <div
     class="modal fade"
@@ -107,16 +120,6 @@
                 class="form-control"
                 placeholder="請輸入 密碼 .."
                 id="create2"
-                v-model="create.passwords"
-                required
-              />
-            </div>
-            <div class="mb-3">
-              <label class="form-label">請再輸入一次密碼</label>
-              <input
-                type="password"
-                class="form-control"
-                id="create."
                 v-model="create.passwords"
                 required
               />
@@ -250,58 +253,154 @@
 </template>
 
 <script>
-import {
-  useLoadUsers,
-  deleteUser,
-  updateUser,
-  getUser,
-  createUser,
-} from "@/firebase";
 import { reactive, ref } from "@vue/reactivity";
-import { inject } from "@vue/runtime-core";
+import { computed, inject } from "@vue/runtime-core";
+import firebase from "firebase/app";
+import router from "../router";
+import { useStore } from "vuex";
 export default {
   setup() {
-    const users = useLoadUsers();
-    const nameInput = ref();
-    const targetUserId = ref();
-    const rankInput = ref();
-    const emtInput = ref();
+    const users = ref([]);
+    const store = useStore();
+    const unit = computed(() => {
+      return store.state.unit;
+    });
     const $UserAPI = inject("$UserAPI");
-    $UserAPI;
+
+    //編輯個別user需要資料
+    const targetUserId = ref("");
+    const nameInput = ref("");
+    const rankInput = ref("");
+    const emtInput = ref("");
+
+    const uid = reactive({ uid: "" });
+    const token = ref("");
+    const adminMode = ref(false);
     const passwordVerifie = ref(false);
+    const isLoading = ref(false);
     const create = reactive({
       name: "",
-      email: "",
-      passwords: "",
+      unit: "",
       emtlevel: "",
       rank: "",
+      email: "",
+      passwords: "",
+      token: "",
     });
 
-    const getUserData = async (id) => {
-      let data = await getUser(id);
-      nameInput.value = data.name;
-      rankInput.value = data.rank;
-      emtInput.value = data.emtlevel;
-      targetUserId.value = id;
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        isLoading.value = true;
+        uid.uid = user.uid;
+        user.getIdToken().then((idToken) => {
+          console.log(idToken);
+          let data = {
+            data: {
+              token: idToken,
+              unit: unit.value,
+            },
+          };
+          token.value = idToken;
+          $UserAPI.verifyUser(data, token.value).then((res) => {
+            adminMode.value = res.data.result.result;
+          });
+          $UserAPI
+            .getUsers(data, token.value)
+            .then((res) => {
+              users.value = res.data.result.data;
+              isLoading.value = false;
+            })
+            .catch((err) => {
+              alert(err);
+            });
+        });
+      } else {
+        console.log("無登入");
+        router.push("/");
+      }
+    });
+
+    // 修改用的
+    const getUserData = (uid, index) => {
+      let user = users.value[index];
+      targetUserId.value = uid;
+      nameInput.value = user.name;
+      emtInput.value = user.emtlevel;
+      rankInput.value = user.rank;
     };
+
     const addUser = async () => {
-      await createUser(create);
+      isLoading.value = true;
+      let data = {
+        data: {
+          name: create.name,
+          rank: create.rank,
+          emtlevel: create.emtlevel,
+          unit: unit.value,
+          email: create.email,
+          password: create.passwords,
+          token: token.value,
+        },
+      };
+      $UserAPI
+        .createUser(data, token.value)
+        .then(() => {
+          $UserAPI.getUsers(data, token.value).then((res) => {
+            users.value = res.data.result.data;
+            isLoading.value = false;
+          });
+        })
+        .catch((err) => {
+          alert(err);
+        });
       create.name = "";
       create.email = "";
       create.passwords = "";
       create.emtlevel = "";
       create.rank = "";
     };
+
     const editUser = () => {
-      let user = {
-        name: nameInput.value,
-        rank: rankInput.value,
-        emtlevel: emtInput.value,
+      isLoading.value = true;
+      let data = {
+        data: {
+          userId: targetUserId.value,
+          name: nameInput.value,
+          rank: rankInput.value,
+          emtlevel: emtInput.value,
+          unit: unit.value,
+          token: token.value,
+        },
       };
-      updateUser(targetUserId.value, user);
+      $UserAPI
+        .updateUser(data, token.value)
+        .then((res) => {
+          console.log(res.data.result.result);
+          $UserAPI.getUsers(data, token.value).then((res) => {
+            users.value = res.data.result.data;
+            isLoading.value = false;
+          });
+        })
+        .catch((err) => {
+          alert(err);
+        });
     };
+
     const deleUser = (id) => {
-      deleteUser(id);
+      isLoading.value = true;
+      let data = { data: { uid: id, token: token.value, unit: unit.value } };
+      $UserAPI
+        .deleteUser(data, token.value)
+        .then((res) => {
+          console.log(res.data.result.result);
+          $UserAPI.getUsers(data, token.value).then((res) => {
+            users.value = res.data.result.data;
+            isLoading.value = false;
+          });
+        })
+        .catch((err) => {
+          alert(err);
+        });
     };
     return {
       users,
@@ -311,6 +410,7 @@ export default {
       emtInput,
       targetUserId,
       passwordVerifie,
+      isLoading,
       getUserData,
       editUser,
       deleUser,

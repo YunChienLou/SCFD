@@ -954,7 +954,7 @@ import {
   loadUnitCasesByTimePeriod,
 } from "@/firebase";
 import { reactive, ref } from "@vue/reactivity";
-import { watch ,inject} from "@vue/runtime-core";
+import { watch, inject } from "@vue/runtime-core";
 
 export default {
   setup() {
@@ -964,7 +964,7 @@ export default {
     const searchList = reactive([]);
     const startTime = ref();
     const endTime = ref();
-    const dateFormate = inject("dateFormate")
+    const dateFormate = inject("dateFormate");
     const do_search = async () => {
       searchList.length = 0;
       let temp;

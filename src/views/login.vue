@@ -84,9 +84,6 @@ export default {
     const forgetPassword = () => {
       forgetPasswords(loginEmail);
     };
-    // const onSubmit = async ()=>{
-    //   await loginUser(loginEmail,loginPassword)
-    // }
 
     return {
       loginEmail,

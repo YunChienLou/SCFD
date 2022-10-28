@@ -2,7 +2,7 @@
   <nav class="navbar fixed-top navbar-dark navBg2">
     <div class="container-fluid">
       <a class="navbar-brand fw-bold">救護義消系統</a>
-      <span>{{ userData.name }} {{ userData.rank }}</span>
+      <span>{{ userData.unit }} {{ userData.name }} {{ userData.rank }}</span>
       <button
         class="navbar-toggler"
         type="button"
@@ -15,35 +15,31 @@
         <i class="bi bi-list" style="font-size: 2rem"></i>
       </button>
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-        <div class="navbar-nav text-end">
-          <li class="nav-item p-3">
+        <div class="navbar-nav text-end mt-5">
+          <li class="nav-item p-3" @click="closeNav()">
             <router-link
               class="text-decoration-none text-white fw-bold fs-4"
               to="/homepage"
               >填寫紀錄表</router-link
             >
           </li>
-          <!-- <li class="nav-item">
-            <router-link to="/dashboard">區域統計表</router-link>
-          </li> -->
-          <li class="nav-item p-3 ">
+          <li class="nav-item p-3" @click="closeNav()">
             <router-link
-              class="nav-link text-white fw-bold fs-4"
+              class="text-decoration-none nav-link text-white fw-bold fs-4"
               to="/list"
               >即時救護案件</router-link
             >
           </li>
-          <li class="nav-item p-3">
+          <li class="nav-item p-3" @click="closeNav()">
             <router-link
-              class="text-decoration-none text-white fw-bold fs-4"
+              class="text-decoration-none nav-link text-white fw-bold fs-4"
               to="/search"
               >案件查詢</router-link
             >
           </li>
-          <!-- !!!!! dynamic router!!!! -->
-          <li class="nav-item p-3">
+          <li class="nav-item p-3" @click="closeNav()">
             <router-link
-              class="text-decoration-none text-white fw-bold fs-4"
+              class="text-decoration-none nav-link text-white fw-bold fs-4"
               :to="`/loginstatus/${uid}`"
               >個人資料</router-link
             >
@@ -59,7 +55,13 @@ export default {
     uid: String,
     userData: Object,
   },
-  setup() {},
+  setup() {
+    const closeNav = () => {
+      const nav = document.getElementById("navbarNavAltMarkup");
+      nav.classList.remove("show");
+    };
+    return { closeNav };
+  },
 };
 </script>
 <style>

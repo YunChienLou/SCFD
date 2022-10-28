@@ -1,5 +1,5 @@
 <template>
-  <Status :uid="uid.uid" :userData="userData" />
+  <!-- <Status :uid="uid" :userData="userData" /> -->
   <div style="height: 100px"></div>
   <div class="loginStatus text-center bg-dark m-4 rounded-3 transBg2">
     <i class="bi bi-person-circle" style="font-size: 6rem"></i>
@@ -16,7 +16,7 @@
           data-bs-toggle="dropdown"
           aria-expanded="false"
         >
-          <span class="mb-0" v-if="adminMode == true">下載/編輯隊員資料</span>
+          <span class="mb-0" v-if="adminMode == 200">下載/編輯隊員資料</span>
           <span v-else>下載資料</span>
         </button>
         <ul
@@ -28,7 +28,7 @@
               下載個人救護紀錄
             </button>
           </li>
-          <li v-if="adminMode == true">
+          <li v-if="adminMode == 200">
             <button
               class="dropdown-item"
               href="#"
@@ -38,19 +38,19 @@
               下載分隊當期救護紀錄
             </button>
           </li>
-          <li v-if="adminMode == true">
+          <li v-if="adminMode == 200">
             <router-link class="dropdown-item" to="/admin"
               >管理者頁面
             </router-link>
           </li>
         </ul>
       </div>
-      <button class="btn btn-danger mb-3 me-2" @click.prevent="logoutUser">
+      <button class="btn btn-danger mb-3 me-2" @click.prevent="logout">
         登出
       </button>
     </div>
 
-    <div class="datepicker" v-if="adminMode == true">
+    <div class="datepicker" v-if="adminMode == 200">
       <div class="row m-2">
         <label class="col-4 form-label">開始時間</label>
         <input
@@ -561,14 +561,11 @@
     </div>
   </div>
 
-  <Footer />
+  <!-- <Footer /> -->
 </template>
 <script>
-import Footer from "../components/Footer.vue";
-import Status from "../components/Status.vue";
-
 import {
-  loadUser,
+  // loadUser,
   logoutUser,
   loadCasesTarget,
   deleteCase,
@@ -576,60 +573,54 @@ import {
 } from "@/firebase";
 import { JSONToExcelConvertor } from "../util/downlaodCase";
 import { reactive, ref } from "@vue/reactivity";
-
-import { watch, inject } from "@vue/runtime-core";
-import firebase from "firebase/app";
-import router from "../router";
-import { useRoute } from "vue-router";
+import { computed, inject, onMounted, watch } from "@vue/runtime-core";
+import { useStore } from "vuex";
 
 export default {
   name: "loginStatus",
   components: {
-    Footer,
-    Status,
+    // Footer,
+    // Status,
   },
   setup() {
     const userData = reactive({
-      name: "",
-      rank: "",
-      emtlevel: "",
-      unit: "",
+      name: computed(() => {
+        return store.state.name;
+      }),
+      rank: computed(() => {
+        return store.state.rank;
+      }),
+      emtlevel: computed(() => {
+        return store.state.emtlevel;
+      }),
+      unit: computed(() => {
+        return store.state.unit;
+      }),
     });
+    const uid = computed(() => {
+      return store.state.uid;
+    });
+    const adminMode = computed(() => {
+      return store.state.isAdmin;
+    });
+
     const dateFormate = inject("dateFormate");
-    const uid = reactive({ uid: "" });
-    const route = useRoute();
+    const store = useStore();
+    // const route = useRoute();
     const json_data = ref();
     const endTime = ref();
     const startTime = ref();
-    const adminMode = ref(false);
-    const targetCases = loadCasesTarget("uid", route.params.uid);
-    const $UserAPI = inject("$UserAPI");
-    const token = ref("");
 
-    firebase.auth().onAuthStateChanged((user) => {
-      if (user) {
-        uid.uid = user.uid;
-        user.getIdToken().then((idToken) => {
-          console.log(idToken);
-          let data = {
-            data: {
-              token: idToken,
-            },
-          };
-          token.value = idToken;
-          $UserAPI.verifyUser(data, token.value).then((res) => {
-            adminMode.value = res.data.result.result;
-          });
-        });
-      } else {
-        console.log("無登入");
-        router.push("/");
-      }
-    });
+    const targetCases = ref([]);
+
+    const verifyVuex = async () => {
+      await store.dispatch("verify");
+    };
 
     const downloadExcel = () => {
+      console.log(targetCases.value);
       JSONToExcelConvertor(
-        targetCases,
+        targetCases.value,
         userData.unit + "分隊_" + userData.name + "的救護紀錄"
       );
     };
@@ -644,18 +635,6 @@ export default {
       );
     };
 
-    const forUserData = async () => {
-      var user = await loadUser(uid.uid);
-      userData.name = user.name;
-      userData.rank = user.rank;
-      userData.emtlevel = user.emtlevel;
-      userData.unit = user.unit;
-    };
-
-    const btnSpecificCase = async () => {};
-
-    watch(uid, forUserData);
-
     const classAppend = (selectedParts, value) => {
       var partsArray = selectedParts.map((a) => a.whatPart);
       var target = value;
@@ -666,8 +645,59 @@ export default {
       };
     };
 
+    const logout = () => {
+      logoutUser(), store.dispatch("logout");
+    };
+
+    onMounted(() => {
+      verifyVuex();
+      loadCasesTarget("uid", store.state.uid).then((res) => {
+        targetCases.value = res.docs.map((doc) => ({
+          id: doc.id,
+          time: doc.data().time,
+          unit: doc.data().unit,
+          emtlevel: doc.data().emtlevel,
+          who: doc.data().who,
+          uid: doc.data().uid,
+          rank: doc.data().rank,
+          patient: doc.data().patient,
+          onScene: doc.data().onScene,
+          treatment: doc.data().treatment,
+          selectedParts: doc.data().selectedParts,
+          vital: doc.data().vital,
+          tp: doc.data().tp,
+          location: doc.data().location,
+          otherContent: doc.data().otherContent,
+          hospital: doc.data().hospital,
+        }));
+      });
+    });
+    watch(userData, () => {
+      console.log("userData update");
+      loadCasesTarget("uid", store.state.uid).then((res) => {
+        targetCases.value = res.docs.map((doc) => ({
+          id: doc.id,
+          time: doc.data().time,
+          unit: doc.data().unit,
+          emtlevel: doc.data().emtlevel,
+          who: doc.data().who,
+          uid: doc.data().uid,
+          rank: doc.data().rank,
+          patient: doc.data().patient,
+          onScene: doc.data().onScene,
+          treatment: doc.data().treatment,
+          selectedParts: doc.data().selectedParts,
+          vital: doc.data().vital,
+          tp: doc.data().tp,
+          location: doc.data().location,
+          otherContent: doc.data().otherContent,
+          hospital: doc.data().hospital,
+        }));
+      });
+    });
+
     return {
-      logoutUser,
+      logout,
       userData,
       uid,
       targetCases,
@@ -675,7 +705,6 @@ export default {
       classAppend,
       deleteCase,
       json_data,
-      btnSpecificCase,
       endTime,
       startTime,
       downloadExcel,
@@ -686,21 +715,12 @@ export default {
 };
 </script>
 <style>
+.modal-backdrop {
+  z-index: -1;
+}
 .loginStatus {
   z-index: 2;
   opacity: 0.8;
-}
-.cls-1 {
-  fill: #f8f9fa;
-  stroke: #0d6efd;
-  stroke-miterlimit: 10;
-  stroke-width: 2px;
-}
-.cls-2 {
-  fill: #750808;
-  stroke: #f92626;
-  stroke-miterlimit: 10;
-  stroke-width: 3px;
 }
 .transBg {
   background: linear-gradient(

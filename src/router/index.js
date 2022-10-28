@@ -55,7 +55,10 @@ const routes = [
       {
         path: "editFireFighters",
         component: () => import("../views/EditFireFighters.vue"),
-        props: (route) => ({ query: route.query.userData }),
+      },
+      {
+        path: "openNewUnit",
+        component: () => import("../views/OpenNewUnit.vue"),
       },
     ],
   },

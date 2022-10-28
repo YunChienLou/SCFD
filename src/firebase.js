@@ -5,10 +5,25 @@ import { ref, onUnmounted } from "vue";
 import router from "./router";
 require("firebase/firestore");
 require("firebase/functions");
-
 const urlBase = "https://asia-east1-scfd-app.cloudfunctions.net/";
 
 const user = {
+  createUser: (data, token) => {
+    return axios.post(urlBase + "createUser", data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+  },
+  getUsers: (data, token) => {
+    return axios.post(urlBase + "getUsers", data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+  },
   deleteUser: (data, token) => {
     return axios.post(urlBase + "deleteUser", data, {
       headers: {
@@ -17,7 +32,14 @@ const user = {
       },
     });
   },
-
+  updateUser: (data, token) => {
+    return axios.post(urlBase + "updateUser", data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+  },
   verifyUser: (data, token) => {
     return axios.post(urlBase + "verifyAdmin", data, {
       headers: {
@@ -28,7 +50,60 @@ const user = {
   },
 };
 
-export default { user };
+const firefighter = {
+  createFirefighter: (data, token) => {
+    return axios.post(urlBase + "createFirefighter", data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+  },
+  getFirefighters: (data, token) => {
+    return axios.post(urlBase + "getFirefighters", data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+  },
+  deleteFirefighter: (data, token) => {
+    return axios.post(urlBase + "deleteFirefighter", data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+  },
+  updateFirefighter: (data, token) => {
+    return axios.post(urlBase + "updateFirefighter", data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+  },
+};
+
+const admin = {
+  getAdmins: (data, token) => {
+    return axios.post(urlBase + "getAdmins", data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+  },
+  createAdmin: (data, token) => {
+    return axios.post(urlBase + "createAdmin", data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+  },
+};
+export default { user, firefighter, admin };
 
 // 即將廢除 改 axios post method call api
 const config = {
@@ -146,51 +221,60 @@ export const useLoadUsers = () => {
   return cases;
 };
 
-export const loadCasesTarget = (subject, value) => {
-  var targetCases = [];
-  // 記錄們(每個以物件為單位) 存放的陣列
-  dailyCases
+// export const loadCasesTarget = (subject, value) => {
+//   var targetCases = [];
+//   // 記錄們(每個以物件為單位) 存放的陣列
+//   dailyCases
+//     .orderBy("time", "desc")
+//     .where(subject, "==", value)
+//     .onSnapshot((snapshot) => {
+//       snapshot.forEach((doc) => {
+//         // targetCases.push({ id: doc.id, ...doc.data() });
+//         targetCases.push({
+//           id: doc.id,
+// time: doc.data().time,
+// unit: doc.data().unit,
+// emtlevel: doc.data().emtlevel,
+// who: doc.data().who,
+// uid: doc.data().uid,
+// rank: doc.data().rank,
+// patient: doc.data().patient,
+// onScene: doc.data().onScene,
+// treatment: doc.data().treatment,
+// selectedParts: doc.data().selectedParts,
+// vital: doc.data().vital,
+// tp: doc.data().tp,
+// location: doc.data().location,
+// otherContent: doc.data().otherContent,
+// hospital: doc.data().hospital,
+//         });
+//       });
+//       // 連上後端資料庫
+//       // 由時間排序 由先排到後
+//       // 找資料庫中 指定科目 == 指定值 的資料
+//       // snapshot 選到的多筆資料(陣列)
+//       // forEach跑回圈
+//       // 每次回圈取陣列中的一筆資料(doc)
+//       // 以物件{id:xxx,name:xxx,rank:xxx, ....}
+//       // 的物件型態 PUSH 回
+//       // targetCases(存放的陣列)
+//     });
+//   //delete close when Unmounted
+//   // console.log(
+//   //   "載入結果符合 " + subject + " = " + value + " 的病例",
+//   //   targetCases
+//   // );
+//   console.log("loadCasesTarget" , targetCases)
+//   return targetCases;
+//   // 最後回傳收繳資料的矩陣
+// };
+
+export const loadCasesTarget = async (subject, value) => {
+  const snapshot = dailyCases
     .orderBy("time", "desc")
     .where(subject, "==", value)
-    .onSnapshot((snapshot) => {
-      snapshot.forEach((doc) => {
-        // targetCases.push({ id: doc.id, ...doc.data() });
-        targetCases.push({
-          id: doc.id,
-          time: doc.data().time,
-          unit: doc.data().unit,
-          emtlevel: doc.data().emtlevel,
-          who: doc.data().who,
-          uid: doc.data().uid,
-          rank: doc.data().rank,
-          patient: doc.data().patient,
-          onScene: doc.data().onScene,
-          treatment: doc.data().treatment,
-          selectedParts: doc.data().selectedParts,
-          vital: doc.data().vital,
-          tp: doc.data().tp,
-          location: doc.data().location,
-          otherContent: doc.data().otherContent,
-          hospital: doc.data().hospital,
-        });
-      });
-      // 連上後端資料庫
-      // 由時間排序 由先排到後
-      // 找資料庫中 指定科目 == 指定值 的資料
-      // snapshot 選到的多筆資料(陣列)
-      // forEach跑回圈
-      // 每次回圈取陣列中的一筆資料(doc)
-      // 以物件{id:xxx,name:xxx,rank:xxx, ....}
-      // 的物件型態 PUSH 回
-      // targetCases(存放的陣列)
-    });
-  //delete close when Unmounted
-  // console.log(
-  //   "載入結果符合 " + subject + " = " + value + " 的病例",
-  //   targetCases
-  // );
-  return targetCases;
-  // 最後回傳收繳資料的矩陣
+    .get();
+  return snapshot;
 };
 
 export const loadWhoCases = async (value) => {
@@ -284,8 +368,8 @@ export const loginUser = (email, password) => {
   auth
     .signInWithEmailAndPassword(email, password)
     .then((cred) => {
-      router.push("/loginstatus/" + cred.user.uid);
-      console.log(cred.user + " has log in !!!");
+      router.push(`/loginstatus/${cred.user.uid}`);
+      return cred.user;
     })
     .catch((err) => {
       var loginErrSection = document.getElementById("loginErrSection");
@@ -300,20 +384,14 @@ export const loginUser = (email, password) => {
 export const verifyIsAdmin = (idToken) => {
   var verifyAdmin = functions.httpsCallable("verifyAdmin");
   return verifyAdmin({ token: idToken });
-  // .then((result) => {
-  //   console.log("verifyIsAdmin",result.data);
-  // })
-  // .catch((error) => {
-  //   console.log("verifyIsAdmin error", error);
-  // });
 };
 
 // 登出邏輯
 export const logoutUser = () => {
   auth.signOut().then(() => {
     console.log("user log out !!!");
+    router.push("/");
   });
-  router.push("/");
 };
 
 // 創建帳號
@@ -396,7 +474,6 @@ export const loadFirefightersByUnit = async (unit) => {
       firefighters.push({ id: doc.id, ...doc.data() });
     }
   });
-  console.log("loadFirefightersByUnit Complete", firefighters);
   return firefighters.length > 0 ? firefighters : null;
 };
 
@@ -426,3 +503,5 @@ export const listenUserState = () => {
     }
   });
 };
+
+// page refresh

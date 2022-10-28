@@ -1,21 +1,23 @@
 <template>
-  <Status :uid="uid.uid" :userData="userData" />
   <div style="height: 100px"></div>
   <div class="admin">
     <ul class="nav nav-tabs mt-3">
       <li class="nav-item">
-        <router-link class="nav-link text-white" to="/admin"
-          >管理首頁</router-link
-        >
+        <router-link class="nav-link text-white" to="/admin">首頁</router-link>
       </li>
       <li class="nav-item">
         <router-link class="nav-link text-white" to="/admin/memberList"
-          >管理分隊成員</router-link
+          >分隊成員</router-link
         >
       </li>
       <li class="nav-item">
         <router-link class="nav-link text-white" to="/admin/editFireFighters"
-          >管理警消成員</router-link
+          >警消成員</router-link
+        >
+      </li>
+      <li class="nav-item">
+        <router-link class="nav-link text-white" to="/admin/openNewUnit"
+          >開新分隊</router-link
         >
       </li>
     </ul>
@@ -32,60 +34,52 @@
         </blockquote>
       </div>
     </div>
-    <router-view :userData="userData"></router-view>
+    <router-view></router-view>
   </div>
-  <Footer />
 </template>
 
 <script>
 // @ is an alias to /src
-import Status from "../components/Status.vue";
-import Footer from "../components/Footer.vue";
 import { useRoute } from "vue-router";
-import { loadUser } from "@/firebase";
 import { reactive } from "@vue/reactivity";
-import { computed, watch } from "@vue/runtime-core";
-import firebase from "firebase/app";
-import router from "../router";
+import { computed } from "@vue/runtime-core";
+// import router from "../router";
+import { useStore } from "vuex";
 
 export default {
   name: "Home",
   components: {
-    Status,
-    Footer,
+    // Status,
+    // Footer,
   },
   setup() {
     const userData = reactive({
-      name: "",
-      rank: "",
-      emtlevel: "",
-      unit: "",
+      name: computed(() => {
+        return store.state.name;
+      }),
+      rank: computed(() => {
+        return store.state.rank;
+      }),
+      emtlevel: computed(() => {
+        return store.state.emtlevel;
+      }),
+      unit: computed(() => {
+        return store.state.unit;
+      }),
     });
-    const uid = reactive({ uid: "" });
-
-    firebase.auth().onAuthStateChanged((user) => {
-      if (user) {
-        uid.uid = user.uid;
-        console.log("登入 帳號 : " + user.uid);
-      } else {
-        console.log("無登入");
-        router.push("/");
-      }
+    const uid = computed(() => {
+      return store.state.uid;
     });
-
+    const store = useStore();
     const route = useRoute();
     const url = computed(() => {
       return route.path;
     });
 
-    const forUserData = async () => {
-      var user = await loadUser(uid.uid);
-      userData.name = user.name;
-      userData.rank = user.rank;
-      userData.emtlevel = user.emtlevel;
-      userData.unit = user.unit;
+    const verifyVuex = async () => {
+      await store.dispatch("verify");
     };
-    watch(uid, forUserData);
+    verifyVuex();
 
     return {
       userData,

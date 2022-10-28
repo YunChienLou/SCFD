@@ -8,11 +8,21 @@
         data-bs-toggle="modal"
         data-bs-target="#staticBackdrop2"
       >
-        + 新增成員
+        + 新增警消
       </button>
     </div>
   </div>
-  <table class="table table-dark table-striped">
+  <div v-if="isLoading" class="text-center mt-5 text-white">
+    <div class="h1 text-center">資料處理中 .....</div>
+    <div
+      class="spinner-border text-primary"
+      style="width: 5rem; height: 5rem"
+      role="status"
+    >
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+  <table v-else class="table table-dark table-striped">
     <thead>
       <tr>
         <th scope="col">No.</th>
@@ -35,7 +45,7 @@
             class="btn btn-secondary me-1"
             data-bs-toggle="modal"
             data-bs-target="#editUserModal"
-            @click="getUserData(user.id)"
+            @click="getUserData(index)"
           >
             修改
           </button>
@@ -84,68 +94,6 @@
                 required
               />
             </div>
-            <div class="mb-3">
-              <label class="form-label">E-mail</label>
-              <input
-                type="text"
-                class="form-control"
-                id="create"
-                placeholder="請輸入 email .."
-                v-model="create.email"
-                pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
-                required
-              />
-              <div class="valid-feedback feedback-pos">Looks good!</div>
-              <div class="invalid-feedback feedback-pos">
-                Please input valid email ID
-              </div>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">密碼</label>
-              <input
-                type="password"
-                class="form-control"
-                placeholder="請輸入 密碼 .."
-                id="create2"
-                v-model="create.passwords"
-                required
-              />
-            </div>
-            <div class="mb-3">
-              <label class="form-label">請再輸入一次密碼</label>
-              <input
-                type="password"
-                class="form-control"
-                id="create."
-                v-model="create.passwords"
-                required
-              />
-            </div>
-            <div class="mb-3">
-              <label class="form-label">級職</label>
-              <input
-                type="text"
-                class="form-control"
-                id="exampleInputPassword1"
-                v-model="create.rank"
-                placeholder="請輸入 級職 .."
-                required
-              />
-            </div>
-            <div class="mb-3">
-              <label class="form-label">EMT</label>
-              <select
-                class="form-select"
-                aria-label="Default select example"
-                v-model="create.emtlevel"
-                required
-              >
-                <option selected>請選擇</option>
-                <option>T1</option>
-                <option>T2</option>
-                <option>TP</option>
-              </select>
-            </div>
           </form>
         </div>
         <div class="modal-footer">
@@ -160,7 +108,7 @@
             type="button"
             class="btn btn-primary"
             data-bs-dismiss="modal"
-            :disabled="create.passwords == '' || passwordVerifie.value == false"
+            :disabled="create.name == ''"
             @click="addUser()"
           >
             新增
@@ -201,30 +149,6 @@
                 required
               />
             </div>
-            <div class="mb-3">
-              <label class="form-label">級職</label>
-              <input
-                type="text"
-                class="form-control"
-                id="exampleInputPassword2"
-                v-model="rankInput"
-                required
-              />
-            </div>
-            <div class="mb-3">
-              <label class="form-label">EMT</label>
-              <select
-                class="form-select"
-                aria-label="Default select example"
-                v-model="emtInput"
-                required
-              >
-                <option selected>請選擇</option>
-                <option>T1</option>
-                <option>T2</option>
-                <option>TP</option>
-              </select>
-            </div>
           </form>
         </div>
         <div class="modal-footer">
@@ -250,80 +174,151 @@
 </template>
 
 <script>
-import {
-  deleteUser,
-  updateUser,
-  getUser,
-  createUser,
-  loadFirefightersByUnit,
-} from "@/firebase";
+import { computed, inject, onMounted } from "@vue/runtime-core";
 import { reactive, ref } from "@vue/reactivity";
+import { useStore } from "vuex";
 import { unitNameEnum } from "@/util/Enum";
-import { watch } from "@vue/runtime-core";
 export default {
-  props: ["userData"],
-  setup(props) {
+  setup() {
+    const store = useStore();
+    const $FirefighterAPI = inject("$FirefighterAPI");
     const firefighters = ref([]);
-    const afterGetUnit = () => {
-      let unit = props.userData.unit;
-      let enumValue = unitNameEnum[unit];
-      loadFirefightersByUnit(enumValue).then((list) => {
-        firefighters.value = list;
-      });
-    };
-    if (props.userData.unit != "") {
-      afterGetUnit();
-    }
+    const isLoading = ref(false);
+    const unitVuex = computed(() => {
+      return store.state.unit;
+    });
+    const tokenVuex = computed(() => {
+      return store.state.token;
+    });
+    // const testGetters = computed(
+    //   () => store.getters["getUserData"]
+    // );
 
-    const nameInput = ref();
-    const targetUserId = ref();
-    const rankInput = ref();
-    const emtInput = ref();
+    const verifyVuex = () => {
+      return store.dispatch("verify");
+    };
+
+    const nameInput = ref("");
+    const targetUserId = ref("");
 
     const passwordVerifie = ref(false);
     const create = reactive({
       name: "",
-      email: "",
-      passwords: "",
-      emtlevel: "",
-      rank: "",
     });
-
-    const getUserData = async (id) => {
-      let data = await getUser(id);
-      nameInput.value = data.name;
-      rankInput.value = data.rank;
-      emtInput.value = data.emtlevel;
-      targetUserId.value = id;
+    const afterGetUnit = () => {
+      console.log("start execute afterGetUnit");
+      isLoading.value = true;
+      let unit = unitVuex.value;
+      let enumValue = unitNameEnum[unit];
+      let data = {
+        data: {
+          token: tokenVuex.value,
+          unit: enumValue,
+        },
+      };
+      console.log(data.data);
+      $FirefighterAPI
+        .getFirefighters(data, tokenVuex.value)
+        .then((res) => {
+          console.log(res);
+          firefighters.value = res.data.result.data;
+          isLoading.value = false;
+        })
+        .catch((err) => {
+          console.log(err);
+          failResponse(err);
+        });
+    };
+    const failResponse = (err) => {
+      isLoading.value = false;
+      alert(err + ";\n通知三重志工 羅云謙  0919539740");
+    };
+    const getUserData = async (index) => {
+      let target = JSON.parse(JSON.stringify(firefighters.value))[index];
+      console.log(target, index);
+      nameInput.value = target.name;
+      targetUserId.value = target.id;
     };
     const addUser = async () => {
-      await createUser(create);
-      create.name = "";
-      create.email = "";
-      create.passwords = "";
-      create.emtlevel = "";
-      create.rank = "";
+      isLoading.value = true;
+      let data = {
+        data: {
+          name: create.name,
+          unit: unitNameEnum[unitVuex.value],
+          token: tokenVuex.value,
+        },
+      };
+      console.log(data.data);
+      $FirefighterAPI
+        .createFirefighter(data, tokenVuex.value)
+        .then((res) => {
+          console.log(res);
+          afterGetUnit();
+        })
+        .catch((err) => {
+          console.log(err);
+          failResponse(err);
+        });
     };
     const editUser = () => {
-      let user = {
-        name: nameInput.value,
-        rank: rankInput.value,
-        emtlevel: emtInput.value,
+      isLoading.value = true;
+      let data = {
+        data: {
+          name: nameInput.value,
+          token: tokenVuex.value,
+          unit: unitNameEnum[unitVuex.value],
+          userId: targetUserId.value,
+        },
       };
-      updateUser(targetUserId.value, user);
+      console.log(data.data, "update data");
+      $FirefighterAPI
+        .updateFirefighter(data, tokenVuex.value)
+        .then((res) => {
+          console.log(res);
+          afterGetUnit();
+        })
+        .catch((err) => {
+          console.log(err);
+          failResponse(err);
+        });
     };
     const deleUser = (id) => {
-      deleteUser(id);
+      isLoading.value = true;
+      let data = {
+        data: {
+          uid: id,
+          unit: unitNameEnum[unitVuex.value],
+          token: tokenVuex.value,
+        },
+      };
+      $FirefighterAPI
+        .deleteFirefighter(data, tokenVuex.value)
+        .then((res) => {
+          console.log(res);
+          afterGetUnit();
+        })
+        .catch((err) => {
+          console.log(err);
+          failResponse(err);
+        });
     };
-    watch(props.userData, afterGetUnit);
+    verifyVuex();
+    onMounted(() => {
+      console.log("onMounted");
+      if (unitVuex.value != null || tokenVuex.value != null) {
+        afterGetUnit();
+      }
+    });
     return {
+      store,
       create,
+      isLoading,
       nameInput,
-      rankInput,
-      emtInput,
       targetUserId,
       passwordVerifie,
       firefighters,
+      unitVuex,
+      tokenVuex,
       getUserData,
       editUser,
       deleUser,

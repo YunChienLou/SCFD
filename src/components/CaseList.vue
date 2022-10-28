@@ -23,8 +23,8 @@
       :key="id"
     >
       <div class="card-header transBg fw-bold fs-4">
-        {{ dateFormate(time) }}<br />{{ unit }}{{ emtlevel }}
-        {{ who }} {{ rank }}<br />患者人數 : {{ patient }}
+        {{ dateFormate(time) }}<br />{{ unit }}{{ emtlevel }} {{ who }} {{ rank
+        }}<br />患者人數 : {{ patient }}
       </div>
       <div class="card-body transBg2">
         <div class="row mb-3">
@@ -498,13 +498,12 @@
 
 <script>
 import { useLoadCases, deleteCase } from "@/firebase";
-import { inject } from '@vue/runtime-core';
+import { inject } from "@vue/runtime-core";
 
 export default {
   setup() {
     const cases = useLoadCases();
-    console.log(cases);
-    const dateFormate = inject("dateFormate")
+    const dateFormate = inject("dateFormate");
     const classAppend = (selectedParts, value) => {
       var partsArray = selectedParts.map((a) => a.whatPart);
       var target = value;

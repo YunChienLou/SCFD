@@ -403,7 +403,7 @@
 
         <!-- Modal -->
         <div
-          class="modal fade text-dark h-50 mt-5"
+          class="modal fade text-dark h-75 mt-5"
           id="exampleModal"
           tabindex="-1"
           aria-labelledby="exampleModalLabel"
@@ -712,8 +712,11 @@
 
         <!-- Modal -->
         <div
-          class="modal fade text-dark h-50 mt-5"
+          class="modal fade text-dark h-75 mt-5"
           id="SceneModal"
+          data-bs-backdrop="static"
+          data-bs-keyboard="false"
+          tabindex="-1"
           aria-labelledby="exampleModalLabel"
           aria-hidden="true"
         >
@@ -1061,7 +1064,7 @@
       <div class="row m-2">
         <label class="col-4 form-label">執行人員</label>
         <!-- <input class="col form-control" type="text" v-model="form.who" /> -->
-        <p class="col form-control mb-0" type="text">{{ userData.name }}</p>
+        <p class="col form-control mb-0" type="text">{{ name }}</p>
       </div>
       <div class="row m-2"></div>
       <!-- <div class="row m-2">
@@ -1145,22 +1148,39 @@
 
 <script>
 import { createCase, loadFirefightersByUnit } from "@/firebase";
-import { reactive, toRef, toRefs, watch, ref } from "vue";
+import { reactive, watch, ref, computed, onMounted } from "vue";
 import { unitNameEnum } from "@/util/Enum";
-export default {
-  props: ["uid", "userData"],
-  setup(props) {
-    const userData = toRefs(props.userData);
-    const userId = toRef(props.uid, "uid");
-    const firefighters = ref([]);
-    // const unitChinese = ref();
+import { useStore } from "vuex";
 
+export default {
+  setup() {
+    const store = useStore();
+    const name = computed(() => {
+      return store.state.name;
+    });
+    const unit = computed(() => {
+      return store.state.unit;
+    });
+    const rank = computed(() => {
+      return store.state.rank;
+    });
+    const emtlevel = computed(() => {
+      return store.state.emtlevel;
+    });
+    const uid = computed(() => {
+      return store.state.uid;
+    });
+    const firefighters = ref([]);
     const afterGetUnit = () => {
-      let unit = props.userData.unit;
-      let enumValue = unitNameEnum[unit];
-      loadFirefightersByUnit(enumValue).then((list) => {
-        firefighters.value = list;
-      });
+      if (unit.value) {
+        let enumValue = unitNameEnum[unit.value];
+        console.log(enumValue);
+        loadFirefightersByUnit(enumValue).then((list) => {
+          firefighters.value = list;
+        });
+      } else {
+        console.log("unit == null");
+      }
     };
 
     var countId = 0;
@@ -1173,20 +1193,20 @@ export default {
       patient: "",
       location: "",
       tp: [],
-      uid: userId,
+      uid: uid,
       otherContent: "",
-      who: userData.name,
-      rank: userData.rank,
-      unit: userData.unit,
-      emtlevel: userData.emtlevel,
+      who: name,
+      rank: rank,
+      unit: unit,
+      emtlevel: emtlevel,
       vital: {
         Bp: {
-          Systolic: Number,
-          Diastolic: Number,
+          Systolic: null,
+          Diastolic: null,
         },
-        Hr: Number,
-        SpO2: Number,
-        BodyTemp: Number,
+        Hr: null,
+        SpO2: null,
+        BodyTemp: null,
       },
       hospital: "",
     });
@@ -1227,12 +1247,12 @@ export default {
       form.location = "";
       form.tp = "";
       form.otherContent = "";
-      form.vital.Bp.Systolic = Number;
-      form.vital.Bp.Diastolic = Number;
-      form.vital.Hr = Number;
-      form.vital.SpO2 = Number;
+      form.vital.Bp.Systolic = null;
+      form.vital.Bp.Diastolic = null;
+      form.vital.Hr = null;
+      form.vital.SpO2 = null;
       form.hospital = "";
-      form.vital.BodyTemp = Number;
+      form.vital.BodyTemp = null;
       // 輸入框歸零 從第0項 刪除到第(陣列數量)項
       selectedParts.splice(0, selectedParts.length);
       // 跳出成功通知
@@ -1252,10 +1272,12 @@ export default {
         document.getElementById(key).classList.add("cls-2");
       }
     };
-    // 監測selectedParts是否變動 變動執行更新
-    watch(selectedParts, updateParts);
-    watch(props.userData, afterGetUnit);
-
+    onMounted(() => {
+      afterGetUnit();
+    }),
+      // 監測selectedParts是否變動 變動執行更新
+      watch(selectedParts, updateParts);
+    watch(unit, afterGetUnit);
     return {
       form,
       onSubmit,
@@ -1264,12 +1286,19 @@ export default {
       deleBodyPart,
       firefighters,
       updateParts,
+      afterGetUnit,
+
+      uid,
+      name,
+      unit,
+      rank,
+      emtlevel,
     };
   },
 };
 </script>
 
-<style>
+<style scoped>
 .caseCreate {
   z-index: 3;
 }

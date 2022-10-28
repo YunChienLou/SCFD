@@ -1062,9 +1062,20 @@
             tp
           }}</span>
         </div>
-
-        <ul class="col p-0 h-25 firefighter-list">
-          {{form.tp}}
+        <div
+          v-if="isLoading"
+          class="col firefighter-list text-center text-white"
+        >
+          <div class="h1 text-center">資料處理中 .....</div>
+          <div
+            class="spinner-border text-primary"
+            style="width: 3rem; height: 3rem"
+            role="status"
+          >
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+        <ul v-else class="col p-0 h-25 firefighter-list">
           <li
             class="list-group-item text-center"
             v-for="fireMan in firefighters"
@@ -1114,6 +1125,7 @@
           <option>榮總</option>
           <option>雙和</option>
           <option>亞東</option>
+          <option>部立台北</option>
           <option>其他醫院</option>
           <option>拒送</option>
         </select>
@@ -1126,30 +1138,58 @@
 </template>
 
 <script>
-import { reactive, computed, onMounted, watch, ref } from "vue";
+import { reactive, computed, onMounted, watch, ref, inject } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { getCase, updateCases, loadFirefightersByUnit } from "@/firebase";
+import { getCase, updateCases } from "@/firebase";
 import { unitNameEnum } from "@/util/Enum";
+import { useStore } from "vuex";
 
 export default {
   setup() {
+    const store = useStore();
     const router = useRouter();
     const route = useRoute();
+    const isLoading = ref(false);
     const caseId = computed(() => route.params.id);
-    // 出錯
-    // 資料挖空格
     var countId = 0;
     var selectedParts = reactive([]);
     const firefighters = ref([]);
     const unitRef = ref();
-
+    const $FirefighterAPI = inject("$FirefighterAPI");
+    const unitVuex = computed(() => {
+      return store.state.unit;
+    });
+    const tokenVuex = computed(() => {
+      return store.state.token;
+    });
     const afterGetUnit = () => {
-      let enumValue = unitNameEnum[unitRef.value];
-      loadFirefightersByUnit(enumValue).then((list) => {
-        firefighters.value = list;
-      });
+      isLoading.value = true;
+      console.log("start execute afterGetUnit");
+      let unit = unitVuex.value;
+      let enumValue = unitNameEnum[unit];
+      let data = {
+        data: {
+          token: tokenVuex.value,
+          unit: enumValue,
+        },
+      };
+      console.log(data.data);
+      $FirefighterAPI
+        .getFirefighters(data, tokenVuex.value)
+        .then((res) => {
+          console.log(res);
+          isLoading.value = false;
+          firefighters.value = res.data.result.data;
+        })
+        .catch((err) => {
+          console.log(err);
+          isLoading.value = false;
+          failResponse(err);
+        });
     };
-
+    const failResponse = (err) => {
+      alert(err + ";\n通知三重志工 羅云謙  0919539740");
+    };
     const form = reactive({
       time: "",
       who: "",
@@ -1264,6 +1304,7 @@ export default {
 
     return {
       form,
+      isLoading,
       update,
       deleBodyPart,
       addbodypart,
@@ -1278,5 +1319,42 @@ export default {
 .edit {
   z-index: 2;
   opacity: 0.8;
+}
+.firefighter-list {
+  max-height: 200px;
+  margin-bottom: 10px;
+  overflow: scroll;
+  -webkit-overflow-scrolling: touch;
+}
+.form-control {
+  background-color: #212529;
+  color: #ffffff;
+}
+.list-group-item {
+  background: #212529;
+  border: #ffffff 1px solid;
+  border-radius: 5px;
+  color: #ffffff;
+}
+.form-select {
+  background: #212529;
+  color: #ffffff;
+}
+div.modal-body > div.list-group > ul > li.list-group-item {
+  background-color: #eeeeee;
+  color: #232323;
+}
+div.modal-body > div.list-group > ul > li.list-group-item {
+  background-color: #eeeeee;
+  color: #232323;
+}
+div.modal-body
+  > div.list-group
+  > ul
+  > li.list-group-item
+  > ul.list-group
+  > li.list-group-item {
+  background-color: #eeeeee;
+  color: #232323;
 }
 </style>

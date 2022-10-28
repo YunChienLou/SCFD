@@ -20,11 +20,12 @@ export function JSONToExcelConvertor(JSONData, FileName) {
     "後送醫院",
   ];
   if (!JSONData) {
+    console.log("JSON is null");
     return;
   }
   // 轉化json爲object
   var arrData = typeof JSONData !== "object" ? JSON.parse(JSONData) : JSONData;
-
+  // console.log("arrData",arrData)
   var excel = '<table id="expoetTable">';
 
   // 設置表頭

@@ -1,11 +1,13 @@
 <template>
   <div class="bg-dark text-white mx-0 overflow-hidden">
-    <div class="bg-filter" :data-text="uid"></div>
+    <div class="bg-filter" :data-text="name"></div>
     <!-- 浮水印 -->
     <div class="container">
       <div class="row d-flex justify-content-center">
         <div class="col-lg-6">
+          <Status :uid="uid" :userData="userData" />
           <router-view />
+          <Footer />
         </div>
       </div>
     </div>
@@ -14,38 +16,80 @@
 </template>
 
 <script>
-import firebase from "firebase/app";
+import Footer from "./components/Footer.vue";
+import Status from "./components/Status.vue";
+
+import { useStore } from "vuex";
+import { reactive } from "@vue/reactivity";
+import { computed, onUpdated } from "@vue/runtime-core";
 
 export default {
-  data() {
-    return {
-      uid: "",
-    };
+  components: {
+    Footer,
+    Status,
   },
-  methods: {
-    loginCheck() {
-      firebase.auth().onAuthStateChanged((user) => {
-        if (user) {
-          this.uid = user.uid;
-          console.log("引入資料");
-        } else {
-          console.log("無登入");
-        }
-      });
-    },
-    moreBg() {
+  setup() {
+    const store = useStore();
+    const name = computed(() => {
+      return store.state.name;
+    });
+    const userData = reactive({
+      name: computed(() => {
+        return store.state.name;
+      }),
+      rank: computed(() => {
+        return store.state.rank;
+      }),
+      emtlevel: computed(() => {
+        return store.state.emtlevel;
+      }),
+      unit: computed(() => {
+        return store.state.unit;
+      }),
+    });
+    const uid = computed(() => {
+      return store.state.uid;
+    });
+
+    const moreBg = () => {
       const target = document.querySelectorAll(".bg-filter");
       Array.from(target).forEach(function (el) {
         el.dataset.text = (el.dataset.text + " ").repeat(10);
       });
-    },
+    };
+
+    const verifyVuex = async () => {
+      console.log("App");
+      await store.dispatch("verify");
+    };
+    verifyVuex();
+    onUpdated(() => {
+      moreBg;
+    });
+    return {
+      userData,
+      uid,
+      name,
+    };
   },
-  mounted() {
-    this.loginCheck();
-  },
-  updated() {
-    this.moreBg();
-  },
+  // methods: {
+  //   async loginCheck() {
+  //     console.log("LoginStatus")
+  //     await store.dispatch("verify");
+  //   },
+  //   moreBg() {
+  //     const target = document.querySelectorAll(".bg-filter");
+  //     Array.from(target).forEach(function (el) {
+  //       el.dataset.text = (el.dataset.text + " ").repeat(10);
+  //     });
+  //   },
+  // },
+  // mounted() {
+  //   this.loginCheck();
+  // },
+  // updated() {
+  //   this.moreBg();
+  // },
 };
 </script>
 <style scoped>
