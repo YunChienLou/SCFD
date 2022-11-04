@@ -33,6 +33,13 @@
           <li class="nav-item p-3" @click="closeNav()">
             <router-link
               class="text-decoration-none nav-link text-white fw-bold fs-4"
+              to="/dashboard"
+              >計分表</router-link
+            >
+          </li>
+          <li class="nav-item p-3" @click="closeNav()">
+            <router-link
+              class="text-decoration-none nav-link text-white fw-bold fs-4"
               to="/search"
               >案件查詢</router-link
             >

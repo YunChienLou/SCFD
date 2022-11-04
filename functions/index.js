@@ -7,6 +7,7 @@ admin.initializeApp({
 });
 const db = admin.firestore();
 const usersRef = db.collection("users");
+const recordRef = db.collection("records");
 
 exports.createUser = functions
   .region("asia-east1")
@@ -41,6 +42,11 @@ exports.createUser = functions
                   .doc(userRecord.uid)
                   .set(userData)
                   .then(() => {
+                    serverRecord(
+                      token,
+                      "Successfully created new user:" + userRecord.uid,
+                      false
+                    );
                     return {
                       message:
                         "Successfully created new user:" + userRecord.uid,
@@ -48,6 +54,11 @@ exports.createUser = functions
                     };
                   })
                   .catch((error) => {
+                    serverRecord(
+                      token,
+                      "Error creating new doc , createUser",
+                      true
+                    );
                     throw new functions.https.HttpsError(
                       502,
                       "Error creating new doc:",
@@ -56,6 +67,11 @@ exports.createUser = functions
                   });
               })
               .catch((error) => {
+                serverRecord(
+                  token,
+                  "Error creating new user , createUser",
+                  true
+                );
                 throw new functions.https.HttpsError(
                   501,
                   "Error creating new user:",
@@ -63,6 +79,7 @@ exports.createUser = functions
                 );
               });
           } else {
+            serverRecord(token, "Not Admin can't access , createUser", true);
             throw new functions.https.HttpsError(
               500,
               "Not Admin can't access",
@@ -89,19 +106,19 @@ exports.getUsers = functions
         .verifyIdToken(token)
         .then(async (claims) => {
           if (claims.isAdmin === true) {
-            console.log("是管理員");
             const snapshot = await usersRef.where("unit", "==", unit).get();
             let data = snapshot.docs.map((doc) => ({
               id: doc.id,
               ...doc.data(),
             }));
-            console.log(data);
+            serverRecord(token, "Successfully getUsers", false);
             return {
               message: "Successfully fetch users:",
               result: 200,
               data: data,
             };
           } else {
+            serverRecord(token, "Not Admin can't access , getUsers", true);
             throw new functions.https.HttpsError(
               500,
               "Not Admin can't access",
@@ -110,6 +127,7 @@ exports.getUsers = functions
           }
         })
         .catch((error) => {
+          serverRecord(token, "verifyIdToken process fail , getUsers", true);
           throw new functions.https.HttpsError(
             500,
             "verifyIdToken process fail",
@@ -137,11 +155,13 @@ exports.deleteUser = functions
           if (claims.isAdmin === true) {
             await admin.auth().deleteUser(uid);
             await usersRef.doc(uid).delete();
+            serverRecord(token, "Successfully delete user:" + uid, false);
             return {
               message: "Successfully delete user:" + uid,
               result: 200,
             };
           } else {
+            serverRecord(token, "Not Admin can't access , deleteUser", true);
             throw new functions.https.HttpsError(
               500,
               "Not Admin can't access",
@@ -177,12 +197,18 @@ exports.updateUser = functions
               .doc(userId)
               .update(userData)
               .then(() => {
+                serverRecord(
+                  token,
+                  "Successfully update user:" + userId,
+                  false
+                );
                 return {
                   message: "Successfully update user:" + userId,
                   result: 200,
                 };
               })
               .catch(() => {
+                serverRecord(token, "fail at updating doc , updateUser", true);
                 throw new functions.https.HttpsError(
                   "failed-execute",
                   "fail at updating doc",
@@ -190,6 +216,7 @@ exports.updateUser = functions
                 );
               });
           } else {
+            serverRecord(token, "Not Admin can't access , updateUser", true);
             throw new functions.https.HttpsError(
               "failed-execute",
               "Not Admin can't access",
@@ -238,12 +265,18 @@ exports.createFirefighter = functions
               .collection(unit + "/" + unitId + "/firefighters")
               .add(firefighterData)
               .then(() => {
+                serverRecord(
+                  token,
+                  "Successfully add firefighter:" + name,
+                  false
+                );
                 return {
                   message: "Successfully add firefighter:" + name,
                   result: 200,
                 };
               })
               .catch(() => {
+                serverRecord(token, "fail create new doc ", true);
                 throw new functions.https.HttpsError(
                   500,
                   "create new doc fail",
@@ -251,6 +284,7 @@ exports.createFirefighter = functions
                 );
               });
           } else {
+            serverRecord(token, "Not Admin can't access", true);
             throw new functions.https.HttpsError(
               500,
               "Not Admin can't access",
@@ -277,7 +311,6 @@ exports.getFirefighters = functions
         .verifyIdToken(token)
         .then(async (claims) => {
           if (claims.isAdmin === true) {
-            console.log("是管理員");
             const unitId = await getCollectionId(unit);
             const snapshot = await db
               .collection(unit + "/" + unitId + "/firefighters")
@@ -286,13 +319,14 @@ exports.getFirefighters = functions
               id: doc.id,
               ...doc.data(),
             }));
-            console.log(data);
+            serverRecord(token, "Successfully fetch firefighters", false);
             return {
               message: "Successfully fetch firefighters",
               result: 200,
               data: data,
             };
           } else {
+            serverRecord(token, "Not Admin can't access", true);
             throw new functions.https.HttpsError(
               500,
               "Not Admin can't access",
@@ -301,6 +335,7 @@ exports.getFirefighters = functions
           }
         })
         .catch((error) => {
+          serverRecord(token, "verifyIdToken process fail", true);
           throw new functions.https.HttpsError(
             500,
             "verifyIdToken process fail",
@@ -370,12 +405,18 @@ exports.updateFirefighter = functions
               .doc(userId)
               .update(firefighterData)
               .then(() => {
+                serverRecord(
+                  token,
+                  "Successfully update firefighterData:" + userId,
+                  false
+                );
                 return {
                   message: "Successfully update firefighterData:" + userId,
                   result: 200,
                 };
               })
               .catch(() => {
+                serverRecord(token, "Not senior-admin can't access", true);
                 throw new functions.https.HttpsError(
                   "failed-execute",
                   "fail at updating doc",
@@ -383,6 +424,7 @@ exports.updateFirefighter = functions
                 );
               });
           } else {
+            serverRecord(token, "Not admin can't access", true);
             throw new functions.https.HttpsError(
               "failed-execute",
               "Not Admin can't access",
@@ -479,6 +521,12 @@ exports.createAdmin = functions
                           .collection("fireFighters")
                           .add({})
                           .then(() => {
+                            serverRecord(
+                              token,
+                              "Successfully created new admin & unit:" +
+                                unitEng,
+                              false
+                            );
                             return {
                               message:
                                 "Successfully created new admin & unit:" +
@@ -488,6 +536,14 @@ exports.createAdmin = functions
                           });
                       })
                       .catch((error) => {
+                        serverRecord(
+                          token,
+                          "Error creating new doc:" +
+                            unitEng +
+                            "; userData: " +
+                            userData,
+                          true
+                        );
                         throw new functions.https.HttpsError(
                           502,
                           "Error creating new doc:" + unitEng,
@@ -496,6 +552,11 @@ exports.createAdmin = functions
                       });
                   })
                   .catch((error) => {
+                    serverRecord(
+                      token,
+                      "Error setCustomUserClaims:" + unitEng,
+                      true
+                    );
                     throw new functions.https.HttpsError(
                       501,
                       "Error setCustomUserClaims:" + unitEng,
@@ -504,6 +565,11 @@ exports.createAdmin = functions
                   });
               })
               .catch((error) => {
+                serverRecord(
+                  token,
+                  "Error creating new admin:" + unitEng,
+                  true
+                );
                 throw new functions.https.HttpsError(
                   501,
                   "Error creating new admin:" + unitEng,
@@ -511,6 +577,7 @@ exports.createAdmin = functions
                 );
               });
           } else {
+            serverRecord(token, "Not YunChien can't access" + unitEng, true);
             throw new functions.https.HttpsError(
               500,
               "Not YunChien can't access" + unitEng,
@@ -550,6 +617,7 @@ exports.getAdmins = functions
                 let adminList = userRecords.users.filter((user) => {
                   return user.customClaims != null;
                 });
+                serverRecord(token, "Successfully fetch admins", false);
                 return {
                   message: "Successfully fetch admins",
                   result: 200,
@@ -557,6 +625,7 @@ exports.getAdmins = functions
                 };
               })
               .catch((error) => {
+                serverRecord(token, "fail on fetch all admins-list", true);
                 throw new functions.https.HttpsError(
                   500,
                   "Not YunChien can't access",
@@ -564,6 +633,7 @@ exports.getAdmins = functions
                 );
               });
           } else {
+            serverRecord(token, "Not senior-admin can't access getAdmins function", true);
             throw new functions.https.HttpsError(
               500,
               "Not YunChien can't access",
@@ -597,12 +667,14 @@ exports.setAdmin = functions
               .auth()
               .setCustomUserClaims(uid, { isAdmin: true })
               .then(() => {
+                serverRecord(token, "Successfully set admin", false);
                 return {
                   message: "Successfully set " + uid + " admin",
                   result: 200,
                 };
               });
           } else {
+            serverRecord(token, "Not senior-admin can't access", true);
             throw new functions.https.HttpsError(
               500,
               "Not YunChien can't access",
@@ -612,4 +684,45 @@ exports.setAdmin = functions
         });
     }
   });
+
 // server msg record
+// sendType : intruder , user , admin , senior-admin
+const serverRecord = (token, msg, isBug) => {
+  let recordData = {
+    uid: "",
+    msg: msg,
+    isBug: isBug,
+  };
+  admin
+    .auth()
+    .verifyIdToken(token)
+    .then((claims) => {
+      recordData.uid = claims.uid;
+      if (
+        claims.isAdmin === true &&
+        claims.uid !== "R3S5c6JQEWZzVDGqMXCGCV2bNrg1"
+      ) {
+        recordData.sendType = "admin";
+      } else if (
+        claims.isAdmin === true &&
+        claims.uid == "R3S5c6JQEWZzVDGqMXCGCV2bNrg1"
+      ) {
+        recordData.sendType = "senior-admin";
+      } else {
+        recordData.sendType = "user";
+      }
+      recordRef.add(recordData)
+      console.log(recordData, "recordData");
+    })
+    .catch(() => {
+      recordRef.add(recordData)
+      recordData.uid = "not autherize user";
+      recordData.sendType = "intruder";
+    });
+};
+
+// per week
+
+// per month
+
+// per 2 month

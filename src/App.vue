@@ -5,7 +5,11 @@
     <div class="container">
       <div class="row d-flex justify-content-center">
         <div class="col-lg-6">
-          <Status :uid="uid" :userData="userData" />
+          <Status
+            v-if="!isLoginPage"
+            :uid="uid"
+            :userData="userData"
+          />
           <router-view />
           <Footer />
         </div>
@@ -18,7 +22,7 @@
 <script>
 import Footer from "./components/Footer.vue";
 import Status from "./components/Status.vue";
-
+import { useRoute } from "vue-router";
 import { useStore } from "vuex";
 import { reactive } from "@vue/reactivity";
 import { computed, onUpdated } from "@vue/runtime-core";
@@ -29,6 +33,10 @@ export default {
     Status,
   },
   setup() {
+    const route = useRoute();
+    const isLoginPage = computed(() => {
+      return ["Login"].indexOf(route.name) > -1;
+    });
     const store = useStore();
     const name = computed(() => {
       return store.state.name;
@@ -67,6 +75,7 @@ export default {
       moreBg;
     });
     return {
+      isLoginPage,
       userData,
       uid,
       name,

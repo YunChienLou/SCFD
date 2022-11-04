@@ -57,6 +57,11 @@
           class="col form-control"
           type="date"
           v-model="startTime"
+          @input="
+            () => {
+              if (startTime > endTime) endTime = '';
+            }
+          "
           required
         />
       </div>
@@ -67,6 +72,11 @@
           type="date"
           v-model="endTime"
           required
+          @input="
+            () => {
+              if (startTime > endTime) startTime = '';
+            }
+          "
         />
       </div>
     </div>
@@ -627,7 +637,8 @@ export default {
     const excelForUnit = async () => {
       let unitCasesTimePeriod = await loadUnitCasesByTimePeriod(
         startTime.value,
-        endTime.value
+        endTime.value,
+        userData.unit
       );
       JSONToExcelConvertor(
         unitCasesTimePeriod,

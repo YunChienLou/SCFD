@@ -15,7 +15,7 @@
           >警消成員</router-link
         >
       </li>
-      <li class="nav-item">
+      <li class="nav-item" v-if="uid == 'R3S5c6JQEWZzVDGqMXCGCV2bNrg1'">
         <router-link class="nav-link text-white" to="/admin/openNewUnit"
           >開新分隊</router-link
         >

@@ -2,6 +2,7 @@
   <div class="d-flex justify-content-between align-items-center my-3">
     <div class="h1 mb-0">管理員編組</div>
     <div class="">
+      {{ unitCh }}
       <button
         class="btn btn-outline-secondary dropdown-toggle"
         type="button"
@@ -10,6 +11,7 @@
       >
         分隊
       </button>
+
       <ul class="dropdown-menu">
         <li
           class="text-center bg-dark text-white fs-4 py-3"
@@ -102,8 +104,13 @@
       </ul>
     </div>
     <div class="">
-      <button type="button" class="btn btn-primary" @click="createAdmin()">
-        + 新增管理員
+      <button
+        type="button"
+        :disabled="unitCh == '' || unitEng == ''"
+        class="btn btn-primary"
+        @click="createAdmin()"
+      >
+        + 新增分隊
       </button>
     </div>
   </div>

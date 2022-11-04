@@ -297,15 +297,17 @@ export const loadUnitCases = async (value) => {
   snapshot.forEach((item) => {
     targetCases.push(item.data());
   });
+  console.log(targetCases);
   return targetCases;
 };
 
-export const loadUnitCasesByTimePeriod = async (start, end) => {
+export const loadUnitCasesByTimePeriod = async (start, end, unit) => {
   var targetCases = [];
   const snapshot = await dailyCases
     .orderBy("time", "desc")
     .where("time", ">=", start)
     .where("time", "<", end)
+    .where("unit", "==", unit)
     .get();
 
   snapshot.forEach((doc) => {
