@@ -256,6 +256,100 @@
         "unit": "三重"
     },
     {
+        "vital": {
+            "Hr": 0,
+            "BodyTemp": 36.5,
+            "Bp": {
+                "Systolic": 138,
+                "Diastolic": 87
+            },
+            "SpO2": 0
+        },
+        "hospital": "市三",
+        "location": "信義西街",
+        "rank": "隊員",
+        "emtlevel": "T1",
+        "tp": "賴彥丞",
+        "time": "2022-10-19T19:37",
+        "who": "重陽",
+        "onScene": [
+            "頭部外傷",
+            "非交通事故",
+            "肢體疼痛"
+        ],
+        "patient": 1,
+        "treatment": [
+            "KED固定"
+        ],
+        "uid": "R3451ds5f6QEWZzVDGqMXCGCV2bNrg1",
+        "selectedParts": [
+            {
+                "whatHappen": "骨折",
+                "id": 1,
+                "whatPart": "右大腿"
+            },
+            {
+                "whatHappen": "歪斜",
+                "whatPart": "骨盆",
+                "id": 2
+            },
+            {
+                "whatPart": "頭部",
+                "whatHappen": "撕裂傷",
+                "id": 3
+            }
+        ],
+        "otherContent": "浴室跌倒 ",
+        "unit": "重陽"
+    },
+    {
+        "vital": {
+            "Hr": 0,
+            "BodyTemp": 36.5,
+            "Bp": {
+                "Systolic": 138,
+                "Diastolic": 87
+            },
+            "SpO2": 0
+        },
+        "hospital": "市三",
+        "location": "信義西街",
+        "rank": "隊員",
+        "emtlevel": "T1",
+        "tp": "賴彥丞",
+        "time": "2022-10-19T19:37",
+        "who": "二重測試",
+        "onScene": [
+            "頭部外傷",
+            "非交通事故",
+            "肢體疼痛"
+        ],
+        "patient": 1,
+        "treatment": [
+            "KED固定"
+        ],
+        "uid": "Ddjif2216JQEWZzVDGqMXCGCV2bNrg1",
+        "selectedParts": [
+            {
+                "whatHappen": "骨折",
+                "id": 1,
+                "whatPart": "右大腿"
+            },
+            {
+                "whatHappen": "歪斜",
+                "whatPart": "骨盆",
+                "id": 2
+            },
+            {
+                "whatPart": "頭部",
+                "whatHappen": "撕裂傷",
+                "id": 3
+            }
+        ],
+        "otherContent": "浴室跌倒 ",
+        "unit": "二重"
+    },
+    {
         "location": "自強路三段43巷5號二樓",
         "onScene": [
             "肢體無力"
