@@ -1,13 +1,16 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
+const { unitNameEnum } = require("./Enum");
 
 const serviceAccount = require("./apiKey.json");
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
 const db = admin.firestore();
+const casesRef = db.collection("cases");
 const usersRef = db.collection("users");
 const recordRef = db.collection("records");
+const allStatsRef = db.collection("allStats");
 
 exports.createUser = functions
   .region("asia-east1")
@@ -633,7 +636,11 @@ exports.getAdmins = functions
                 );
               });
           } else {
-            serverRecord(token, "Not senior-admin can't access getAdmins function", true);
+            serverRecord(
+              token,
+              "Not senior-admin can't access getAdmins function",
+              true
+            );
             throw new functions.https.HttpsError(
               500,
               "Not YunChien can't access",
@@ -692,6 +699,7 @@ const serverRecord = (token, msg, isBug) => {
     uid: "",
     msg: msg,
     isBug: isBug,
+    time: new Date(),
   };
   admin
     .auth()
@@ -711,18 +719,264 @@ const serverRecord = (token, msg, isBug) => {
       } else {
         recordData.sendType = "user";
       }
-      recordRef.add(recordData)
+      recordRef.add(recordData);
       console.log(recordData, "recordData");
     })
     .catch(() => {
-      recordRef.add(recordData)
+      recordRef.add(recordData);
       recordData.uid = "not autherize user";
       recordData.sendType = "intruder";
     });
 };
 
+const missionStatsByPersonal = (cases) => {
+  let ResultStats = {
+    //總排名
+    missionStatsByAllPersonal: [],
+    missionStatsByAllUnit: [],
+    //隊排名
+    missionStatsByUnitPersonal: [],
+  };
+  let missionStatsAll = [];
+  cases.forEach((el) => {
+    if (missionStatsAll.find((e) => e.uid == el.uid)) {
+      let obj = missionStatsAll.find((e) => {
+        return e.uid === el.uid;
+      });
+      obj.missionNum += 1;
+      // console.log("此案執行人員已造冊");
+      // 此案執行人員已造冊
+    } else {
+      // 此案執行人員未曾出現過
+      missionStatsAll.push({
+        unit: el.unit,
+        name: el.who,
+        uid: el.uid,
+        missionNum: 1,
+      });
+      // console.log("此案執行人員未造冊", missionStatsAll);
+    }
+  });
+  // missionStatsAll 即是 三大所有人 的勤務數量表
+  // 按照分隊歸類成 一個 Array 再跑一次 即可得到各分隊 排名
+  let missionStatsSortByUnit = {};
+  missionStatsAll.forEach((person) => {
+    let thisPersonsUnit = person.unit;
+    if (person.unit in missionStatsSortByUnit) {
+      missionStatsSortByUnit[thisPersonsUnit].push(person);
+    } else {
+      missionStatsSortByUnit[thisPersonsUnit] = [];
+      missionStatsSortByUnit[thisPersonsUnit].push(person);
+    }
+  });
+  // console.log("按照分隊 分出 個人統計結果", missionStatsSortByUnit);
+
+  Object.keys(missionStatsSortByUnit).forEach((key) => {
+    missionStatsSortByUnit[key] = missionNumTopN(
+      missionStatsSortByUnit[key],
+      3
+    );
+  });
+  // console.log("各分隊 救護前三名", missionStatsSortByUnit);
+  ResultStats.missionStatsByUnitPersonal = missionStatsSortByUnit;
+
+  // console.log("三大 個人 救護前三名: ", missionNumTopN(missionStatsAll, 3));
+  ResultStats.missionStatsByAllPersonal = missionNumTopN(missionStatsAll, 3);
+
+  let missionStatsByUnit = [];
+  missionStatsAll.forEach((person) => {
+    if (missionStatsByUnit.find((e) => e.unit == person.unit)) {
+      let obj = missionStatsByUnit.find((e) => {
+        return e.unit == person.unit;
+      });
+      obj.missionNum += person.missionNum;
+    } else {
+      missionStatsByUnit.push({ unit: person.unit, missionNum: 1 });
+    }
+  });
+  ResultStats.missionStatsByAllUnit = missionNumTopN(missionStatsByUnit, 3);
+
+  // console.log("三大各分隊 統計結果: ", missionNumTopN(missionStatsByUnit, 3));
+  return ResultStats;
+};
+
+const missionNumTopN = (arr, n) => {
+  return arr
+    .slice()
+    .sort((a, b) => {
+      return b.missionNum - a.missionNum;
+    })
+    .slice(0, n);
+};
+
+const onSceneStats = (cases) => {
+  let result = {
+    onSceneStatsAll: {},
+    onSceneStatsByUnit: {},
+  };
+  result.onSceneStatsByUnit = {};
+  cases.forEach((Case) => {
+    if (Case.unit in result.onSceneStatsByUnit) {
+      // console.log("此分隊已造冊");
+    } else {
+      result.onSceneStatsByUnit[Case.unit] = {};
+      // console.log("此分隊未造冊");
+    }
+    Case.onScene.forEach((el) => {
+      if (el in result.onSceneStatsByUnit[Case.unit]) {
+        result.onSceneStatsByUnit[Case.unit][el] += 1;
+        // console.log("已有此統計項目");
+      } else {
+        result.onSceneStatsByUnit[Case.unit][el] = 1;
+        // console.log("尚未有此統計項目");
+      }
+    });
+  });
+
+  Object.values(result.onSceneStatsByUnit).forEach((unit) => {
+    // console.log(Object.entries(unit), "this is units");
+    Object.entries(unit).forEach((scene) => {
+      if (scene[0] in result.onSceneStatsAll) {
+        result.onSceneStatsAll[scene[0]] += scene[1];
+      } else {
+        result.onSceneStatsAll[scene[0]] = scene[1];
+      }
+    });
+  });
+  return result;
+};
+
+const treatmentStats = (Cases) => {
+  let result = {
+    treatmentStatsAll: {},
+    treatmentStatsByUnit: {},
+  };
+  result.treatmentStatsByUnit = {};
+  Cases.forEach((Case) => {
+    if (Case.unit in result.treatmentStatsByUnit) {
+      // console.log("此分隊已造冊");
+    } else {
+      result.treatmentStatsByUnit[Case.unit] = {};
+      // console.log("此分隊未造冊");
+    }
+    Case.treatment.forEach((el) => {
+      if (el in result.treatmentStatsByUnit[Case.unit]) {
+        result.treatmentStatsByUnit[Case.unit][el] += 1;
+        // console.log("已有此統計項目");
+      } else {
+        result.treatmentStatsByUnit[Case.unit][el] = 1;
+        // console.log("尚未有此統計項目");
+      }
+    });
+  });
+
+  Object.values(result.treatmentStatsByUnit).forEach((unit) => {
+    // console.log(Object.entries(unit), "this is units");
+    Object.entries(unit).forEach((scene) => {
+      if (scene[0] in result.treatmentStatsAll) {
+        result.treatmentStatsAll[scene[0]] += scene[1];
+      } else {
+        result.treatmentStatsAll[scene[0]] = scene[1];
+      }
+    });
+  });
+  return result;
+};
+
+// dashboard
+
+// get data
+exports.getReport = functions
+  .region("asia-east1")
+  .https.onCall(async (data, context) => {
+    if (!context.auth) {
+      // Throwing an HttpsError so that the client gets the error details.
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        "The function must be called " + "while authenticated."
+      );
+    } else {
+      // let allStatsData = {
+      //   week:null,
+      //   month:null,
+      //   twoMonth:null
+      // }
+      const weekReportSnapshot = await allStatsRef
+        .doc("week")
+        .collection("weekCollection")
+        .orderBy("time", "desc")
+        .limit(1)
+        .get();
+        let data = weekReportSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }))
+      // const monthReportSnapshot = await allStatsRef
+      //   .doc("week")
+      //   .collection("weekCollection")
+      //   .orderBy("time", "desc")
+      //   .limit(1)
+      //   .get();
+      // const twoMonthReportSnapshot = await allStatsRef
+      //   .doc("week")
+      //   .collection("weekCollection")
+      //   .orderBy("time", "desc")
+      //   .limit(1)
+      //   .get();
+      console.log(data)
+    }
+  });
+
 // per week
+exports.weekReoprt = functions.pubsub
+  .schedule("every 2 minutes")
+  .timeZone("Asia/Taipei")
+  .onRun(async (context) => {
+    const now = new Date();
+    const weekAgoTimeStamp = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate() - 7,
+      now.getHours(),
+      now.getMinutes()
+    );
 
-// per month
+    const query = await casesRef
+      .orderBy("time", "desc")
+      .where("time", ">=", weekAgoTimeStamp.toISOString().split(".")[0])
+      .get();
+    const pool = query.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    console.log("weekAgoTimeStamp", weekAgoTimeStamp);
+    const MissionStatsResult = missionStatsByPersonal(pool);
+    const OnSceneStatsResult = onSceneStats(pool);
+    const treatmentStatsResult = treatmentStats(pool);
 
-// per 2 month
+    const AllStatsData = {
+      time: now,
+      onSceneStatsAll: OnSceneStatsResult.onSceneStatsAll,
+      treatmentStatsAll: treatmentStatsResult.treatmentStatsAll,
+      missionStatsByAllPersonal: MissionStatsResult.missionStatsByAllPersonal,
+      missionStatsByAllUnit: MissionStatsResult.missionStatsByAllUnit,
+    };
+    allStatsRef.doc("week").collection("weekCollection").add(AllStatsData);
+
+    for (const unit in MissionStatsResult.missionStatsByUnitPersonal) {
+      const UnitStatsData = {
+        time: now,
+        missionStatsByUnitPersonal:
+          MissionStatsResult.missionStatsByUnitPersonal[unit],
+        treatmentStatsByUnit: treatmentStatsResult.treatmentStatsByUnit[unit],
+        onSceneStatsByUnit: OnSceneStatsResult.onSceneStatsByUnit[unit],
+      };
+      const unitEngName = unitNameEnum[unit];
+      const unitId = await getCollectionId(unitEngName);
+      db.collection(unitEngName + "/" + unitId + "/unitStats")
+        .doc("unitStatsCollection")
+        .collection("week")
+        .add(UnitStatsData)
+        .then(console.log("success run weekReport"));
+    }
+  });
