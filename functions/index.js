@@ -886,7 +886,7 @@ const treatmentStats = (Cases) => {
 // dashboard
 
 // get data
-exports.getReport = functions
+exports.getReports = functions
   .region("asia-east1")
   .https.onCall(async (data, context) => {
     if (!context.auth) {
@@ -896,39 +896,78 @@ exports.getReport = functions
         "The function must be called " + "while authenticated."
       );
     } else {
-      // let allStatsData = {
-      //   week:null,
-      //   month:null,
-      //   twoMonth:null
-      // }
+      const { unit } = data;
+      const unitId = await getCollectionId(unit);
+      const unitRefs = db.collection(unit + "/" + unitId + "/unitStats");
       const weekReportSnapshot = await allStatsRef
         .doc("week")
         .collection("weekCollection")
         .orderBy("time", "desc")
         .limit(1)
         .get();
-        let data = weekReportSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }))
-      // const monthReportSnapshot = await allStatsRef
-      //   .doc("week")
-      //   .collection("weekCollection")
-      //   .orderBy("time", "desc")
-      //   .limit(1)
-      //   .get();
-      // const twoMonthReportSnapshot = await allStatsRef
-      //   .doc("week")
-      //   .collection("weekCollection")
-      //   .orderBy("time", "desc")
-      //   .limit(1)
-      //   .get();
-      console.log(data)
+      let weekData = weekReportSnapshot.docs.map((doc) => ({
+        ...doc.data(),
+      }))[0];
+      const monthReportSnapshot = await allStatsRef
+        .doc("month")
+        .collection("monthCollection")
+        .orderBy("time", "desc")
+        .limit(1)
+        .get();
+      let monthData = monthReportSnapshot.docs.map((doc) => ({
+        ...doc.data(),
+      }))[0];
+      const twoMonthReportSnapshot = await allStatsRef
+        .doc("2month")
+        .collection("2monthCollection")
+        .orderBy("time", "desc")
+        .limit(1)
+        .get();
+      let twoMonthData = twoMonthReportSnapshot.docs.map((doc) => ({
+        ...doc.data(),
+      }))[0];
+      const unitWeekReportSnapshot = await unitRefs
+        .doc("unitStatsCollection")
+        .collection("week")
+        .orderBy("time", "desc")
+        .limit(1)
+        .get();
+      let unitWeekData = unitWeekReportSnapshot.docs.map((doc) => ({
+        ...doc.data(),
+      }))[0];
+      const unitMonthReportSnapshot = await unitRefs
+        .doc("unitStatsCollection")
+        .collection("month")
+        .orderBy("time", "desc")
+        .limit(1)
+        .get();
+      let unitMonthData = unitMonthReportSnapshot.docs.map((doc) => ({
+        ...doc.data(),
+      }))[0];
+      const unit2MonthReportSnapshot = await unitRefs
+        .doc("unitStatsCollection")
+        .collection("2month")
+        .orderBy("time", "desc")
+        .limit(1)
+        .get();
+      let unit2MonthData = unit2MonthReportSnapshot.docs.map((doc) => ({
+        ...doc.data(),
+      }))[0];
+      return {
+        weekReport: { ...weekData },
+        monthReport: { ...monthData },
+        twoMonthReport: { ...twoMonthData },
+        unitData: {
+          week: unitWeekData,
+          month: unitMonthData,
+          twoMonth: unit2MonthData,
+        },
+      };
     }
   });
 
 // per week
-exports.weekReoprt = functions.pubsub
+exports.weekReport = functions.pubsub
   .schedule("every 2 minutes")
   .timeZone("Asia/Taipei")
   .onRun(async (context) => {

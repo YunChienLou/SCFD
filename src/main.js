@@ -10,7 +10,7 @@ app.provide("dateFormate", dateFormate);
 app.provide("$UserAPI", ServerAPI.user);
 app.provide("$FirefighterAPI", ServerAPI.firefighter);
 app.provide("$AdminAPI", ServerAPI.admin);
-
+app.provide("$ReportAPI", ServerAPI.report);
 app.use(router);
 app.use(store);
 

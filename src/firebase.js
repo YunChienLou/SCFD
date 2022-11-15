@@ -103,7 +103,18 @@ const admin = {
     });
   },
 };
-export default { user, firefighter, admin };
+
+const report = {
+  getReports: (data, token) => {
+    return axios.post(urlBase + "getReports", data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+  },
+}
+export default { user, firefighter, admin ,report};
 
 // 即將廢除 改 axios post method call api
 const config = {

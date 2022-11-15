@@ -40,8 +40,12 @@ const store = createStore({
         rank: state.rank,
       };
     },
+    getUnit:(state) => {return state.unit}
   },
   actions: {
+    async getData(state){
+      return state.state.unit
+    },
     async login(context, { email, password }) {
       let user = loginUser(email, password);
       console.log("login action", user.uid);
