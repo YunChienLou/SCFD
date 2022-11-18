@@ -4,8 +4,6 @@
 
 <script>
 // @ is an alias to /src
-// import Status from "../components/Status.vue";
-// import Footer from "../components/Footer.vue";
 import ManageUnit from "../components/ManageUnit.vue";
 
 export default {

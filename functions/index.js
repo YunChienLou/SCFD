@@ -968,7 +968,7 @@ exports.getReports = functions
 
 // per week
 exports.weekReport = functions.pubsub
-  .schedule("every 2 minutes")
+  .schedule("0 0 * * 7")
   .timeZone("Asia/Taipei")
   .onRun(async (context) => {
     const now = new Date();
@@ -1017,5 +1017,111 @@ exports.weekReport = functions.pubsub
         .collection("week")
         .add(UnitStatsData)
         .then(console.log("success run weekReport"));
+    }
+  });
+
+exports.monthReport = functions.pubsub
+  .schedule("0 0 1 * *")
+  .timeZone("Asia/Taipei")
+  .onRun(async (context) => {
+    const now = new Date();
+    const monthAgoTimeStamp = new Date(
+      now.getFullYear(),
+      now.getMonth() - 1,
+      now.getDate(),
+      now.getHours(),
+      now.getMinutes()
+    );
+
+    const query = await casesRef
+      .orderBy("time", "desc")
+      .where("time", ">=", monthAgoTimeStamp.toISOString().split(".")[0])
+      .get();
+    const pool = query.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    console.log("monthAgoTimeStamp", monthAgoTimeStamp);
+    const MissionStatsResult = missionStatsByPersonal(pool);
+    const OnSceneStatsResult = onSceneStats(pool);
+    const treatmentStatsResult = treatmentStats(pool);
+
+    const AllStatsData = {
+      time: now,
+      onSceneStatsAll: OnSceneStatsResult.onSceneStatsAll,
+      treatmentStatsAll: treatmentStatsResult.treatmentStatsAll,
+      missionStatsByAllPersonal: MissionStatsResult.missionStatsByAllPersonal,
+      missionStatsByAllUnit: MissionStatsResult.missionStatsByAllUnit,
+    };
+    allStatsRef.doc("month").collection("monthCollection").add(AllStatsData);
+
+    for (const unit in MissionStatsResult.missionStatsByUnitPersonal) {
+      const UnitStatsData = {
+        time: now,
+        missionStatsByUnitPersonal:
+          MissionStatsResult.missionStatsByUnitPersonal[unit],
+        treatmentStatsByUnit: treatmentStatsResult.treatmentStatsByUnit[unit],
+        onSceneStatsByUnit: OnSceneStatsResult.onSceneStatsByUnit[unit],
+      };
+      const unitEngName = unitNameEnum[unit];
+      const unitId = await getCollectionId(unitEngName);
+      db.collection(unitEngName + "/" + unitId + "/unitStats")
+        .doc("unitStatsCollection")
+        .collection("month")
+        .add(UnitStatsData)
+        .then(console.log("success run monthReport"));
+    }
+  });
+
+exports.twoMonthReport = functions.pubsub
+  .schedule("0 0 1 */2 *")
+  .timeZone("Asia/Taipei")
+  .onRun(async (context) => {
+    const now = new Date();
+    const twoMonthAgoTimeStamp = new Date(
+      now.getFullYear(),
+      now.getMonth() - 2,
+      now.getDate(),
+      now.getHours(),
+      now.getMinutes()
+    );
+
+    const query = await casesRef
+      .orderBy("time", "desc")
+      .where("time", ">=", twoMonthAgoTimeStamp.toISOString().split(".")[0])
+      .get();
+    const pool = query.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    console.log("twoMonthAgoTimeStamp", twoMonthAgoTimeStamp);
+    const MissionStatsResult = missionStatsByPersonal(pool);
+    const OnSceneStatsResult = onSceneStats(pool);
+    const treatmentStatsResult = treatmentStats(pool);
+
+    const AllStatsData = {
+      time: now,
+      onSceneStatsAll: OnSceneStatsResult.onSceneStatsAll,
+      treatmentStatsAll: treatmentStatsResult.treatmentStatsAll,
+      missionStatsByAllPersonal: MissionStatsResult.missionStatsByAllPersonal,
+      missionStatsByAllUnit: MissionStatsResult.missionStatsByAllUnit,
+    };
+    allStatsRef.doc("twoMonth").collection("twoMonthCollection").add(AllStatsData);
+
+    for (const unit in MissionStatsResult.missionStatsByUnitPersonal) {
+      const UnitStatsData = {
+        time: now,
+        missionStatsByUnitPersonal:
+          MissionStatsResult.missionStatsByUnitPersonal[unit],
+        treatmentStatsByUnit: treatmentStatsResult.treatmentStatsByUnit[unit],
+        onSceneStatsByUnit: OnSceneStatsResult.onSceneStatsByUnit[unit],
+      };
+      const unitEngName = unitNameEnum[unit];
+      const unitId = await getCollectionId(unitEngName);
+      db.collection(unitEngName + "/" + unitId + "/unitStats")
+        .doc("unitStatsCollection")
+        .collection("twoMonth")
+        .add(UnitStatsData)
+        .then(console.log("success run twoMonthReport"));
     }
   });

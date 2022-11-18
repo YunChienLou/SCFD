@@ -1,5 +1,7 @@
-export const TimeStampConverter = (seconds)=> {
-    console.log('TimeStampConverter',seconds)
-    if(undefined != seconds){return new Date(seconds).toISOString()}
-    
-}
+export const TimeStampConverter = (seconds) => {
+  
+  if (undefined != seconds) {
+    let d = new Date(seconds*1000);
+    return d.toISOString().split('T')[0]
+  }
+};

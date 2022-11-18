@@ -32,15 +32,10 @@ const store = createStore({
     },
   },
   getters: {
-    getUserData: (state) => {
-      return {
-        name: state.name,
-        unit: state.unit,
-        emtlevel: state.emtlevel,
-        rank: state.rank,
-      };
-    },
-    getUnit:(state) => {return state.unit}
+    getUnit:state => state.unit,
+    getToken:state => state.token,
+    getUid:state => state.uid,
+    getIsAdmin:state => state.isAdmin,
   },
   actions: {
     async getData(state){
