@@ -889,7 +889,6 @@
               >
                 {{ parts.whatPart }}<br />{{ parts.whatHappen }}
               </li>
-              <!-- <li class="list-group-item"></li> -->
             </div>
           </div>
         </div>

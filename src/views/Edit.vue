@@ -1187,8 +1187,8 @@ export default {
           failResponse(err);
         });
     };
-    const failResponse = (err) => {
-      alert(err + ";\n通知三重志工 羅云謙  0919539740");
+    const failResponse = () => {
+      // alert(err + ";\n通知三重志工 羅云謙  0919539740");
     };
     const form = reactive({
       time: "",

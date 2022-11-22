@@ -1,6 +1,6 @@
 <template>
   <div style="height: 100px"></div>
-  <div v-if="isLoading " class="text-center mt-5 text-white">
+  <div v-if="isLoading " class="text-center my-5 text-white">
     <div class="h1 text-center">資料處理中 .....</div>
     <div
       class="spinner-border text-primary"
@@ -13,9 +13,9 @@
   <div v-else class="">
     <div class="text-end fs-5 mb-4">
       <span class="me-3">統計模式 : </span>
-      <div class="h1" v-if="displayMode =='week'">week</div>
+      <!-- <div class="h1" v-if="displayMode =='week'">week</div>
       <div class="h1" v-if="displayMode =='month'">Month</div>
-      <div class="h1" v-if="displayMode =='twoMonth'">twoMonth</div>
+      <div class="h1" v-if="displayMode =='twoMonth'">twoMonth</div> -->
       <div class="form-check form-check-inline">
         <input
           class="form-check-input"

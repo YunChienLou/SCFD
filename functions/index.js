@@ -233,13 +233,19 @@ exports.updateUser = functions
 // Firefighters
 const getCollectionId = async (collection_name) => {
   var id;
+  console.log("getCollectionId collection_name", collection_name);
   await db
     .collection(collection_name)
     .get()
     .then((docs) => {
+      console.log("getCollectionId 找到 collection", docs.docs);
       docs.forEach((doc) => {
         id = doc.id;
+        console.log("getCollectionId forEach: ", doc.id);
       });
+    })
+    .catch((e) => {
+      console.log("getCollectionId error", e);
     });
   return id;
 };
@@ -518,12 +524,41 @@ exports.createAdmin = functions
                       .doc(userRecord.uid)
                       .set(userData)
                       .then(() => {
+                        console.log("create userRecord.uid");
                         return db
                           .collection(unitEng)
-                          .doc("subcollections")
+                          .doc()
                           .collection("fireFighters")
                           .add({})
-                          .then(() => {
+                          .then(async (obj) => {
+                            console.log("create fireFighters folder");
+                            const unitId = obj.path.split("/")[1];
+                            db.collection(unitEng)
+                              .doc(unitId)
+                              .collection("unitStats")
+                              .doc("unitStatsCollection")
+                              .collection("week")
+                              .add({});
+                            db.collection(unitEng)
+                              .doc(unitId)
+                              .collection("unitStats")
+                              .doc("unitStatsCollection")
+                              .collection("month")
+                              .add({});
+                            db.collection(unitEng)
+                              .doc(unitId)
+                              .collection("unitStats")
+                              .doc("unitStatsCollection")
+                              .collection("2Month")
+                              .add({});
+                            // db.collection(unitEng + "/" + unitId + "/unitStats")
+                            //   .doc("unitStatsCollection")
+                            //   .collection("month")
+                            //   .add({});
+                            // db.collection(unitEng + "/" + unitId + "/unitStats")
+                            //   .doc("unitStatsCollection")
+                            //   .collection("2Month")
+                            //   .add({});
                             serverRecord(
                               token,
                               "Successfully created new admin & unit:" +
@@ -1106,7 +1141,10 @@ exports.twoMonthReport = functions.pubsub
       missionStatsByAllPersonal: MissionStatsResult.missionStatsByAllPersonal,
       missionStatsByAllUnit: MissionStatsResult.missionStatsByAllUnit,
     };
-    allStatsRef.doc("twoMonth").collection("twoMonthCollection").add(AllStatsData);
+    allStatsRef
+      .doc("twoMonth")
+      .collection("twoMonthCollection")
+      .add(AllStatsData);
 
     for (const unit in MissionStatsResult.missionStatsByUnitPersonal) {
       const UnitStatsData = {

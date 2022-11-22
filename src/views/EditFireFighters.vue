@@ -229,9 +229,9 @@ export default {
           failResponse(err);
         });
     };
-    const failResponse = (err) => {
+    const failResponse = () => {
       isLoading.value = false;
-      alert(err + ";\n通知三重志工 羅云謙  0919539740");
+      // alert(err + ";\n通知三重志工 羅云謙  0919539740");
     };
     const getUserData = async (index) => {
       let target = JSON.parse(JSON.stringify(firefighters.value))[index];

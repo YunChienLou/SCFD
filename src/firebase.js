@@ -312,13 +312,12 @@ export const loadUnitCases = async (value) => {
   return targetCases;
 };
 
-export const loadUnitCasesByTimePeriod = async (start, end, unit) => {
+export const loadUnitCasesByTimePeriod = async (start, end) => {
   var targetCases = [];
   const snapshot = await dailyCases
     .orderBy("time", "desc")
     .where("time", ">=", start)
     .where("time", "<", end)
-    .where("unit", "==", unit)
     .get();
 
   snapshot.forEach((doc) => {
