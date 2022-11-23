@@ -1,15 +1,11 @@
 <template>
   <div class="bg-dark text-white mx-0 overflow-hidden">
-    <div class="bg-filter" :data-text="name"></div>
     <!-- 浮水印 -->
     <div class="container">
+      <div v-if="!isLoginPage" class="bg-filter" :data-text="name"></div>
       <div class="row d-flex justify-content-center">
         <div class="col-lg-6">
-          <Status
-            v-if="!isLoginPage"
-            :uid="uid"
-            :userData="userData"
-          />
+          <Status v-if="!isLoginPage" :uid="uid" :userData="userData" />
           <router-view />
           <Footer />
         </div>
@@ -39,7 +35,9 @@ export default {
     });
     const store = useStore();
     const name = computed(() => {
-      return store.state.name;
+      let identify =
+        store.state.unit + "分隊 " + store.state.rank + " " + store.state.name;
+      return identify;
     });
     const userData = reactive({
       name: computed(() => {
@@ -60,9 +58,12 @@ export default {
     });
 
     const moreBg = () => {
+      console.log("onUpdated");
       const target = document.querySelectorAll(".bg-filter");
       Array.from(target).forEach(function (el) {
-        el.dataset.text = (el.dataset.text + " ").repeat(10);
+        el.dataset.text = "";
+        el.dataset.text = (name.value + " ").repeat(20);
+        console.log(el.dataset.text);
       });
     };
 
@@ -70,9 +71,10 @@ export default {
       console.log("App");
       await store.dispatch("verify");
     };
-    verifyVuex();
+    
     onUpdated(() => {
-      moreBg;
+      moreBg();
+      verifyVuex();
     });
     return {
       isLoginPage,
@@ -81,38 +83,20 @@ export default {
       name,
     };
   },
-  // methods: {
-  //   async loginCheck() {
-  //     console.log("LoginStatus")
-  //     await store.dispatch("verify");
-  //   },
-  //   moreBg() {
-  //     const target = document.querySelectorAll(".bg-filter");
-  //     Array.from(target).forEach(function (el) {
-  //       el.dataset.text = (el.dataset.text + " ").repeat(10);
-  //     });
-  //   },
-  // },
-  // mounted() {
-  //   this.loginCheck();
-  // },
-  // updated() {
-  //   this.moreBg();
-  // },
 };
 </script>
 <style scoped>
 .bg-filter {
   position: fixed;
-  top: -15%;
-  right: 20%;
+  top: -60%;
+  right: 40%;
   /* overflow: hidden; */
   z-index: 0;
 }
 .bg-filter::before {
   display: block;
-  width: 150%;
-  height: 150%;
+  width: 250%;
+  height: 50%;
 
   transform: rotate(60deg);
   content: attr(data-text);

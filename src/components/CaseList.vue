@@ -463,16 +463,16 @@
         <h5 class="card-title badge transBg p-2 text-wrap">
           <i class="bi bi-info-circle"></i> 現場狀況 :
         </h5>
-        <p class="card-text">{{ onScene }}</p>
+        <p class="card-text">{{ onScene.toString() }}</p>
         <h5 class="card-title badge transBg p-2 text-wrap">
           <i class="bi bi-activity"></i> 處置項目 :
         </h5>
-        <p class="card-text">{{ treatment }}</p>
+        <p class="card-text">{{ treatment.toString() }}</p>
         <h5 class="card-title badge transBg p-2 text-wrap">
           <i class="bi bi-geo-alt"></i>
           執行警消
         </h5>
-        <p class="card-text">{{ tp }}</p>
+        <p class="card-text">{{ tp.toString() }}</p>
         <h5 class="card-title badge transBg p-2 text-wrap">
           <i class="bi bi-geo-alt"></i>
           報案地址 :
