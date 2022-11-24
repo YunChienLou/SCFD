@@ -216,16 +216,13 @@ export default {
           unit: enumValue,
         },
       };
-      console.log(data.data);
       $FirefighterAPI
         .getFirefighters(data, tokenVuex.value)
         .then((res) => {
-          console.log(res);
           firefighters.value = res.data.result.data;
           isLoading.value = false;
         })
         .catch((err) => {
-          console.log(err);
           failResponse(err);
         });
     };

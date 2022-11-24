@@ -1,6 +1,6 @@
 <template>
   <div style="height: 100px"></div>
-  <div v-if="isLoading " class="text-center my-5 text-white">
+  <div v-if="isLoading" class="text-center my-5 text-white">
     <div class="h1 text-center">資料處理中 .....</div>
     <div
       class="spinner-border text-primary"
@@ -48,7 +48,6 @@
           value="twoMonth"
           v-model="displayMode"
           :disabled="isTwoMonthExist"
-
         />
         <label class="form-check-label" for="inlineRadio3">2 個月</label>
       </div>
@@ -159,6 +158,8 @@
           </li>
         </ul>
       </div>
+    </div>
+    <div class="row my-4">
       <div class="col">
         <div class="h4">救護次數-分隊組</div>
         <ul class="list-group" v-if="displayMode == 'week'">
@@ -352,7 +353,7 @@
         </ul>
       </div>
     </div>
-    <div class="plot" v-if="displayMode =='week'">
+    <div class="plot" v-if="displayMode == 'week'">
       <div class="row mb-4">
         <div class="col">
           <div class="h4">現場狀況 統計圖</div>
@@ -374,7 +375,7 @@
         </div>
       </div>
     </div>
-    <div class="plot" v-if="displayMode =='month'">
+    <div class="plot" v-if="displayMode == 'month'">
       <div class="row mb-4">
         <div class="col">
           <div class="h4">現場狀況 統計圖</div>
@@ -396,7 +397,7 @@
         </div>
       </div>
     </div>
-    <div class="plot" v-if="displayMode =='twoMonth'">
+    <div class="plot" v-if="displayMode == 'twoMonth'">
       <div class="row mb-4">
         <div class="col">
           <div class="h4">現場狀況 統計圖</div>
@@ -434,25 +435,25 @@ export default {
     const $ReportAPI = inject("$ReportAPI");
     const isLoading = ref(false);
     const displayMode = ref("week");
-    const isWeekExist = computed(()=>{
-      if(reportData.value.weekReport){
-        return true
-      }else{
-        return false
+    const isWeekExist = computed(() => {
+      if (reportData.value.weekReport) {
+        return true;
+      } else {
+        return false;
       }
     });
-    const isMonthExist = computed(()=>{
-      if(reportData.value.monthReport){
-        return true
-      }else{
-        return false
+    const isMonthExist = computed(() => {
+      if (reportData.value.monthReport) {
+        return true;
+      } else {
+        return false;
       }
     });
-    const isTwoMonthExist = computed(()=>{
-      if(reportData.value.twoMonthReport){
-        return true
-      }else{
-        return false
+    const isTwoMonthExist = computed(() => {
+      if (reportData.value.twoMonthReport) {
+        return true;
+      } else {
+        return false;
       }
     });
     // const isTwoMonthExist = ref();
@@ -481,7 +482,6 @@ export default {
         },
       };
       if (tokenVuex.value != undefined && unitVuex.value != undefined) {
-        console.log("run api", tokenVuex.value, unitVuex.value);
         isLoading.value = true;
         $ReportAPI
           .getReports(data, tokenVuex.value)
@@ -517,7 +517,7 @@ export default {
       displayMode,
       isWeekExist,
       isMonthExist,
-      isTwoMonthExist
+      isTwoMonthExist,
     };
   },
 };

@@ -156,7 +156,12 @@ exports.deleteUser = functions
         .verifyIdToken(token)
         .then(async (claims) => {
           if (claims.isAdmin === true) {
-            await admin.auth().deleteUser(uid);
+            const userExist = await admin.auth().getUser(uid).then(()=>{
+              return true;
+            }).catch(()=>{return false});
+            if (userExist) {
+              await admin.auth().deleteUser(uid);
+            }
             await usersRef.doc(uid).delete();
             serverRecord(token, "Successfully delete user:" + uid, false);
             return {
@@ -234,11 +239,12 @@ exports.updateUser = functions
 const getCollectionId = async (collection_name) => {
   var id;
   console.log("getCollectionId collection_name", collection_name);
-  await db
+  db
     .collection(collection_name)
+    .limit(1)
     .get()
     .then((docs) => {
-      console.log("getCollectionId 找到 collection", docs.docs);
+      console.log("getCollectionId 找到 collection: ", docs.docs);
       docs.forEach((doc) => {
         id = doc.id;
         console.log("getCollectionId forEach: ", doc.id);
@@ -270,6 +276,7 @@ exports.createFirefighter = functions
               name: name,
             };
             const unitId = await getCollectionId(unit);
+            console.log("unitId"+ unitId)
             return db
               .collection(unit + "/" + unitId + "/firefighters")
               .add(firefighterData)
@@ -528,10 +535,10 @@ exports.createAdmin = functions
                         return db
                           .collection(unitEng)
                           .doc()
-                          .collection("fireFighters")
+                          .collection("firefighters")
                           .add({})
                           .then(async (obj) => {
-                            console.log("create fireFighters folder");
+                            console.log("create firefighters folder");
                             const unitId = obj.path.split("/")[1];
                             db.collection(unitEng)
                               .doc(unitId)
@@ -551,14 +558,6 @@ exports.createAdmin = functions
                               .doc("unitStatsCollection")
                               .collection("2Month")
                               .add({});
-                            // db.collection(unitEng + "/" + unitId + "/unitStats")
-                            //   .doc("unitStatsCollection")
-                            //   .collection("month")
-                            //   .add({});
-                            // db.collection(unitEng + "/" + unitId + "/unitStats")
-                            //   .doc("unitStatsCollection")
-                            //   .collection("2Month")
-                            //   .add({});
                             serverRecord(
                               token,
                               "Successfully created new admin & unit:" +

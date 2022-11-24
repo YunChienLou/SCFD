@@ -58,12 +58,10 @@ export default {
     });
 
     const moreBg = () => {
-      console.log("onUpdated");
       const target = document.querySelectorAll(".bg-filter");
       Array.from(target).forEach(function (el) {
         el.dataset.text = "";
         el.dataset.text = (name.value + " ").repeat(20);
-        console.log(el.dataset.text);
       });
     };
 
@@ -73,6 +71,7 @@ export default {
     };
     
     onUpdated(() => {
+      console.log("onUpdated");
       moreBg();
       verifyVuex();
     });

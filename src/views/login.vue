@@ -1,16 +1,17 @@
 <template>
-  <div class="login container vh-100">
+  <div class="login container">
     <div class="row justify-content-center">
       <div class="col-md-6 my-5 text-center">
         <h2 class="heading-section">新北市救護義消<br />線上系統</h2>
       </div>
     </div>
-    <div class="row justify-content-center">
+    <img src="@/assets/unitLogo_whiteBg.png" class="img-fluid mb-5" alt="...">
+    <div class="row justify-content-center mb-5">
       <div class="col-md-7">
         <div class="login-wrap p-4">
           <div class="d-flex">
             <div class="w-100">
-              <h3 class="mb-5">登入</h3>
+              <h2 class="mb-5">登入</h2>
             </div>
           </div>
           <form action="#" class="login-form" autocomplete="on">
@@ -65,18 +66,15 @@
         </div>
       </div>
     </div>
-    <Footer />
   </div>
 </template>
 
 <script>
-import Footer from "../components/Footer.vue";
 import { loginUser, forgetPasswords } from "@/firebase";
 
 export default {
   name: "login",
   components: {
-    Footer,
   },
   setup() {
     const loginEmail = "";
@@ -95,8 +93,4 @@ export default {
 };
 </script>
 <style scoped>
-.login {
-  z-index: 2;
-  opacity: 0.8;
-}
 </style>

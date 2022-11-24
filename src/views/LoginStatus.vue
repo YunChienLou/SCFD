@@ -525,9 +525,48 @@
         <i class="bi bi-info-circle"></i> 生命徵象 :
       </h5>
       <table class="table text-reset">
+        <thead>
+          <tr>
+            <th scope="col">血壓</th>
+            <th scope="col">血氧</th>
+            <th scope="col">心律</th>
+            <th scope="col">體溫</th>
+          </tr>
+        </thead>
         <tbody>
-          <tr v-for="(name, value, index) in vital" :key="index">
-            <td>{{ value }} {{ name }}</td>
+          <tr>
+            <td :class="[
+                  vital?.Bp?.Systolic >= 120 || vital?.Bp?.Systolic <= 90 || vital?.Bp?.Diastolic >= 80 ? 'bg-danger text-white' : ' ',
+                ]">
+              <span
+                >{{ vital?.Bp?.Systolic }}  </span
+              >
+              /
+              <span
+                >{{ vital?.Bp?.Diastolic }}</span
+              >
+            </td>
+            <td :class="[vital?.SpO2 <= 97 ? 'text-white bg-danger' : 'text-white']">
+              {{ vital?.SpO2 }}
+            </td>
+            <td
+              :class="[
+                vital?.Hr >= 120 || vital?.Hr <= 60
+                  ? 'text-white bg-danger'
+                  : 'text-white',
+              ]"
+            >
+              {{ vital?.Hr }}
+            </td>
+            <td
+              :class="[
+                vital?.BodyTemp >= 38.5 || vital?.BodyTemp <= 32
+                  ? 'text-white bg-danger'
+                  : 'text-white',
+              ]"
+            >
+              {{ vital?.BodyTemp }}
+            </td>
           </tr>
         </tbody>
       </table>

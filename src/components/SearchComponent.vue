@@ -906,11 +906,39 @@
           </thead>
           <tbody>
             <tr>
-              <td>{{ vital?.Bp.Systolic }}/{{ vital?.Bp.Diastolic }}</td>
-              <td>{{ vital?.SpO2 }}</td>
-              <td>{{ vital?.Hr }}</td>
-              <td>{{ vital?.BodyTemp }}</td>
-            </tr>
+            <td :class="[
+                  vital?.Bp?.Systolic >= 120 || vital?.Bp?.Systolic <= 90 || vital?.Bp?.Diastolic >= 80 ? 'bg-danger text-white' : ' ',
+                ]">
+              <span
+                >{{ vital?.Bp?.Systolic }}  </span
+              >
+              /
+              <span
+                >{{ vital?.Bp?.Diastolic }}</span
+              >
+            </td>
+            <td :class="[vital?.SpO2 <= 97 ? 'text-white bg-danger' : 'text-white']">
+              {{ vital?.SpO2 }}
+            </td>
+            <td
+              :class="[
+                vital?.Hr >= 120 || vital?.Hr <= 60
+                  ? 'text-white bg-danger'
+                  : 'text-white',
+              ]"
+            >
+              {{ vital?.Hr }}
+            </td>
+            <td
+              :class="[
+                vital?.BodyTemp >= 38.5 || vital?.BodyTemp <= 32
+                  ? 'text-white bg-danger'
+                  : 'text-white',
+              ]"
+            >
+              {{ vital?.BodyTemp }}
+            </td>
+          </tr>
           </tbody>
         </table>
         <h5 class="card-title badge transBg p-2 text-wrap">

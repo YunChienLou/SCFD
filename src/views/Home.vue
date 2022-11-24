@@ -10,7 +10,7 @@
 <script>
 // @ is an alias to /src
 import CaseCreate from "../components/CaseCreate.vue";
-// import userState from "../mixin/userState";
+
 export default {
   name: "Home",
   components: {

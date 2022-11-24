@@ -163,7 +163,13 @@
             type="button"
             class="btn btn-primary"
             data-bs-dismiss="modal"
-            :disabled="create.passwords == '' || passwordVerifie.value == false"
+            :disabled="
+              create.passwords == '' ||
+              create.emtlevel == '' ||
+              create.name == '' ||
+              create.email == '' ||
+              create.rank == ''
+            "
             @click="addUser()"
           >
             新增
@@ -307,7 +313,10 @@ export default {
           $UserAPI
             .getUsers(data, token.value)
             .then((res) => {
-              users.value = res.data.result.data;
+              let filterArray = res.data.result.data.filter((el) => {
+                return el.rank != "承辦警消";
+              });
+              users.value = filterArray;
               isLoading.value = false;
             })
             .catch((err) => {
@@ -351,7 +360,8 @@ export default {
           });
         })
         .catch((err) => {
-          alert(err);
+          alert("操作錯誤 : " + err);
+          isLoading.value = false;
         });
       create.name = "";
       create.email = "";
@@ -388,7 +398,8 @@ export default {
 
     const deleUser = (id) => {
       isLoading.value = true;
-      let data = { data: { uid: id, token: token.value, unit: unit.value } };
+      let data = { data: { uid: id, token: token.value } };
+      console.log("received data ", data);
       $UserAPI
         .deleteUser(data, token.value)
         .then((res) => {

@@ -1,5 +1,6 @@
 <template>
   <div class="edit">
+    <div style="height: 100px"></div>
     <h2 class="text-center p-3 bg-danger">修改頁面</h2>
     <form @submit.prevent="update" class="mb-5">
       <div
