@@ -113,8 +113,8 @@ const report = {
       },
     });
   },
-}
-export default { user, firefighter, admin ,report};
+};
+export default { user, firefighter, admin, report };
 
 // 即將廢除 改 axios post method call api
 const config = {

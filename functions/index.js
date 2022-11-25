@@ -237,9 +237,10 @@ exports.updateUser = functions
 
 // Firefighters
 const getCollectionId = async (collection_name) => {
-  var id;
+  let id;
   console.log("getCollectionId collection_name", collection_name);
-  db
+  return new Promise((resolve, reject)=>{
+    db
     .collection(collection_name)
     .limit(1)
     .get()
@@ -249,11 +250,14 @@ const getCollectionId = async (collection_name) => {
         id = doc.id;
         console.log("getCollectionId forEach: ", doc.id);
       });
+      resolve(id);
     })
     .catch((e) => {
       console.log("getCollectionId error", e);
+      reject();
     });
-  return id;
+  })
+  
 };
 
 exports.createFirefighter = functions
@@ -932,6 +936,7 @@ exports.getReports = functions
     } else {
       const { unit } = data;
       const unitId = await getCollectionId(unit);
+      console.log(unit + "/" + unitId + "/unitStats");
       const unitRefs = db.collection(unit + "/" + unitId + "/unitStats");
       const weekReportSnapshot = await allStatsRef
         .doc("week")
@@ -960,6 +965,7 @@ exports.getReports = functions
       let twoMonthData = twoMonthReportSnapshot.docs.map((doc) => ({
         ...doc.data(),
       }))[0];
+
       const unitWeekReportSnapshot = await unitRefs
         .doc("unitStatsCollection")
         .collection("week")
@@ -969,6 +975,7 @@ exports.getReports = functions
       let unitWeekData = unitWeekReportSnapshot.docs.map((doc) => ({
         ...doc.data(),
       }))[0];
+
       const unitMonthReportSnapshot = await unitRefs
         .doc("unitStatsCollection")
         .collection("month")

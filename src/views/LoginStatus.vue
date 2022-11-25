@@ -535,18 +535,24 @@
         </thead>
         <tbody>
           <tr>
-            <td :class="[
-                  vital?.Bp?.Systolic >= 120 || vital?.Bp?.Systolic <= 90 || vital?.Bp?.Diastolic >= 80 ? 'bg-danger text-white' : ' ',
-                ]">
-              <span
-                >{{ vital?.Bp?.Systolic }}  </span
-              >
+            <td
+              :class="[
+                vital?.Bp?.Systolic >= 120 ||
+                vital?.Bp?.Systolic <= 90 ||
+                vital?.Bp?.Diastolic >= 80
+                  ? 'bg-danger text-white'
+                  : ' ',
+              ]"
+            >
+              <span>{{ vital?.Bp?.Systolic }} </span>
               /
-              <span
-                >{{ vital?.Bp?.Diastolic }}</span
-              >
+              <span>{{ vital?.Bp?.Diastolic }}</span>
             </td>
-            <td :class="[vital?.SpO2 <= 97 ? 'text-white bg-danger' : 'text-white']">
+            <td
+              :class="[
+                vital?.SpO2 <= 97 ? 'text-white bg-danger' : 'text-white',
+              ]"
+            >
               {{ vital?.SpO2 }}
             </td>
             <td

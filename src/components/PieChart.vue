@@ -3,14 +3,9 @@
 </template>
 
 <script>
-
 export default {
-    setup(){
-
-    }
-}
+  setup() {},
+};
 </script>
 
-<style>
-
-</style>
+<style></style>

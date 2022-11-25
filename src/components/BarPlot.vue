@@ -1,40 +1,43 @@
 <template>
+  <h1>BarPlot</h1>
   <div v-bind:id="id"></div>
 </template>
 
 <script setup>
-import { defineProps, onMounted, ref, toRefs} from "vue";
+import { defineProps, onMounted, ref, toRefs } from "vue";
 import { Object2Array } from "../util/Object2Array";
 import * as d3 from "d3";
+
 const props = defineProps({
-  data: { type: Object, required: true },
-  id:{type :String ,required: true}
+  data: { required: true },
+  id: { type: String, required: true },
 });
-const { data , id } = toRefs(props);
+const { data, id } = toRefs(props);
 const convertedData = ref([]);
-convertedData.value = Object2Array(data.value)
+convertedData.value = Object2Array(data.value);
 // console.log("convertedData", convertedData.value);
 
-onMounted(()=>{
+onMounted(() => {
+  console.log("BarPlot onMounted")
   drawPlot();
   // console.log("onMounted")
-})
+});
+
 const drawPlot = () => {
   // set the dimensions and margins of the graph
   const margin = { top: 10, right: 30, bottom: 150, left: 40 },
     width = 400 - margin.left - margin.right,
     height = 400 - margin.top - margin.bottom;
 
+  console.log(id.value)
   // append the svg object to the body of the page
   const svg = d3
-    .select("#"+id.value)
+    .select("#" + id.value)
     .append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
     .append("g")
-    .attr("transform", `translate(${margin.left},${margin.top})`)
-    ;
-
+    .attr("transform", `translate(${margin.left},${margin.top})`);
   // X axis
   const x = d3
     .scaleBand()
@@ -52,7 +55,7 @@ const drawPlot = () => {
     .selectAll("text")
     .attr("transform", "translate(-10,0)rotate(-45)")
     .style("text-anchor", "end")
-    .style("font-size","20px");
+    .style("font-size", "20px");
 
   // Add Y axis
   const y = d3
@@ -87,6 +90,8 @@ const drawPlot = () => {
     .delay((d, i) => {
       return i * 100;
     });
+
+    console.log("svg",svg)
 };
 </script>
 

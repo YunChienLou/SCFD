@@ -5,7 +5,7 @@
         <h2 class="heading-section">新北市救護義消<br />線上系統</h2>
       </div>
     </div>
-    <img src="@/assets/unitLogo_whiteBg.png" class="img-fluid mb-5" alt="...">
+    <img src="@/assets/unitLogo_whiteBg.png" class="img-fluid mb-5" alt="..." />
     <div class="row justify-content-center mb-5">
       <div class="col-md-7">
         <div class="login-wrap p-4">
@@ -74,8 +74,7 @@ import { loginUser, forgetPasswords } from "@/firebase";
 
 export default {
   name: "login",
-  components: {
-  },
+  components: {},
   setup() {
     const loginEmail = "";
     const loginPassword = "";
@@ -92,5 +91,4 @@ export default {
   },
 };
 </script>
-<style scoped>
-</style>
+<style scoped></style>

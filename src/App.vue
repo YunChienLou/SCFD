@@ -69,7 +69,7 @@ export default {
       console.log("App");
       await store.dispatch("verify");
     };
-    
+
     onUpdated(() => {
       console.log("onUpdated");
       moreBg();
@@ -99,7 +99,7 @@ export default {
 
   transform: rotate(60deg);
   content: attr(data-text);
-
+  z-index: -2;
   opacity: 0.3;
   line-height: 10rem;
   letter-spacing: 2px;
