@@ -1147,14 +1147,18 @@
 </template>
 
 <script>
-import { createCase, loadFirefightersByUnit } from "@/firebase";
-import { reactive, watch, ref, computed, onMounted } from "vue";
+import { createCase } from "@/firebase";
+import { reactive, watch, ref, computed, onMounted, inject } from "vue";
 import { unitNameEnum } from "@/util/Enum";
 import { useStore } from "vuex";
 
 export default {
   setup() {
+    const $FirefighterAPI = inject("$FirefighterAPI");
     const store = useStore();
+    const tokenVuex = computed(() => {
+      return store.state.token;
+    });
     const name = computed(() => {
       return store.state.name;
     });
@@ -1175,8 +1179,15 @@ export default {
       if (unit.value) {
         let enumValue = unitNameEnum[unit.value];
         console.log(enumValue);
-        loadFirefightersByUnit(enumValue).then((list) => {
-          firefighters.value = list;
+        let data = {
+          data: {
+            token: tokenVuex.value,
+            unit: enumValue,
+          },
+        };
+        $FirefighterAPI.getFirefighters(data, tokenVuex.value).then((res) => {
+          firefighters.value = res.data.result.data;
+          // console.log("run getFirefighters" , res.data.result.data)
         });
       } else {
         console.log("unit == null");
@@ -1287,7 +1298,6 @@ export default {
       firefighters,
       updateParts,
       afterGetUnit,
-
       uid,
       name,
       unit,

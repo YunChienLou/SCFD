@@ -260,9 +260,9 @@
 
 <script>
 import { reactive, ref } from "@vue/reactivity";
-import { computed, inject } from "@vue/runtime-core";
-import firebase from "firebase/app";
-import router from "../router";
+import { computed, inject, onMounted, watch } from "@vue/runtime-core";
+// import firebase from "firebase/app";
+// import router from "../router";
 import { useStore } from "vuex";
 export default {
   setup() {
@@ -279,9 +279,9 @@ export default {
     const rankInput = ref("");
     const emtInput = ref("");
 
-    const uid = reactive({ uid: "" });
+    // const uid = reactive({ uid: "" });
     const token = ref("");
-    const adminMode = ref(false);
+    // const adminMode = ref(false);
     const passwordVerifie = ref(false);
     const isLoading = ref(false);
     const create = reactive({
@@ -294,40 +294,68 @@ export default {
       token: "",
     });
 
-    firebase.auth().onAuthStateChanged((user) => {
-      if (user) {
-        isLoading.value = true;
-        uid.uid = user.uid;
-        user.getIdToken().then((idToken) => {
-          console.log(idToken);
-          let data = {
+    const tokenVuex = computed(() => {
+      return store.state.token;
+    });
+    const unitVuex = computed(() => {
+      return store.state.unit;
+    });
+
+    // firebase.auth().onAuthStateChanged((user) => {
+    //   if (user) {
+    //     isLoading.value = true;
+    //     uid.uid = user.uid;
+    //     user.getIdToken().then((idToken) => {
+    //       console.log(idToken);
+    //       let data = {
+    //         data: {
+    //           token: idToken,
+    //           unit: unit.value,
+    //         },
+    //       };
+    //       token.value = idToken;
+    //       $UserAPI.verifyUser(data, token.value).then((res) => {
+    //         adminMode.value = res.data.result.result;
+    //       });
+    //       $UserAPI
+    //         .getUsers(data, token.value)
+    //         .then((res) => {
+    //           let filterArray = res.data.result.data.filter((el) => {
+    //             return el.rank != "承辦警消";
+    //           });
+    //           users.value = filterArray;
+    //           isLoading.value = false;
+    //         })
+    //         .catch((err) => {
+    //           alert(err);
+    //         });
+    //     });
+    //   } else {
+    //     console.log("無登入");
+    //     router.push("/");
+    //   }
+    // });
+
+    const loadUsers = () => {
+      let data = {
             data: {
-              token: idToken,
-              unit: unit.value,
+              token: tokenVuex.value,
+              unit: unitVuex.value,
             },
           };
-          token.value = idToken;
-          $UserAPI.verifyUser(data, token.value).then((res) => {
-            adminMode.value = res.data.result.result;
+      $UserAPI
+        .getUsers(data, token.value)
+        .then((res) => {
+          let filterArray = res.data.result.data.filter((el) => {
+            return el.rank != "承辦警消";
           });
-          $UserAPI
-            .getUsers(data, token.value)
-            .then((res) => {
-              let filterArray = res.data.result.data.filter((el) => {
-                return el.rank != "承辦警消";
-              });
-              users.value = filterArray;
-              isLoading.value = false;
-            })
-            .catch((err) => {
-              alert(err);
-            });
+          users.value = filterArray;
+          isLoading.value = false;
+        })
+        .catch((err) => {
+          alert(err);
         });
-      } else {
-        console.log("無登入");
-        router.push("/");
-      }
-    });
+    };
 
     // 修改用的
     const getUserData = (uid, index) => {
@@ -403,6 +431,12 @@ export default {
       $UserAPI
         .deleteUser(data, token.value)
         .then((res) => {
+          let data = {
+            data: {
+              token: token.value,
+              unit: unit.value,
+            },
+          };
           console.log(res.data.result.result);
           $UserAPI.getUsers(data, token.value).then((res) => {
             users.value = res.data.result.data;
@@ -413,6 +447,15 @@ export default {
           alert(err);
         });
     };
+
+    watch(unitVuex, () => {
+      console.log("watcher",tokenVuex.value)
+      loadUsers()
+    });
+
+    onMounted(() => {
+      loadUsers()
+    });
     return {
       users,
       create,

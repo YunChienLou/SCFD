@@ -101,6 +101,17 @@
         >
           滬尾
         </li>
+        <li
+          class="text-center bg-dark text-white fs-4 py-3"
+          @click="
+            () => {
+              unitCh = '重陽';
+              unitEng = 'ChongYoung';
+            }
+          "
+        >
+          重陽
+        </li>
       </ul>
     </div>
     <div class="">

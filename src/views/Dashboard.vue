@@ -359,18 +359,17 @@
           <div class="col">
             <div class="h4">現場狀況 統計圖</div>
             <BarPlot
-              :data="reportData?.unitData?.week?.treatmentStatsByUnit"
-              :id="'現場狀況'"
+              :data="reportData?.unitData?.week?.onSceneStatsByUnit"
+              :id="'OnScene'"
             />
-            <responsive-line-chart :data="data" />
           </div>
         </div>
         <div class="row mb-4">
           <div class="col">
             <div class="h4">處置項目 統計圖</div>
             <BarPlot
-              :data="reportData?.unitData?.week?.onSceneStatsByUnit"
-              :id="'處置項目'"
+              :id="'treatment'"
+              :data="reportData?.unitData?.week?.treatmentStatsByUnit"
             />
           </div>
         </div>
@@ -380,8 +379,8 @@
           <div class="col">
             <div class="h4">現場狀況 統計圖</div>
             <BarPlot
-              :data="reportData?.unitData?.month?.treatmentStatsByUnit"
-              :id="'現場狀況'"
+              :data="reportData?.unitData?.month?.onSceneStatsByUnit"
+              :id="'OnScene'"
             />
           </div>
         </div>
@@ -389,8 +388,8 @@
           <div class="col">
             <div class="h4">處置項目 統計圖</div>
             <BarPlot
-              :data="reportData?.unitData?.month?.onSceneStatsByUnit"
-              :id="'處置項目'"
+              :data="reportData?.unitData?.month?.treatmentStatsByUnit"
+              :id="'treatment'"
             />
           </div>
         </div>
@@ -400,8 +399,8 @@
           <div class="col">
             <div class="h4">現場狀況 統計圖</div>
             <BarPlot
-              :data="reportData?.unitData?.twoMonth?.treatmentStatsByUnit"
-              :id="'現場狀況'"
+              :data="reportData?.unitData?.twoMonth?.onSceneStatsByUnit"
+              :id="'OnScene'"
             />
           </div>
         </div>
@@ -409,8 +408,8 @@
           <div class="col">
             <div class="h4">處置項目 統計圖</div>
             <BarPlot
-              :data="reportData?.unitData?.twoMonth?.onSceneStatsByUnit"
-              :id="'處置項目'"
+              :data="reportData?.unitData?.twoMonth?.treatmentStatsByUnit"
+              :id="'treatment'"
             />
           </div>
         </div>
@@ -425,11 +424,13 @@ import { useStore } from "vuex";
 import { unitNameEnum } from "@/util/Enum";
 import { TimeStampConverter } from "@/util/TimeStampConverter";
 import BarPlot from "../components/BarPlot.vue";
-import ResponsiveLineChart from "../components/ResponsiveLineChart.vue";
+import { Object2Array } from "../util/Object2Array";
+// import BarPlot2 from "../components/BarPlot2.vue";
+// import ResponsiveLineChart from "../components/ResponsiveLineChart.vue";
 
 export default {
   name: "Dashboard",
-  components: { BarPlot, ResponsiveLineChart },
+  components: { BarPlot },
   setup() {
     const $ReportAPI = inject("$ReportAPI");
     const isLoading = ref(false);
@@ -442,15 +443,23 @@ export default {
       }
     });
     let data = [10, 40, 15, 25, 50];
+
     const isMonthExist = computed(() => {
-      if (reportData.value.monthReport) {
+      if (
+        reportData.value["monthReport"] != undefined ||
+        reportData.value["monthReport"] != null
+      ) {
         return true;
       } else {
         return false;
       }
     });
     const isTwoMonthExist = computed(() => {
-      if (reportData.value.twoMonthReport) {
+      console.log(reportData.value["twoMonthReport"])
+      if (
+        reportData.value["twoMonthReport"] != undefined ||
+        reportData.value["twoMonthReport"] != null
+      ) {
         return true;
       } else {
         return false;
@@ -475,6 +484,7 @@ export default {
     const twoMonthUnitData = ref();
 
     const loadReportData = () => {
+      console.log("執行了 loadReportData");
       let data = {
         data: {
           unit: unitNameEnum[unitVuex.value],
@@ -487,15 +497,18 @@ export default {
           .then((res) => {
             reportData.value = res.data.result;
             isLoading.value = false;
+            console.log("結果 loadReportData", res.data.result);
           })
           .catch((e) => {
             console.log(e);
           });
       }
     };
-    watch(tokenVuex, () => {
+    watch(unitVuex, () => {
+      console.log("watcher", tokenVuex.value);
       loadReportData();
     });
+
     onMounted(() => {
       loadReportData();
     });
@@ -518,12 +531,13 @@ export default {
       isWeekExist,
       isMonthExist,
       isTwoMonthExist,
+      Object2Array,
     };
   },
 };
 </script>
 <style scoped>
-  .dashBoard{
-     z-index: 3;
-  }
+.dashBoard {
+  z-index: 3;
+}
 </style>

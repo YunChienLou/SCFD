@@ -1,6 +1,6 @@
 const unitNameEnum = Object.freeze({
   三重: "sanchong",
-  重陽: "chongyoung",
+  重陽: "ChongYoung",
   淡水: "TamSui",
   鷺江: "LuJiang",
   二重: "ErChong",

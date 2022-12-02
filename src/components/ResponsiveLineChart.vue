@@ -28,7 +28,7 @@ export default {
     // create ref to pass to D3 for DOM manipulation
     const svgRef = ref(null);
 
-    // this creates another ref to observe resizing, 
+    // this creates another ref to observe resizing,
     // which we will attach to a DIV,
     // since observing SVGs with the ResizeObserver API doesn't work properly
     const { resizeRef, resizeState } = useResizeObserver();

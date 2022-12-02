@@ -25,7 +25,7 @@
       <div class="card-header">提醒 學長姊!!</div>
       <div class="card-body">
         <blockquote class="blockquote mb-0">
-          <p>此為管理頁面，系統將會記錄各管理員，編輯資料的紀錄。</p>
+          <p>此為管理頁面，系統將會記錄各管理員，編輯此系統資料的紀錄。</p>
           <p>請小心編輯!! 謝謝</p>
           <br />
           <footer class="blockquote-footer text-light">

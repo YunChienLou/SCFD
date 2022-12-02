@@ -475,7 +475,7 @@
               </td>
               <td
                 :class="[
-                  vital?.Hr >= 120 || vital?.Hr <= 60
+                  vital?.Hr > 120 || vital?.Hr < 60
                     ? 'text-white bg-danger'
                     : 'text-white',
                 ]"

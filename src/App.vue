@@ -21,7 +21,7 @@ import Status from "./components/Status.vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
 import { reactive } from "@vue/reactivity";
-import { computed, onUpdated } from "@vue/runtime-core";
+import { computed, onMounted, onUpdated } from "@vue/runtime-core";
 
 export default {
   components: {
@@ -73,8 +73,12 @@ export default {
     onUpdated(() => {
       console.log("onUpdated");
       moreBg();
-      verifyVuex();
     });
+    
+    onMounted(()=>{
+      verifyVuex();
+    })
+
     return {
       isLoginPage,
       userData,

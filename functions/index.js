@@ -89,6 +89,17 @@ exports.createUser = functions
               error
             );
           }
+        }).catch((error)=>{
+          serverRecord(
+            token,
+            "you 're not even user can't access , createUser",
+            true
+          );
+          throw new functions.https.HttpsError(
+            501,
+            "you 're not even user can't access , createUser",
+            error
+          );
         });
     }
   });
@@ -236,29 +247,27 @@ exports.updateUser = functions
   });
 
 // Firefighters
-const getCollectionId = async (collection_name) => {
-  let id;
-  console.log("getCollectionId collection_name", collection_name);
-  return new Promise((resolve, reject)=>{
-    db
-    .collection(collection_name)
-    .limit(1)
-    .get()
-    .then((docs) => {
-      console.log("getCollectionId 找到 collection: ", docs.docs);
-      docs.forEach((doc) => {
-        id = doc.id;
-        console.log("getCollectionId forEach: ", doc.id);
-      });
-      resolve(id);
-    })
-    .catch((e) => {
-      console.log("getCollectionId error", e);
-      reject();
-    });
-  })
-  
-};
+// const getCollectionId = async (collection_name) => {
+//   let id;
+//   console.log("getCollectionId collection_name", collection_name);
+//   return new Promise((resolve, reject)=>{
+//     db
+//     .collection(collection_name)
+//     .get()
+//     .then((docs) => {
+//       console.log("getCollectionId 找到 collection: ", docs.docs);
+//       docs.forEach((doc) => {
+//         id = doc.id;
+//         console.log("getCollectionId forEach: ", doc.id);
+//       });
+//       resolve(id);
+//     })
+//     .catch((e) => {
+//       console.log("getCollectionId error", e);
+//       reject();
+//     });
+//   })
+// };
 
 exports.createFirefighter = functions
   .region("asia-east1")
@@ -279,10 +288,10 @@ exports.createFirefighter = functions
             let firefighterData = {
               name: name,
             };
-            const unitId = await getCollectionId(unit);
-            console.log("unitId"+ unitId)
+            // const unitId = await getCollectionId(unit);
+            // console.log("unitId"+ unitId)
             return db
-              .collection(unit + "/" + unitId + "/firefighters")
+              .collection(unit + "/" + "unitFolder" + "/firefighters")
               .add(firefighterData)
               .then(() => {
                 serverRecord(
@@ -330,10 +339,10 @@ exports.getFirefighters = functions
         .auth()
         .verifyIdToken(token)
         .then(async (claims) => {
-          if (claims.isAdmin === true) {
-            const unitId = await getCollectionId(unit);
+          // if (claims.isAdmin === true) {
+            // const unitId = await getCollectionId(unit);
             const snapshot = await db
-              .collection(unit + "/" + unitId + "/firefighters")
+              .collection(unit + "/" + "unitFolder" + "/firefighters")
               .get();
             let data = snapshot.docs.map((doc) => ({
               id: doc.id,
@@ -345,14 +354,14 @@ exports.getFirefighters = functions
               result: 200,
               data: data,
             };
-          } else {
-            serverRecord(token, "Not Admin can't access", true);
-            throw new functions.https.HttpsError(
-              500,
-              "Not Admin can't access",
-              error
-            );
-          }
+          // } else {
+          //   serverRecord(token, "Not Admin can't access", true);
+          //   throw new functions.https.HttpsError(
+          //     500,
+          //     "Not Admin can't access",
+          //     error
+          //   );
+          // }
         })
         .catch((error) => {
           serverRecord(token, "verifyIdToken process fail", true);
@@ -381,9 +390,9 @@ exports.deleteFirefighter = functions
         .verifyIdToken(token)
         .then(async (claims) => {
           if (claims.isAdmin === true) {
-            const unitId = await getCollectionId(unit);
+            // const unitId = await getCollectionId(unit);
             await db
-              .collection(unit + "/" + unitId + "/firefighters")
+              .collection(unit + "/" + "unitFolder" + "/firefighters")
               .doc(uid)
               .delete();
             return {
@@ -419,9 +428,9 @@ exports.updateFirefighter = functions
             name: name,
           };
           if (claims.isAdmin === true) {
-            const unitId = await getCollectionId(unit);
+            // const unitId = await getCollectionId(unit);
             return db
-              .collection(unit + "/" + unitId + "/firefighters")
+              .collection(unit + "/" + "unitFolder" + "/firefighters")
               .doc(userId)
               .update(firefighterData)
               .then(() => {
@@ -536,11 +545,12 @@ exports.createAdmin = functions
                       .set(userData)
                       .then(() => {
                         console.log("create userRecord.uid");
+                        // 此段以下出錯 認不得 我的collection
                         return db
                           .collection(unitEng)
-                          .doc()
+                          .doc("unitFolder")
                           .collection("firefighters")
-                          .add({})
+                          .add({name:"測試"})
                           .then(async (obj) => {
                             console.log("create firefighters folder");
                             const unitId = obj.path.split("/")[1];
@@ -560,7 +570,7 @@ exports.createAdmin = functions
                               .doc(unitId)
                               .collection("unitStats")
                               .doc("unitStatsCollection")
-                              .collection("2Month")
+                              .collection("2month")
                               .add({});
                             serverRecord(
                               token,
@@ -829,7 +839,7 @@ const missionStatsByPersonal = (cases) => {
       });
       obj.missionNum += person.missionNum;
     } else {
-      missionStatsByUnit.push({ unit: person.unit, missionNum: 1 });
+      missionStatsByUnit.push({ unit: person.unit, missionNum: person.missionNum });
     }
   });
   ResultStats.missionStatsByAllUnit = missionNumTopN(missionStatsByUnit, 3);
@@ -935,9 +945,9 @@ exports.getReports = functions
       );
     } else {
       const { unit } = data;
-      const unitId = await getCollectionId(unit);
-      console.log(unit + "/" + unitId + "/unitStats");
-      const unitRefs = db.collection(unit + "/" + unitId + "/unitStats");
+      // const unitId = await getCollectionId(unit);
+      // console.log(unit + "/" + "unitFolder" + "/unitStats");
+      const unitRefs = db.collection(unit + "/" + "unitFolder" + "/unitStats");
       const weekReportSnapshot = await allStatsRef
         .doc("week")
         .collection("weekCollection")
@@ -1010,6 +1020,7 @@ exports.getReports = functions
 // per week
 exports.weekReport = functions.pubsub
   .schedule("0 0 * * 7")
+  // .schedule("every 3 minutes")
   .timeZone("Asia/Taipei")
   .onRun(async (context) => {
     const now = new Date();
@@ -1052,8 +1063,8 @@ exports.weekReport = functions.pubsub
         onSceneStatsByUnit: OnSceneStatsResult.onSceneStatsByUnit[unit],
       };
       const unitEngName = unitNameEnum[unit];
-      const unitId = await getCollectionId(unitEngName);
-      db.collection(unitEngName + "/" + unitId + "/unitStats")
+      // const unitId = await getCollectionId(unitEngName);
+      db.collection(unitEngName + "/" + "unitFolder" + "/unitStats")
         .doc("unitStatsCollection")
         .collection("week")
         .add(UnitStatsData)
@@ -1105,8 +1116,8 @@ exports.monthReport = functions.pubsub
         onSceneStatsByUnit: OnSceneStatsResult.onSceneStatsByUnit[unit],
       };
       const unitEngName = unitNameEnum[unit];
-      const unitId = await getCollectionId(unitEngName);
-      db.collection(unitEngName + "/" + unitId + "/unitStats")
+      // const unitId = await getCollectionId(unitEngName);
+      db.collection(unitEngName + "/" + "unitFolder" + "/unitStats")
         .doc("unitStatsCollection")
         .collection("month")
         .add(UnitStatsData)
@@ -1161,8 +1172,8 @@ exports.twoMonthReport = functions.pubsub
         onSceneStatsByUnit: OnSceneStatsResult.onSceneStatsByUnit[unit],
       };
       const unitEngName = unitNameEnum[unit];
-      const unitId = await getCollectionId(unitEngName);
-      db.collection(unitEngName + "/" + unitId + "/unitStats")
+      // const unitId = await getCollectionId(unitEngName);
+      db.collection(unitEngName + "/" + "unitFolder" + "/unitStats")
         .doc("unitStatsCollection")
         .collection("twoMonth")
         .add(UnitStatsData)

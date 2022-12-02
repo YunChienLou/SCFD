@@ -1,16 +1,16 @@
 import { ref, reactive, onMounted, onBeforeUnmount } from "vue";
 
 export const useResizeObserver = () => {
-  // create a new ref, 
+  // create a new ref,
   // which needs to be attached to an element in a template
   const resizeRef = ref();
   const resizeState = reactive({
-    dimensions: {}
+    dimensions: {},
   });
 
-  const observer = new ResizeObserver(entries => {
+  const observer = new ResizeObserver((entries) => {
     // called initially and on resize
-    entries.forEach(entry => {
+    entries.forEach((entry) => {
       resizeState.dimensions = entry.contentRect;
     });
   });
