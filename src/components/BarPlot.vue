@@ -19,7 +19,7 @@ export default {
     // set the dimensions and margins of the graph
     const width = 400,
       height = 400,
-      margin = 80;
+      margin = 130;
 
     const idRef = toRef(props, "id");
 
@@ -85,10 +85,10 @@ export default {
         .attr("transform", function (d) {
           //   return `translate(${arcGenerator.centroid(d)})`;
           var c = arcGenerator.centroid(d);
-          return "translate(" + c[0] * 2 + "," + c[1] * 2 + ")";
+          return "translate(" + c[0] * 4 + "," + c[1] * 2.5 + ")";
         })
         .style("text-anchor", "middle")
-        .style("font-size", 20)
+        .style("font-size", 17)
         .style("background-color", "white")
         .style("background", "white");
       d3.selectAll("text")

@@ -337,6 +337,7 @@ export default {
     // });
 
     const loadUsers = () => {
+      isLoading.value = true;
       let data = {
             data: {
               token: tokenVuex.value,
@@ -344,7 +345,7 @@ export default {
             },
           };
       $UserAPI
-        .getUsers(data, token.value)
+        .getUsers(data, tokenVuex.value)
         .then((res) => {
           let filterArray = res.data.result.data.filter((el) => {
             return el.rank != "承辦警消";

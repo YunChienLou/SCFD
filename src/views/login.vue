@@ -41,7 +41,7 @@
                 type="password"
                 v-model="loginPassword"
                 class="form-control rounded-left"
-                placeholder="消民字號"
+                placeholder="身分證後6碼"
                 required
               />
               <div class="form-group mb-5" id="loginErrSection"></div>

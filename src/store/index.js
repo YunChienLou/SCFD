@@ -3,7 +3,7 @@ import { loginUser, loadUser } from "../firebase";
 import firebase from "firebase/app";
 import ServerAPI from "../firebase";
 import router from "../router";
-// Create a new store instance.
+
 const store = createStore({
   state: {
     isAdmin: false,
@@ -14,6 +14,7 @@ const store = createStore({
     rank: null,
     uid: null,
   },
+
   mutations: {
     setUserData(state, payload) {
       state.name = payload.name;
@@ -31,12 +32,14 @@ const store = createStore({
       state.isAdmin = payload;
     },
   },
+
   getters: {
     getUnit: (state) => state.unit,
     getToken: (state) => state.token,
     getUid: (state) => state.uid,
     getIsAdmin: (state) => state.isAdmin,
   },
+
   actions: {
     async getData(state) {
       return state.state.unit;

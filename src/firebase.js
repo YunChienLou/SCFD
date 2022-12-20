@@ -157,10 +157,10 @@ export const getCase = async (id) => {
   return Case.exists ? Case.data() : null;
 };
 
-export const getUser = async (id) => {
-  const User = await users.doc(id).get();
-  return User.exists ? User.data() : null;
-};
+// export const getUser = async (id) => {
+//   const User = await users.doc(id).get();
+//   return User.exists ? User.data() : null;
+// };
 
 export const updateCases = (id, Case) => {
   return dailyCases
@@ -176,9 +176,9 @@ export const updateCases = (id, Case) => {
     });
 };
 
-export const updateUser = (id, User) => {
-  return users.doc(id).update(User);
-};
+// export const updateUser = (id, User) => {
+//   return users.doc(id).update(User);
+// };
 
 export const deleteCase = async (id) => {
   var deleteBoolean = confirm("確認刪除?");
@@ -199,18 +199,18 @@ export const deleteCase = async (id) => {
   }
 };
 
-export const deleteUser = async (id) => {
-  var deleteBoolean = confirm("確認刪除?");
-  var deleteUser2 = functions.httpsCallable("deleteUser");
-  if (deleteBoolean) {
-    users.doc(id).delete();
-    await deleteUser2({ uid: id }).then((result) => {
-      console.log("User delete successfully", result);
-    });
-    // refresh route to origin page
-    return router.go();
-  }
-};
+// export const deleteUser = async (id) => {
+//   var deleteBoolean = confirm("確認刪除?");
+//   var deleteUser2 = functions.httpsCallable("deleteUser");
+//   if (deleteBoolean) {
+//     users.doc(id).delete();
+//     await deleteUser2({ uid: id }).then((result) => {
+//       console.log("User delete successfully", result);
+//     });
+//     // refresh route to origin page
+//     return router.go();
+//   }
+// };
 
 //load whole collection in
 export const useLoadCases = () => {
@@ -406,29 +406,6 @@ export const logoutUser = () => {
   });
 };
 
-// 創建帳號
-var secondaryApp = firebase.initializeApp(config, "Secondary");
-export const createUser = async (User) => {
-  let data = {
-    name: User.name,
-    emtlevel: User.emtlevel,
-    rank: User.rank,
-    unit: "三重",
-  };
-  let uid;
-  await secondaryApp
-    .auth()
-    .createUserWithEmailAndPassword(User.email, User.passwords)
-    .then((user) => {
-      uid = user.user.uid;
-      console.log("Successfully create", user, uid);
-      secondaryApp.auth().signOut();
-    })
-    .catch(() => {
-      console.log("fail create");
-    });
-  users.doc(uid).set(data);
-};
 
 //忘記密碼
 export const forgetPasswords = (email) => {
@@ -462,58 +439,16 @@ export const loadUser = async (uid) => {
 };
 
 //  警消名單載入
-export const loadFirefighters = () => {
-  const firefighters = ref([]);
-  const close = db.collection("firefighters").onSnapshot((snapshot) => {
-    firefighters.value = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-  });
-  onUnmounted(close);
-  return firefighters;
-};
-
-export const loadFirefightersByUnit = async (unit) => {
-  const firefighters = [];
-  const unitId = await getCollectionId(unit);
-
-  const snapshot = await db
-    .collection(unit + "/" + unitId + "/firefighters")
-    .get();
-  snapshot.forEach((doc) => {
-    if (Object.keys(doc.data()) != 0) {
-      firefighters.push({ id: doc.id, ...doc.data() });
-    }
-  });
-  return firefighters.length > 0 ? firefighters : null;
-};
-
-export const createFirefightersByUnit = () => {};
-
-const getCollectionId = async (collection_name) => {
-  var id;
-  await db
-    .collection(collection_name)
-    .get()
-    .then((docs) => {
-      docs.forEach((doc) => {
-        id = doc.id;
-      });
-    });
-  return id;
-};
-
-// get uid
-export const listenUserState = () => {
-  firebase.auth().onAuthStateChanged((user) => {
-    if (user) {
-      console.log("目前登入 帳號 : " + user.uid);
-    } else {
-      console.log("無登入");
-      router.push("/");
-    }
-  });
-};
+// export const loadFirefighters = () => {
+//   const firefighters = ref([]);
+//   const close = db.collection("firefighters").onSnapshot((snapshot) => {
+//     firefighters.value = snapshot.docs.map((doc) => ({
+//       id: doc.id,
+//       ...doc.data(),
+//     }));
+//   });
+//   onUnmounted(close);
+//   return firefighters;
+// };
 
 // page refresh

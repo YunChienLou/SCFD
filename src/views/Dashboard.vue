@@ -12,45 +12,44 @@
       </div>
     </div>
     <div v-else class="">
-      <div class="text-end fs-5 mb-4">
-        <span class="me-3">統計模式 : </span>
-        <!-- <div class="h1" v-if="displayMode =='week'">week</div>
-      <div class="h1" v-if="displayMode =='month'">Month</div>
-      <div class="h1" v-if="displayMode =='twoMonth'">twoMonth</div> -->
-        <div class="form-check form-check-inline">
-          <input
-            class="form-check-input"
-            type="radio"
-            name="inlineRadioOptions"
-            id="inlineRadio1"
-            value="week"
-            v-model="displayMode"
-          />
-          <label class="form-check-label" for="inlineRadio1">週</label>
-        </div>
-        <div class="form-check form-check-inline">
-          <input
-            class="form-check-input"
-            type="radio"
-            name="inlineRadioOptions"
-            id="inlineRadio2"
-            value="month"
-            :disabled="isMonthExist"
-            v-model="displayMode"
-          />
-          <label class="form-check-label" for="inlineRadio2">月</label>
-        </div>
-        <div class="form-check form-check-inline">
-          <input
-            class="form-check-input"
-            type="radio"
-            name="inlineRadioOptions"
-            id="inlineRadio3"
-            value="twoMonth"
-            v-model="displayMode"
-            :disabled="isTwoMonthExist"
-          />
-          <label class="form-check-label" for="inlineRadio3">2 個月</label>
+      <div class="row text-end fs-5 mb-4" style="z-index: 5">
+        <div class="col">
+          <span style="" class="me-3">統計模式 : </span>
+          <div class="form-check form-check-inline">
+            <input
+              class="form-check-input"
+              type="radio"
+              name="inlineRadioOptions"
+              id="inlineRadio1"
+              value="week"
+              v-model="displayMode"
+            />
+            <label class="form-check-label" for="inlineRadio1">週</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input
+              class="form-check-input"
+              type="radio"
+              name="inlineRadioOptions"
+              id="inlineRadio2"
+              value="month"
+              :disabled="!isMonthExist"
+              v-model="displayMode"
+            />
+            <label class="form-check-label" for="inlineRadio2">月</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input
+              class="form-check-input"
+              type="radio"
+              name="inlineRadioOptions"
+              id="inlineRadio3"
+              value="twoMonth"
+              v-model="displayMode"
+              :disabled="!isTwoMonthExist"
+            />
+            <label class="form-check-label" for="inlineRadio3">2 個月</label>
+          </div>
         </div>
       </div>
       <div class="h1 transBg p-2 text-wrap">
@@ -419,14 +418,19 @@
 </template>
 
 <script>
-import { computed, inject, onMounted, ref, watch } from "@vue/runtime-core";
+import {
+  computed,
+  inject,
+  onMounted,
+  ref,
+  toRaw,
+  watch,
+} from "@vue/runtime-core";
 import { useStore } from "vuex";
 import { unitNameEnum } from "@/util/Enum";
 import { TimeStampConverter } from "@/util/TimeStampConverter";
 import BarPlot from "../components/BarPlot.vue";
 import { Object2Array } from "../util/Object2Array";
-// import BarPlot2 from "../components/BarPlot2.vue";
-// import ResponsiveLineChart from "../components/ResponsiveLineChart.vue";
 
 export default {
   name: "Dashboard",
@@ -436,35 +440,36 @@ export default {
     const isLoading = ref(false);
     const displayMode = ref("week");
     const isWeekExist = computed(() => {
-      if (reportData.value.weekReport) {
-        return true;
-      } else {
+      let obj = toRaw(reportData.value["weekReport"]);
+      if (Object.keys(obj).length === 0) {
         return false;
+      } else {
+        return true;
       }
     });
-    let data = [10, 40, 15, 25, 50];
 
     const isMonthExist = computed(() => {
-      if (
-        reportData.value["monthReport"] != undefined ||
-        reportData.value["monthReport"] != null
-      ) {
-        return true;
-      } else {
-        return false;
+      let obj = toRaw(reportData.value["monthReport"]);
+      if (obj != undefined) {
+        if (Object.keys(obj).length === 0) {
+          return false;
+        } else {
+          return true;
+        }
       }
     });
+
     const isTwoMonthExist = computed(() => {
-      console.log(reportData.value["twoMonthReport"])
-      if (
-        reportData.value["twoMonthReport"] != undefined ||
-        reportData.value["twoMonthReport"] != null
-      ) {
-        return true;
-      } else {
-        return false;
+      let obj = toRaw(reportData.value["twoMonthReport"]);
+      if (obj != undefined) {
+        if (Object.keys(obj).length === 0) {
+          return false;
+        } else {
+          return true;
+        }
       }
     });
+
     const store = useStore();
 
     const tokenVuex = computed(() => {
@@ -484,7 +489,6 @@ export default {
     const twoMonthUnitData = ref();
 
     const loadReportData = () => {
-      console.log("執行了 loadReportData");
       let data = {
         data: {
           unit: unitNameEnum[unitVuex.value],
@@ -497,7 +501,6 @@ export default {
           .then((res) => {
             reportData.value = res.data.result;
             isLoading.value = false;
-            console.log("結果 loadReportData", res.data.result);
           })
           .catch((e) => {
             console.log(e);
@@ -514,7 +517,6 @@ export default {
     });
 
     return {
-      data,
       reportData,
       isLoading,
       unitVuex,
@@ -536,8 +538,10 @@ export default {
   },
 };
 </script>
+
 <style scoped>
 .dashBoard {
   z-index: 3;
+  opacity: 0.8;
 }
 </style>

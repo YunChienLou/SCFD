@@ -620,7 +620,6 @@
 </template>
 <script>
 import {
-  // loadUser,
   logoutUser,
   loadCasesTarget,
   deleteCase,

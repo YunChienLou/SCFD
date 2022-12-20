@@ -12,6 +12,92 @@ const usersRef = db.collection("users");
 const recordRef = db.collection("records");
 const allStatsRef = db.collection("allStats");
 
+// case
+// login logout
+// search api
+
+exports.createCase = functions
+  .region("asia-east1")
+  .https.onCall(async (data, context) => {
+    if (!context.auth) {
+      // Throwing an HttpsError so that the client gets the error details.
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        "The function must be called " + "while authenticated."
+      );
+    } else {
+      const { caseData } = data;
+      return casesRef
+        .add(caseData)
+        .then((docRef) => {
+          serverRecord(
+            token,
+            "Successfully created new case:" + docRef.id,
+            false
+          );
+          return {
+            message:
+              "Successfully created new case:" + docRef.id,
+            result: 200,
+          };
+        })
+        .catch((error) => {
+          console.error("Error adding case: ", error);
+          serverRecord(
+            token,
+            "Error created new case",
+            true
+          );
+          return {
+            message:
+              "Error created new case",
+            result: 500,
+          };
+        });
+    }
+  });
+
+  exports.updateCase = functions
+  .region("asia-east1")
+  .https.onCall(async (data, context) => {
+    if (!context.auth) {
+      // Throwing an HttpsError so that the client gets the error details.
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        "The function must be called " + "while authenticated."
+      );
+    } else {
+      const { caseData } = data;
+      return casesRef
+        .add(caseData)
+        .then((docRef) => {
+          serverRecord(
+            token,
+            "Successfully created new case:" + docRef.id,
+            false
+          );
+          return {
+            message:
+              "Successfully created new case:" + docRef.id,
+            result: 200,
+          };
+        })
+        .catch((error) => {
+          console.error("Error adding case: ", error);
+          serverRecord(
+            token,
+            "Error created new case",
+            true
+          );
+          return {
+            message:
+              "Error created new case",
+            result: 500,
+          };
+        });
+    }
+  });
+
 exports.createUser = functions
   .region("asia-east1")
   .https.onCall(async (data, context) => {
@@ -89,7 +175,8 @@ exports.createUser = functions
               error
             );
           }
-        }).catch((error)=>{
+        })
+        .catch((error) => {
           serverRecord(
             token,
             "you 're not even user can't access , createUser",
@@ -167,9 +254,15 @@ exports.deleteUser = functions
         .verifyIdToken(token)
         .then(async (claims) => {
           if (claims.isAdmin === true) {
-            const userExist = await admin.auth().getUser(uid).then(()=>{
-              return true;
-            }).catch(()=>{return false});
+            const userExist = await admin
+              .auth()
+              .getUser(uid)
+              .then(() => {
+                return true;
+              })
+              .catch(() => {
+                return false;
+              });
             if (userExist) {
               await admin.auth().deleteUser(uid);
             }
@@ -246,29 +339,6 @@ exports.updateUser = functions
     }
   });
 
-// Firefighters
-// const getCollectionId = async (collection_name) => {
-//   let id;
-//   console.log("getCollectionId collection_name", collection_name);
-//   return new Promise((resolve, reject)=>{
-//     db
-//     .collection(collection_name)
-//     .get()
-//     .then((docs) => {
-//       console.log("getCollectionId 找到 collection: ", docs.docs);
-//       docs.forEach((doc) => {
-//         id = doc.id;
-//         console.log("getCollectionId forEach: ", doc.id);
-//       });
-//       resolve(id);
-//     })
-//     .catch((e) => {
-//       console.log("getCollectionId error", e);
-//       reject();
-//     });
-//   })
-// };
-
 exports.createFirefighter = functions
   .region("asia-east1")
   .https.onCall(async (data, context) => {
@@ -340,20 +410,20 @@ exports.getFirefighters = functions
         .verifyIdToken(token)
         .then(async (claims) => {
           // if (claims.isAdmin === true) {
-            // const unitId = await getCollectionId(unit);
-            const snapshot = await db
-              .collection(unit + "/" + "unitFolder" + "/firefighters")
-              .get();
-            let data = snapshot.docs.map((doc) => ({
-              id: doc.id,
-              ...doc.data(),
-            }));
-            serverRecord(token, "Successfully fetch firefighters", false);
-            return {
-              message: "Successfully fetch firefighters",
-              result: 200,
-              data: data,
-            };
+          // const unitId = await getCollectionId(unit);
+          const snapshot = await db
+            .collection(unit + "/" + "unitFolder" + "/firefighters")
+            .get();
+          let data = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          serverRecord(token, "Successfully fetch firefighters", false);
+          return {
+            message: "Successfully fetch firefighters",
+            result: 200,
+            data: data,
+          };
           // } else {
           //   serverRecord(token, "Not Admin can't access", true);
           //   throw new functions.https.HttpsError(
@@ -550,7 +620,7 @@ exports.createAdmin = functions
                           .collection(unitEng)
                           .doc("unitFolder")
                           .collection("firefighters")
-                          .add({name:"測試"})
+                          .add({ name: "測試" })
                           .then(async (obj) => {
                             console.log("create firefighters folder");
                             const unitId = obj.path.split("/")[1];
@@ -839,7 +909,10 @@ const missionStatsByPersonal = (cases) => {
       });
       obj.missionNum += person.missionNum;
     } else {
-      missionStatsByUnit.push({ unit: person.unit, missionNum: person.missionNum });
+      missionStatsByUnit.push({
+        unit: person.unit,
+        missionNum: person.missionNum,
+      });
     }
   });
   ResultStats.missionStatsByAllUnit = missionNumTopN(missionStatsByUnit, 3);
@@ -1172,7 +1245,7 @@ exports.twoMonthReport = functions.pubsub
         onSceneStatsByUnit: OnSceneStatsResult.onSceneStatsByUnit[unit],
       };
       const unitEngName = unitNameEnum[unit];
-      // const unitId = await getCollectionId(unitEngName);
+
       db.collection(unitEngName + "/" + "unitFolder" + "/unitStats")
         .doc("unitStatsCollection")
         .collection("twoMonth")

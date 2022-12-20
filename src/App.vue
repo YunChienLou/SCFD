@@ -1,12 +1,12 @@
 <template>
   <div class="bg-dark text-white mx-0 overflow-hidden">
-    <!-- 浮水印 -->
+    <!-- 浮水印 --><div v-if="!isLoginPage" class="bg-filter" :data-text="name"></div>
     <div class="container">
-      <div v-if="!isLoginPage" class="bg-filter" :data-text="name"></div>
       <div class="row d-flex justify-content-center">
         <div class="col-lg-6">
           <Status v-if="!isLoginPage" :uid="uid" :userData="userData" />
           <router-view />
+          
           <Footer />
         </div>
       </div>
@@ -103,7 +103,7 @@ export default {
 
   transform: rotate(60deg);
   content: attr(data-text);
-  z-index: -2;
+  z-index: 0;
   opacity: 0.3;
   line-height: 10rem;
   letter-spacing: 2px;
