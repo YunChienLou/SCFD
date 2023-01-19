@@ -337,14 +337,33 @@
         </div>
       </div>
       <div class="row m-2 mb-3">
-        <div class="col-8">
-          <label class="form-label col-2">B/P</label>
+        <div class="col-6">
+          <div class="d-flex justify-content-between">
+            <label class="form-label col-2">B/P</label>
+            <div class="form-check form-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="switch_vital_bp"
+                v-model="value_bp"
+                @change="
+                  () => {
+                    bp_no_input_func(value_bp);
+                  }
+                "
+              />
+              <label class="form-check-label" for="switch_vital_bp"
+                >未量測</label
+              >
+            </div>
+          </div>
           <div class="row">
             <div class="col-6 pe-0">
               <input
                 class="col form-control"
                 type="number"
                 v-model="form.vital.Bp.Systolic"
+                id="input_vital_bp_systolic"
                 required
               />
             </div>
@@ -352,17 +371,33 @@
               <input
                 class="col form-control"
                 type="number"
+                id="input_vital_bp_diastolic"
                 v-model="form.vital.Bp.Diastolic"
                 required
               />
             </div>
           </div>
         </div>
-        <div class="col">
-          <label class="form-label col-2">SpO2</label>
+        <div class="col-6">
+          <div class="d-flex justify-content-between">
+            <label class="form-label col-2">SpO2</label>
+            <div class="form-check form-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="switch_vital_spo2"
+                v-model="value_spo2"
+                @change="no_input_func(value_spo2, 'input_vital_spo2', 'SpO2')"
+              />
+              <label class="form-check-label" for="switch_vital_spo2"
+                >未量測</label
+              >
+            </div>
+          </div>
           <input
             class="col form-control"
             type="number"
+            id="input_vital_spo2"
             v-model="form.vital.SpO2"
             required
           />
@@ -370,18 +405,54 @@
       </div>
       <div class="row m-2 mb-3">
         <div class="col">
-          <label class="form-label col-2">H/R</label>
+          <div class="d-flex justify-content-between">
+            <label class="form-label col-2 me-3">H/R</label>
+            <div class="form-check form-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="switch_vital_hr"
+                v-model="value_hr"
+                @change="no_input_func(value_hr, 'input_vital_Hr', 'Hr')"
+              />
+              <label class="form-check-label" for="switch_vital_hr"
+                >未量測</label
+              >
+            </div>
+          </div>
           <input
             class="col form-control"
+            id="input_vital_Hr"
             type="number"
             v-model="form.vital.Hr"
             required
           />
         </div>
         <div class="col">
-          <label class="form-label col-2">&deg;C</label>
+          <div class="d-flex justify-content-between">
+            <label class="form-label col-2 me-3">&deg;C</label>
+            <div class="form-check form-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="switch_vital_bodyTemp"
+                v-model="value_bodyTemp"
+                @change="
+                  no_input_func(
+                    value_bodyTemp,
+                    'input_vital_bodyTemp',
+                    'BodyTemp'
+                  )
+                "
+              />
+              <label class="form-check-label" for="switch_vital_bodyTemp"
+                >未量測</label
+              >
+            </div>
+          </div>
           <input
             class="col form-control"
+            id="input_vital_bodyTemp"
             type="number"
             step="0.1"
             v-model="form.vital.BodyTemp"
@@ -527,9 +598,9 @@
                     <li class="list-group-item">
                       <input
                         type="checkbox"
-                        value="夾板固定"
+                        value="SAM護木固定"
                         v-model="form.treatment"
-                      />夾板固定
+                      />SAM護木固定
                     </li>
                     <li class="list-group-item">
                       <input
@@ -574,23 +645,23 @@
                     <li class="list-group-item">
                       <input
                         type="checkbox"
-                        value="使用AED"
+                        value="使用AED電擊去顫"
                         v-model="form.treatment"
-                      />使用AED
+                      />使用AED 電擊去顫
                     </li>
                     <li class="list-group-item">
                       <input
                         type="checkbox"
-                        value="電擊去顫"
+                        value="使用AED不建議電擊"
                         v-model="form.treatment"
-                      />電擊去顫
+                      />使用AED 不建議電擊
                     </li>
                     <li class="list-group-item">
                       <input
                         type="checkbox"
-                        value="不建議電擊"
+                        value="LUCAS"
                         v-model="form.treatment"
-                      />不建議電擊
+                      />LUCAS
                     </li>
                   </ul>
                 </div>
@@ -600,11 +671,31 @@
                     <li class="list-group-item">
                       <input
                         type="checkbox"
-                        value="靜脈輸液"
+                        value="IV"
                         v-model="form.treatment"
-                      />靜脈輸液
+                      />IV
                     </li>
-
+                    <li class="list-group-item">
+                      <input
+                        type="checkbox"
+                        value="IO"
+                        v-model="form.treatment"
+                      />IO
+                    </li>
+                    <li class="list-group-item">
+                      <input
+                        type="checkbox"
+                        value="Adrenalin(Bosmin)"
+                        v-model="form.treatment"
+                      />Adrenalin(Bosmin)
+                    </li>
+                    <li class="list-group-item">
+                      <input
+                        type="checkbox"
+                        value="Epinephrine"
+                        v-model="form.treatment"
+                      />Epinephrine
+                    </li>
                     <li class="list-group-item">
                       <input
                         type="checkbox"
@@ -630,9 +721,9 @@
                     <li class="list-group-item">
                       <input
                         type="checkbox"
-                        value="給予口服葡萄糖液／粉"
+                        value="給予口服阿茲匹靈"
                         v-model="form.treatment"
-                      />給予口服葡萄糖液／粉
+                      />給予口服阿茲匹靈
                     </li>
                     <li class="list-group-item">
                       <input
@@ -666,6 +757,20 @@
                         value="心理支持"
                         v-model="form.treatment"
                       />心理支持
+                    </li>
+                    <li class="list-group-item">
+                      <input
+                        type="checkbox"
+                        value="量測血糖"
+                        v-model="form.treatment"
+                      />量測血糖
+                    </li>
+                    <li class="list-group-item">
+                      <input
+                        type="checkbox"
+                        value="EKG"
+                        v-model="form.treatment"
+                      />EKG
                     </li>
                     <li class="list-group-item">
                       <input
@@ -1067,14 +1172,6 @@
         <p class="col form-control mb-0" type="text">{{ name }}</p>
       </div>
       <div class="row m-2"></div>
-      <!-- <div class="row m-2">
-        <label class="col-4 form-label">執行警消</label>
-        <select class="col form-select" v-model="form.tp" required>
-          <option class="fs-3" v-for="fireMan in firefighters" :key="fireMan.id">
-            {{ fireMan.name }}
-          </option>
-        </select>
-      </div> -->
 
       <div class="row m-2 overflow-auto">
         <div class="col-4">
@@ -1086,7 +1183,21 @@
         </div>
 
         <ul class="col p-0 h-25 firefighter-list">
+          <button
+            v-if="firefighters.length == null"
+            class="btn btn-primary"
+            type="button"
+            disabled
+          >
+            <span
+              class="spinner-grow spinner-grow-sm"
+              role="status"
+              aria-hidden="true"
+            ></span>
+            Loading...
+          </button>
           <li
+            v-else
             class="list-group-item text-center"
             v-for="fireMan in firefighters"
             :key="fireMan.id"
@@ -1099,12 +1210,9 @@
       </div>
       <div class="row m-2">
         <label class="col-4 form-label">載送人數</label>
-        <input
-          class="col form-control"
-          type="number"
-          v-model="form.patient"
-          required
-        />
+        <select class="form-select col" v-model="form.patient" required>
+          <option v-for="i in 11" :key="i">{{ i - 1 }}</option>
+        </select>
       </div>
       <div class="row m-2">
         <label class="col-4 form-label">發生地點</label>
@@ -1116,7 +1224,7 @@
         />
       </div>
       <div class="row m-2">
-        <label class="col-4 form-label">案情補述</label>
+        <label class="col-4 form-label">案件補述</label>
         <input
           class="col form-control"
           type="text"
@@ -1248,6 +1356,42 @@ export default {
       }
     };
 
+    const no_input_func = (value, target, variable) => {
+      let dom = document.getElementById(target);
+      if (value) {
+        form.vital[variable] = null;
+        dom.disabled = true;
+        dom.classList.add("bg-light");
+        dom.placeholder = "未量測";
+      } else {
+        dom.disabled = false;
+        dom.classList.remove("bg-light");
+        dom.placeholder = "";
+      }
+    };
+
+    const bp_no_input_func = (value) => {
+      let dom1 = document.getElementById("input_vital_bp_systolic");
+      let dom2 = document.getElementById("input_vital_bp_diastolic");
+      if (value) {
+        form.vital.Bp.Systolic = null;
+        form.vital.Bp.Diastolic = null;
+        dom1.disabled = true;
+        dom1.classList.add("bg-light");
+        dom1.placeholder = "未量測";
+        dom2.disabled = true;
+        dom2.classList.add("bg-light");
+        dom2.placeholder = "未量測";
+      } else {
+        dom1.disabled = false;
+        dom1.classList.remove("bg-light");
+        dom1.placeholder = "";
+        dom2.disabled = false;
+        dom2.classList.remove("bg-light");
+        dom2.placeholder = "";
+      }
+    };
+
     const onSubmit = async () => {
       await createCase({ ...form, selectedParts });
       // v-model傳進資料後，展開物件，丟進createCase()函試
@@ -1303,6 +1447,8 @@ export default {
       unit,
       rank,
       emtlevel,
+      no_input_func,
+      bp_no_input_func,
     };
   },
 };

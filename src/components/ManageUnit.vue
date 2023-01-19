@@ -278,10 +278,6 @@ export default {
     const nameInput = ref("");
     const rankInput = ref("");
     const emtInput = ref("");
-
-    // const uid = reactive({ uid: "" });
-    const token = ref("");
-    // const adminMode = ref(false);
     const passwordVerifie = ref(false);
     const isLoading = ref(false);
     const create = reactive({
@@ -301,49 +297,14 @@ export default {
       return store.state.unit;
     });
 
-    // firebase.auth().onAuthStateChanged((user) => {
-    //   if (user) {
-    //     isLoading.value = true;
-    //     uid.uid = user.uid;
-    //     user.getIdToken().then((idToken) => {
-    //       console.log(idToken);
-    //       let data = {
-    //         data: {
-    //           token: idToken,
-    //           unit: unit.value,
-    //         },
-    //       };
-    //       token.value = idToken;
-    //       $UserAPI.verifyUser(data, token.value).then((res) => {
-    //         adminMode.value = res.data.result.result;
-    //       });
-    //       $UserAPI
-    //         .getUsers(data, token.value)
-    //         .then((res) => {
-    //           let filterArray = res.data.result.data.filter((el) => {
-    //             return el.rank != "承辦警消";
-    //           });
-    //           users.value = filterArray;
-    //           isLoading.value = false;
-    //         })
-    //         .catch((err) => {
-    //           alert(err);
-    //         });
-    //     });
-    //   } else {
-    //     console.log("無登入");
-    //     router.push("/");
-    //   }
-    // });
-
     const loadUsers = () => {
       isLoading.value = true;
       let data = {
-            data: {
-              token: tokenVuex.value,
-              unit: unitVuex.value,
-            },
-          };
+        data: {
+          token: tokenVuex.value,
+          unit: unitVuex.value,
+        },
+      };
       $UserAPI
         .getUsers(data, tokenVuex.value)
         .then((res) => {
@@ -377,13 +338,13 @@ export default {
           unit: unit.value,
           email: create.email,
           password: create.passwords,
-          token: token.value,
+          token: tokenVuex.value,
         },
       };
       $UserAPI
-        .createUser(data, token.value)
+        .createUser(data, tokenVuex.value)
         .then(() => {
-          $UserAPI.getUsers(data, token.value).then((res) => {
+          $UserAPI.getUsers(data, tokenVuex.value).then((res) => {
             users.value = res.data.result.data;
             isLoading.value = false;
           });
@@ -408,14 +369,14 @@ export default {
           rank: rankInput.value,
           emtlevel: emtInput.value,
           unit: unit.value,
-          token: token.value,
+          token: tokenVuex.value,
         },
       };
       $UserAPI
-        .updateUser(data, token.value)
+        .updateUser(data, tokenVuex.value)
         .then((res) => {
           console.log(res.data.result.result);
-          $UserAPI.getUsers(data, token.value).then((res) => {
+          $UserAPI.getUsers(data, tokenVuex.value).then((res) => {
             users.value = res.data.result.data;
             isLoading.value = false;
           });
@@ -427,19 +388,19 @@ export default {
 
     const deleUser = (id) => {
       isLoading.value = true;
-      let data = { data: { uid: id, token: token.value } };
+      let data = { data: { uid: id, token: tokenVuex.value } };
       console.log("received data ", data);
       $UserAPI
-        .deleteUser(data, token.value)
+        .deleteUser(data, tokenVuex.value)
         .then((res) => {
           let data = {
             data: {
-              token: token.value,
+              token: tokenVuex.value,
               unit: unit.value,
             },
           };
           console.log(res.data.result.result);
-          $UserAPI.getUsers(data, token.value).then((res) => {
+          $UserAPI.getUsers(data, tokenVuex.value).then((res) => {
             users.value = res.data.result.data;
             isLoading.value = false;
           });
@@ -450,14 +411,15 @@ export default {
     };
 
     watch(unitVuex, () => {
-      console.log("watcher",tokenVuex.value)
-      loadUsers()
+      console.log("watcher", tokenVuex.value);
+      loadUsers();
     });
 
     onMounted(() => {
-      loadUsers()
+      loadUsers();
     });
     return {
+      tokenVuex,
       users,
       create,
       nameInput,

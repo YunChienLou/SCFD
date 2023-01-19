@@ -1,12 +1,13 @@
 <template>
   <div class="bg-dark text-white mx-0 overflow-hidden">
-    <!-- 浮水印 --><div v-if="!isLoginPage" class="bg-filter" :data-text="name"></div>
+    <!-- 浮水印 -->
+    <div v-if="!isLoginPage" class="bg-filter" :data-text="name"></div>
     <div class="container">
       <div class="row d-flex justify-content-center">
         <div class="col-lg-6">
           <Status v-if="!isLoginPage" :uid="uid" :userData="userData" />
           <router-view />
-          
+
           <Footer />
         </div>
       </div>
@@ -74,10 +75,10 @@ export default {
       console.log("onUpdated");
       moreBg();
     });
-    
-    onMounted(()=>{
+
+    onMounted(() => {
       verifyVuex();
-    })
+    });
 
     return {
       isLoginPage,

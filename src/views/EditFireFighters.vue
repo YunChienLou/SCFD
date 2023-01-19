@@ -248,8 +248,8 @@ export default {
       console.log(data.data);
       $FirefighterAPI
         .createFirefighter(data, tokenVuex.value)
-        .then((res) => {
-          console.log(res);
+        .then(() => {
+          create.name = '';
           afterGetUnit();
         })
         .catch((err) => {

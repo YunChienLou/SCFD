@@ -15,8 +15,59 @@
         <i class="bi bi-list" style="font-size: 2rem"></i>
       </button>
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-        <div class="navbar-nav text-end mt-5">
-          <li class="nav-item p-3" @click="closeNav()">
+        <div class="navbar-nav text-center mt-5 fs-5">
+          <div class="row"  style="font-size: 3rem">
+            <div class="col-6" style="background:#ffcd35">
+              <li class="nav-item p-3" @click="closeNav()">
+                <router-link
+                  class="text-decoration-none nav-link text-white fw-bold"
+                  to="/homepage"
+                  >填寫紀錄表</router-link
+                >
+              </li>
+            </div>
+            <div class="col-6" style="background:#eddf6b">
+              <li class="nav-item p-3" @click="closeNav()">
+                <router-link
+                  class="text-decoration-none nav-link text-white fw-bold"
+                  to="/list"
+                  >即時救護案件</router-link
+                >
+              </li>
+            </div>
+          </div>
+          <div class="row" style="font-size: 3.5rem">
+            <div class="col-6" style="background:#002c7f">
+              <li class="nav-item p-3" @click="closeNav()">
+                <router-link
+                  class="text-decoration-none nav-link text-white fw-bold"
+                  to="/dashboard"
+                  >計分表</router-link
+                >
+              </li>
+            </div>
+            <div class="col-6" style="background:#00659f">
+              <li class="nav-item p-3" @click="closeNav()">
+                <router-link
+                  class="text-decoration-none nav-link text-white fw-bold"
+                  to="/search"
+                  >案件查詢</router-link
+                >
+              </li>
+            </div>
+          </div>
+          <div class="row justify-content-center" style="font-size: 3.5rem">
+            <div class="col" style="background:#00b3c5">
+              <li class="nav-item p-3" @click="closeNav()">
+                <router-link
+                  class="text-decoration-none nav-link text-white fw-bold"
+                  :to="`/loginstatus/${uid}`"
+                  >個人資料</router-link
+                >
+              </li>
+            </div>
+          </div>
+          <!-- <li class="nav-item p-3" @click="closeNav()">
             <router-link
               class="text-decoration-none text-white fw-bold fs-4"
               to="/homepage"
@@ -50,7 +101,7 @@
               :to="`/loginstatus/${uid}`"
               >個人資料</router-link
             >
-          </li>
+          </li> -->
         </div>
       </div>
     </div>

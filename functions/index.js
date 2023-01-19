@@ -12,8 +12,6 @@ const usersRef = db.collection("users");
 const recordRef = db.collection("records");
 const allStatsRef = db.collection("allStats");
 
-// case
-// login logout
 // search api
 
 exports.createCase = functions
@@ -30,11 +28,6 @@ exports.createCase = functions
       return casesRef
         .add(caseData)
         .then((docRef) => {
-          serverRecord(
-            token,
-            "Successfully created new case:" + docRef.id,
-            false
-          );
           return {
             message:
               "Successfully created new case:" + docRef.id,
@@ -43,11 +36,6 @@ exports.createCase = functions
         })
         .catch((error) => {
           console.error("Error adding case: ", error);
-          serverRecord(
-            token,
-            "Error created new case",
-            true
-          );
           return {
             message:
               "Error created new case",
@@ -71,11 +59,6 @@ exports.createCase = functions
       return casesRef
         .add(caseData)
         .then((docRef) => {
-          serverRecord(
-            token,
-            "Successfully created new case:" + docRef.id,
-            false
-          );
           return {
             message:
               "Successfully created new case:" + docRef.id,
@@ -84,11 +67,68 @@ exports.createCase = functions
         })
         .catch((error) => {
           console.error("Error adding case: ", error);
-          serverRecord(
-            token,
-            "Error created new case",
-            true
-          );
+          return {
+            message:
+              "Error created new case",
+            result: 500,
+          };
+        });
+    }
+  });
+
+  exports.deleteCase = functions
+  .region("asia-east1")
+  .https.onCall(async (data, context) => {
+    if (!context.auth) {
+      // Throwing an HttpsError so that the client gets the error details.
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        "The function must be called " + "while authenticated."
+      );
+    } else {
+      const { caseData } = data;
+      return casesRef
+        .add(caseData)
+        .then((docRef) => {
+          return {
+            message:
+              "Successfully created new case:" + docRef.id,
+            result: 200,
+          };
+        })
+        .catch((error) => {
+          console.error("Error adding case: ", error);
+          return {
+            message:
+              "Error created new case",
+            result: 500,
+          };
+        });
+    }
+  });
+
+  exports.updateCase = functions
+  .region("asia-east1")
+  .https.onCall(async (data, context) => {
+    if (!context.auth) {
+      // Throwing an HttpsError so that the client gets the error details.
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        "The function must be called " + "while authenticated."
+      );
+    } else {
+      const { caseData } = data;
+      return casesRef
+        .add(caseData)
+        .then((docRef) => {
+          return {
+            message:
+              "Successfully created new case:" + docRef.id,
+            result: 200,
+          };
+        })
+        .catch((error) => {
+          console.error("Error adding case: ", error);
           return {
             message:
               "Error created new case",
@@ -424,14 +464,7 @@ exports.getFirefighters = functions
             result: 200,
             data: data,
           };
-          // } else {
-          //   serverRecord(token, "Not Admin can't access", true);
-          //   throw new functions.https.HttpsError(
-          //     500,
-          //     "Not Admin can't access",
-          //     error
-          //   );
-          // }
+
         })
         .catch((error) => {
           serverRecord(token, "verifyIdToken process fail", true);
@@ -1040,8 +1073,8 @@ exports.getReports = functions
         ...doc.data(),
       }))[0];
       const twoMonthReportSnapshot = await allStatsRef
-        .doc("2month")
-        .collection("2monthCollection")
+        .doc("twoMonth")
+        .collection("twoMonthCollection")
         .orderBy("time", "desc")
         .limit(1)
         .get();
@@ -1070,7 +1103,7 @@ exports.getReports = functions
       }))[0];
       const unit2MonthReportSnapshot = await unitRefs
         .doc("unitStatsCollection")
-        .collection("2month")
+        .collection("twoMonth")
         .orderBy("time", "desc")
         .limit(1)
         .get();
@@ -1253,3 +1286,17 @@ exports.twoMonthReport = functions.pubsub
         .then(console.log("success run twoMonthReport"));
     }
   });
+
+  /// log Event
+  // exports.login = functions
+  // .region("asia-east1")
+  // .https.onCall(async (data, context) => {
+  //   if (!context.auth) {
+  //     // Throwing an HttpsError so that the client gets the error details.
+  //     throw new functions.https.HttpsError(
+  //       "failed-precondition",
+  //       "The function must be called " + "while authenticated."
+  //     );
+  //   } else {
+
+  //   }})

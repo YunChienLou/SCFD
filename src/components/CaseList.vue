@@ -416,7 +416,8 @@
               </g>
             </svg>
           </div>
-          <div class="col">
+
+          <div class="col overflow-auto" style="max-height: 150px">
             <div
               class="list-group"
               v-for="(parts, index) in selectedParts"
@@ -454,6 +455,7 @@
           <tbody>
             <tr>
               <td
+                v-if="vital?.Bp?.Systolic != null || vital?.Bp?.Diastolic != null"
                 :class="[
                   vital?.Bp?.Systolic >= 120 ||
                   vital?.Bp?.Systolic <= 90 ||
@@ -466,14 +468,18 @@
                 /
                 <span>{{ vital?.Bp?.Diastolic }}</span>
               </td>
+              <td v-else class="bg-light text-dark">未量測</td>
               <td
+                v-if="vital?.SpO2 != null"
                 :class="[
                   vital?.SpO2 <= 97 ? 'text-white bg-danger' : 'text-white',
                 ]"
               >
                 {{ vital?.SpO2 }}
               </td>
+              <td v-else class="bg-light text-dark">未量測</td>
               <td
+                v-if="vital?.Hr != null"
                 :class="[
                   vital?.Hr > 120 || vital?.Hr < 60
                     ? 'text-white bg-danger'
@@ -482,7 +488,9 @@
               >
                 {{ vital?.Hr }}
               </td>
+              <td v-else class="bg-light text-dark">未量測</td>
               <td
+                v-if="vital?.BodyTemp != null"
                 :class="[
                   vital?.BodyTemp >= 38.5 || vital?.BodyTemp <= 32
                     ? 'text-white bg-danger'
@@ -491,6 +499,7 @@
               >
                 {{ vital?.BodyTemp }}
               </td>
+              <td v-else class="bg-light text-dark">未量測</td>
             </tr>
           </tbody>
         </table>
@@ -517,7 +526,7 @@
           v-if="otherContent.length > 0"
         >
           <i class="bi bi-chat-left-dots"></i>
-          案情補述 :
+          案件補述 :
         </h5>
         <p class="card-text">{{ otherContent }}</p>
         <h5 class="card-title badge transBg p-2 text-wrap">

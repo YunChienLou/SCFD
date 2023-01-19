@@ -16,7 +16,7 @@ export function JSONToExcelConvertor(JSONData, FileName) {
     "生命徵象",
     "執行警消",
     "報案地址",
-    "案情補述",
+    "案件補述",
     "後送醫院",
   ];
   if (!JSONData) {

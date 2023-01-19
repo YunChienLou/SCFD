@@ -399,7 +399,7 @@
 
         <!-- Modal -->
         <div
-          class="modal fade text-dark"
+          class="modal fade text-dark h-75 mt-5"
           id="exampleModal"
           tabindex="-1"
           aria-labelledby="exampleModalLabel"
@@ -523,9 +523,9 @@
                     <li class="list-group-item">
                       <input
                         type="checkbox"
-                        value="夾板固定"
+                        value="SAM護木固定"
                         v-model="form.treatment"
-                      />夾板固定
+                      />SAM護木固定
                     </li>
                     <li class="list-group-item">
                       <input
@@ -570,23 +570,23 @@
                     <li class="list-group-item">
                       <input
                         type="checkbox"
-                        value="使用AED"
+                        value="使用AED電擊去顫"
                         v-model="form.treatment"
-                      />使用AED
+                      />使用AED 電擊去顫
                     </li>
                     <li class="list-group-item">
                       <input
                         type="checkbox"
-                        value="電擊去顫"
+                        value="使用AED不建議電擊"
                         v-model="form.treatment"
-                      />電擊去顫
+                      />使用AED 不建議電擊
                     </li>
                     <li class="list-group-item">
                       <input
                         type="checkbox"
-                        value="不建議電擊"
+                        value="LUCAS"
                         v-model="form.treatment"
-                      />不建議電擊
+                      />LUCAS
                     </li>
                   </ul>
                 </div>
@@ -596,11 +596,31 @@
                     <li class="list-group-item">
                       <input
                         type="checkbox"
-                        value="靜脈輸液"
+                        value="IV"
                         v-model="form.treatment"
-                      />靜脈輸液
+                      />IV
                     </li>
-
+                    <li class="list-group-item">
+                      <input
+                        type="checkbox"
+                        value="IO"
+                        v-model="form.treatment"
+                      />IO
+                    </li>
+                    <li class="list-group-item">
+                      <input
+                        type="checkbox"
+                        value="Adrenalin(Bosmin)"
+                        v-model="form.treatment"
+                      />Adrenalin(Bosmin)
+                    </li>
+                    <li class="list-group-item">
+                      <input
+                        type="checkbox"
+                        value="Epinephrine"
+                        v-model="form.treatment"
+                      />Epinephrine
+                    </li>
                     <li class="list-group-item">
                       <input
                         type="checkbox"
@@ -626,9 +646,9 @@
                     <li class="list-group-item">
                       <input
                         type="checkbox"
-                        value="給予口服葡萄糖液／粉"
+                        value="給予口服阿茲匹靈"
                         v-model="form.treatment"
-                      />給予口服葡萄糖液／粉
+                      />給予口服阿茲匹靈
                     </li>
                     <li class="list-group-item">
                       <input
@@ -666,6 +686,20 @@
                     <li class="list-group-item">
                       <input
                         type="checkbox"
+                        value="量測血糖"
+                        v-model="form.treatment"
+                      />量測血糖
+                    </li>
+                    <li class="list-group-item">
+                      <input
+                        type="checkbox"
+                        value="EKG"
+                        v-model="form.treatment"
+                      />EKG
+                    </li>
+                    <li class="list-group-item">
+                      <input
+                        type="checkbox"
                         value="急產接生"
                         v-model="form.treatment"
                       />急產接生
@@ -673,7 +707,7 @@
                     <li class="list-group-item">
                       <input
                         type="checkbox"
-                        value="其他其他處置"
+                        value="其他處置"
                         v-model="form.treatment"
                       />其他
                     </li>
@@ -1107,7 +1141,7 @@
         />
       </div>
       <div class="row m-2">
-        <label class="col-4 form-label">案情補述</label>
+        <label class="col-4 form-label">案件補述</label>
         <input
           class="col form-control"
           type="text"
