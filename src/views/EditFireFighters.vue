@@ -249,7 +249,7 @@ export default {
       $FirefighterAPI
         .createFirefighter(data, tokenVuex.value)
         .then(() => {
-          create.name = '';
+          create.name = "";
           afterGetUnit();
         })
         .catch((err) => {

@@ -907,7 +907,9 @@
           <tbody>
             <tr>
               <td
-                v-if="vital?.Bp?.Systolic != null || vital?.Bp?.Diastolic != null"
+                v-if="
+                  vital?.Bp?.Systolic != null || vital?.Bp?.Diastolic != null
+                "
                 :class="[
                   vital?.Bp?.Systolic >= 120 ||
                   vital?.Bp?.Systolic <= 90 ||

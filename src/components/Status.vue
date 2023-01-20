@@ -16,9 +16,18 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav text-center mt-5 fs-5">
-          <div class="row"  style="font-size: 3rem">
-            <div class="col-6" style="background:#ffcd35">
-              <li class="nav-item p-3" @click="closeNav()">
+          <div class="row" style="font-size: 2rem; height: 30vh">
+            <div
+              class="col-6 d-flex align-items-center"
+              style="background: #ffcd35"
+              @click="
+                () => {
+                  router.push('/homepage');
+                  closeNav();
+                }
+              "
+            >
+              <li class="nav-item p-3">
                 <router-link
                   class="text-decoration-none nav-link text-white fw-bold"
                   to="/homepage"
@@ -26,8 +35,17 @@
                 >
               </li>
             </div>
-            <div class="col-6" style="background:#eddf6b">
-              <li class="nav-item p-3" @click="closeNav()">
+            <div
+              class="col-6 d-flex align-items-center"
+              style="background: #eddf6b"
+              @click="
+                () => {
+                  router.push('/list');
+                  closeNav();
+                }
+              "
+            >
+              <li class="nav-item p-3">
                 <router-link
                   class="text-decoration-none nav-link text-white fw-bold"
                   to="/list"
@@ -36,9 +54,18 @@
               </li>
             </div>
           </div>
-          <div class="row" style="font-size: 3.5rem">
-            <div class="col-6" style="background:#002c7f">
-              <li class="nav-item p-3" @click="closeNav()">
+          <div class="row" style="font-size: 2rem; height: 30vh">
+            <div
+              class="col-6 d-flex align-items-center"
+              style="background: #002c7f"
+              @click="
+                () => {
+                  router.push('/dashboard');
+                  closeNav();
+                }
+              "
+            >
+              <li class="nav-item p-3">
                 <router-link
                   class="text-decoration-none nav-link text-white fw-bold"
                   to="/dashboard"
@@ -46,8 +73,17 @@
                 >
               </li>
             </div>
-            <div class="col-6" style="background:#00659f">
-              <li class="nav-item p-3" @click="closeNav()">
+            <div
+              class="col-6 d-flex align-items-center"
+              style="background: #00659f"
+              @click="
+                () => {
+                  router.push('/search');
+                  closeNav();
+                }
+              "
+            >
+              <li class="nav-item p-3">
                 <router-link
                   class="text-decoration-none nav-link text-white fw-bold"
                   to="/search"
@@ -56,9 +92,21 @@
               </li>
             </div>
           </div>
-          <div class="row justify-content-center" style="font-size: 3.5rem">
-            <div class="col" style="background:#00b3c5">
-              <li class="nav-item p-3" @click="closeNav()">
+          <div
+            class="row"
+            style="font-size: 2rem; height: 30vh"
+            @click="
+              () => {
+                router.push(`/loginstatus/${uid}`);
+                closeNav();
+              }
+            "
+          >
+            <div
+              class="col d-flex align-items-center justify-content-center"
+              style="background: #00b3c5"
+            >
+              <li class="p-3">
                 <router-link
                   class="text-decoration-none nav-link text-white fw-bold"
                   :to="`/loginstatus/${uid}`"
@@ -67,7 +115,7 @@
               </li>
             </div>
           </div>
-          <!-- <li class="nav-item p-3" @click="closeNav()">
+          <!-- <li class="nav-item p-3" >
             <router-link
               class="text-decoration-none text-white fw-bold fs-4"
               to="/homepage"
@@ -108,17 +156,19 @@
   </nav>
 </template>
 <script>
+import { useRouter } from "vue-router";
 export default {
   props: {
     uid: String,
     userData: Object,
   },
   setup() {
+    const router = useRouter();
     const closeNav = () => {
       const nav = document.getElementById("navbarNavAltMarkup");
       nav.classList.remove("show");
     };
-    return { closeNav };
+    return { closeNav, router };
   },
 };
 </script>
