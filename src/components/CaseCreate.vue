@@ -1248,14 +1248,22 @@
         </select>
       </div>
       <div class="d-grid mt-4 gap-2">
-        <button class="btn btn-primary mx-2" type="submit">送出</button>
+        <button class="btn btn-primary mx-2" type="submit">
+          <div v-if="isCreating" class="d-flex justify-content-center">
+            <div class="spinner-border" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <div class="p ms-2">送出中...</div>
+          </div>
+          <div v-else class="">送出</div>
+          
+        </button>
       </div>
     </form>
   </div>
 </template>
 
 <script>
-import { createCase } from "@/firebase";
 import { reactive, watch, ref, computed, onMounted, inject } from "vue";
 import { unitNameEnum } from "@/util/Enum";
 import { useStore } from "vuex";
@@ -1263,7 +1271,9 @@ import { useStore } from "vuex";
 export default {
   setup() {
     const $FirefighterAPI = inject("$FirefighterAPI");
+    const $CaseAPI = inject("$CaseAPI");
     const store = useStore();
+    const isCreating = ref(false)
     const tokenVuex = computed(() => {
       return store.state.token;
     });
@@ -1393,7 +1403,15 @@ export default {
     };
 
     const onSubmit = async () => {
-      await createCase({ ...form, selectedParts });
+      isCreating.value = true
+      let data = {
+        data: {
+          caseData: { ...form, selectedParts },
+        },
+      };
+      $CaseAPI.createCase(data, tokenVuex.value).then(() => {
+        isCreating.value = false
+      });
       // v-model傳進資料後，展開物件，丟進createCase()函試
       form.treatment = [];
       form.onScene = [];
@@ -1435,6 +1453,7 @@ export default {
     watch(unit, afterGetUnit);
     return {
       form,
+      isCreating,
       onSubmit,
       addbodypart,
       selectedParts,

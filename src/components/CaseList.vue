@@ -542,7 +542,7 @@
 </template>
 
 <script>
-import { useLoadCases, deleteCase } from "@/firebase";
+import { useLoadCases } from "@/firebase";
 import { inject } from "@vue/runtime-core";
 
 export default {
@@ -559,7 +559,7 @@ export default {
         "cls-2": exsist,
       };
     };
-    return { cases, deleteCase, classAppend, dateFormate };
+    return { cases, classAppend, dateFormate };
   },
 };
 </script>

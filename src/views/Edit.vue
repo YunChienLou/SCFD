@@ -1168,6 +1168,12 @@
       <div class="d-grid my-4 mb-5">
         <button class="btn btn-primary mx-2" type="submit">送出</button>
       </div>
+      <div v-if="isSending" class="d-flex justify-content-center">
+        <div class="spinner-border" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <div class="p ms-2">資料上傳中...</div>
+      </div>
     </form>
   </div>
 </template>
@@ -1175,56 +1181,11 @@
 <script>
 import { reactive, computed, onMounted, watch, ref, inject } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { getCase, updateCases } from "@/firebase";
 import { unitNameEnum } from "@/util/Enum";
 import { useStore } from "vuex";
 
 export default {
   setup() {
-    const store = useStore();
-    const router = useRouter();
-    const route = useRoute();
-    const isLoading = ref(false);
-    const caseId = computed(() => route.params.id);
-    var countId = 0;
-    var selectedParts = reactive([]);
-    const firefighters = ref([]);
-    const unitRef = ref();
-    const $FirefighterAPI = inject("$FirefighterAPI");
-    const unitVuex = computed(() => {
-      return store.state.unit;
-    });
-    const tokenVuex = computed(() => {
-      return store.state.token;
-    });
-    const afterGetUnit = () => {
-      isLoading.value = true;
-      console.log("start execute afterGetUnit");
-      let unit = unitVuex.value;
-      let enumValue = unitNameEnum[unit];
-      let data = {
-        data: {
-          token: tokenVuex.value,
-          unit: enumValue,
-        },
-      };
-      console.log(data.data);
-      $FirefighterAPI
-        .getFirefighters(data, tokenVuex.value)
-        .then((res) => {
-          console.log(res);
-          isLoading.value = false;
-          firefighters.value = res.data.result.data;
-        })
-        .catch((err) => {
-          console.log(err);
-          isLoading.value = false;
-          failResponse(err);
-        });
-    };
-    const failResponse = () => {
-      // alert(err + ";\n通知三重志工 羅云謙  0919539740");
-    };
     const form = reactive({
       time: "",
       who: "",
@@ -1247,6 +1208,81 @@ export default {
       },
       hospital: "",
     });
+    const store = useStore();
+    const router = useRouter();
+    const route = useRoute();
+    const isLoading = ref(false);
+    const isSending = ref(false);
+    const caseId = computed(() => {
+      return route.params.id;
+    });
+    const tokenVuex = computed(() => {
+      return store.state.token;
+    });
+    var countId = 0;
+    var selectedParts = reactive([]);
+    const firefighters = ref([]);
+    const unitRef = ref();
+    const $FirefighterAPI = inject("$FirefighterAPI");
+    const $CaseAPI = inject("$CaseAPI");
+
+    const afterGetUnit = () => {
+      isLoading.value = true;
+      console.log("start execute afterGetUnit");
+
+      let caseData = {
+        data: {
+          caseId: caseId.value,
+        },
+      };
+      $CaseAPI.getCase(caseData, tokenVuex.value).then((res) => {
+        let Case = res.data.result.data;
+        console.log(Case);
+        unitRef.value = Case.unit;
+        const acessParts = Case.selectedParts;
+        //用string 資料得到目標ID CASE的資料
+        form.time = Case.time;
+        form.patient = Case.patient;
+        form.who = Case.who;
+        form.location = Case.location;
+        form.rank = Case.rank;
+        form.treatment = Case.treatment;
+        form.onScene = Case.onScene;
+        form.uid = Case.uid;
+        form.tp = Case.tp;
+        form.otherContent = Case.otherContent;
+        form.vital.Bp.Systolic = Case.vital.Bp.Systolic;
+        form.vital.Bp.Diastolic = Case.vital.Bp.Diastolic;
+        form.hospital = Case.hospital;
+        form.vital.BodyTemp = Case.vital.BodyTemp;
+        form.vital.Hr = Case.vital.Hr;
+        form.vital.SpO2 = Case.vital.SpO2;
+        Array.prototype.push.apply(selectedParts, acessParts);
+        var countArray = acessParts.map((e) => e.id);
+        countId = Math.max(...countArray);
+
+        let unit = Case.unit;
+        let enumValue = unitNameEnum[unit];
+        let data = {
+          data: {
+            token: tokenVuex.value,
+            unit: enumValue,
+          },
+        };
+        $FirefighterAPI
+          .getFirefighters(data, tokenVuex.value)
+          .then((res) => {
+            console.log(res);
+            isLoading.value = false;
+            firefighters.value = res.data.result.data;
+          })
+          .catch((err) => {
+            console.log(err);
+            isLoading.value = false;
+          });
+      });
+    };
+
     const deleBodyPart = (id) => {
       // find index of parts wanna delete
       // var selectWords = event.currentTarget
@@ -1271,34 +1307,11 @@ export default {
       }
     };
     onMounted(async () => {
-      const Case = await getCase(caseId.value);
-      unitRef.value = Case.unit;
-      const acessParts = Case.selectedParts;
-      //用string 資料得到目標ID CASE的資料
-      form.time = Case.time;
-      form.patient = Case.patient;
-      form.who = Case.who;
-      form.location = Case.location;
-      form.rank = Case.rank;
-      form.treatment = Case.treatment;
-      form.onScene = Case.onScene;
-      form.uid = Case.uid;
-      form.tp = Case.tp;
-      form.otherContent = Case.otherContent;
-      form.vital.Bp.Systolic = Case.vital.Bp.Systolic;
-      form.vital.Bp.Diastolic = Case.vital.Bp.Diastolic;
-      form.hospital = Case.hospital;
-      form.vital.BodyTemp = Case.vital.BodyTemp;
-      form.vital.Hr = Case.vital.Hr;
-      form.vital.SpO2 = Case.vital.SpO2;
-      Array.prototype.push.apply(selectedParts, acessParts);
-      var countArray = acessParts.map((e) => e.id);
-      countId = Math.max(...countArray);
+      afterGetUnit();
     });
     const updateParts = () => {
       // 全部回復cls-1
       var allparts = document.getElementsByTagName("g");
-      console.log(allparts);
       for (let j = 0; j < allparts.length; j++) {
         allparts[j].classList.remove("cls-2");
         allparts[j].classList.add("cls-1");
@@ -1311,35 +1324,30 @@ export default {
       }
     };
     watch(selectedParts, updateParts);
-    watch(unitRef, afterGetUnit);
-    // 新填入的資料
+    watch(tokenVuex, afterGetUnit);
 
+    // 新填入的資料
     const update = async () => {
-      await updateCases(caseId.value, { ...form, selectedParts });
+      isSending.value = true;
+      let data = {
+        data: {
+          caseData: { ...form, selectedParts },
+          caseId: caseId.value,
+        },
+      };
+      $CaseAPI.updateCase(data, tokenVuex.value).then(() => {
+        isSending.value = false;
+        router.push(`/LoginStatus/${form.uid}`);
+      });
       // 等資料更新上去 再往下走
-      router.push(`/LoginStatus/${form.uid}`);
-      // 更新完資料 回到首頁"/"
-      form.treatment = [];
-      form.onScene = [];
-      form.time = "";
-      form.patient = "";
-      form.location = "";
-      form.tp = "";
-      form.otherContent = "";
-      form.vital.Bp.Systolic = 0;
-      form.vital.Bp.Diastolic = 0;
-      form.vital.Hr = 0;
-      form.vital.SpO2 = 0;
-      form.hospital = "";
-      form.vital.BodyTemp = 35;
-      // 清空輸入框
-      // 輸入框歸零 從第0項 刪除到第(陣列數量)項
-      // selectedParts.splice(0, selectedParts.length);
+
+      // 更新完資料 回到首頁
     };
 
     return {
       form,
       isLoading,
+      isSending,
       update,
       deleBodyPart,
       addbodypart,

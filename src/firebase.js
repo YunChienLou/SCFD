@@ -116,10 +116,38 @@ const report = {
 };
 
 const cases = {
-  createCase: () => {},
-  updateCase: () => {},
-  deleteCase: () => {},
-  getCases: () => {},
+  createCase: (data, token) => {
+    return axios.post(urlBase + "createCase", data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+  },
+  updateCase: (data, token) => {
+    return axios.post(urlBase + "updateCase", data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+  },
+  deleteCase: (data, token) => {
+    return axios.post(urlBase + "deleteCase", data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+  },
+  getCase: (data, token) => {
+    return axios.post(urlBase + "getCase", data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+  },
 };
 export default { user, firefighter, admin, report, cases };
 
@@ -145,57 +173,57 @@ const auth = firebase.auth();
 // Cloud Function test
 
 // add doc to firebase collection
-export const createCase = (Case) => {
-  return dailyCases
-    .add(Case)
-    .then((docRef) => {
-      console.log("Document written with ID: ", docRef.id);
-      alert("上傳成功");
-    })
-    .catch((error) => {
-      console.error("Error adding document: ", error);
-      alert("上傳失敗");
-    });
-};
+// export const createCase = (Case) => {
+//   return dailyCases
+//     .add(Case)
+//     .then((docRef) => {
+//       console.log("Document written with ID: ", docRef.id);
+//       alert("上傳成功");
+//     })
+//     .catch((error) => {
+//       console.error("Error adding document: ", error);
+//       alert("上傳失敗");
+//     });
+// };
 
 // get specific doc that match id
-export const getCase = async (id) => {
-  const Case = await dailyCases.doc(id).get();
-  return Case.exists ? Case.data() : null;
-};
+// export const getCase = async (id) => {
+//   const Case = await dailyCases.doc(id).get();
+//   return Case.exists ? Case.data() : null;
+// };
 
-export const updateCases = (id, Case) => {
-  return dailyCases
-    .doc(id)
-    .update(Case)
-    .then((docRef) => {
-      console.log("Document updating with ID: ", docRef);
-      alert("更新成功");
-    })
-    .catch((error) => {
-      console.error("Error updating document: ", error);
-      alert("更新失敗");
-    });
-};
+// export const updateCases = (id, Case) => {
+//   return dailyCases
+//     .doc(id)
+//     .update(Case)
+//     .then((docRef) => {
+//       console.log("Document updating with ID: ", docRef);
+//       alert("更新成功");
+//     })
+//     .catch((error) => {
+//       console.error("Error updating document: ", error);
+//       alert("更新失敗");
+//     });
+// };
 
-export const deleteCase = async (id) => {
-  var deleteBoolean = confirm("確認刪除?");
-  if (deleteBoolean) {
-    await dailyCases
-      .doc(id)
-      .delete()
-      .then((msg) => {
-        console.log(msg);
-        alert("刪除成功");
-      })
-      .catch((error) => {
-        console.log(error);
-        alert("刪除失敗");
-      });
-    // refresh route to origin page
-    return router.go();
-  }
-};
+// export const deleteCase = async (id) => {
+//   var deleteBoolean = confirm("確認刪除?");
+//   if (deleteBoolean) {
+//     await dailyCases
+//       .doc(id)
+//       .delete()
+//       .then((msg) => {
+//         console.log(msg);
+//         alert("刪除成功");
+//       })
+//       .catch((error) => {
+//         console.log(error);
+//         alert("刪除失敗");
+//       });
+//     // refresh route to origin page
+//     return router.go();
+//   }
+// };
 
 //load whole collection in
 export const useLoadCases = () => {

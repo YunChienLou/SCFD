@@ -45,7 +45,7 @@ exports.createCase = functions
     }
   });
 
-  exports.updateCase = functions
+  exports.getCase = functions
   .region("asia-east1")
   .https.onCall(async (data, context) => {
     if (!context.auth) {
@@ -55,18 +55,20 @@ exports.createCase = functions
         "The function must be called " + "while authenticated."
       );
     } else {
-      const { caseData } = data;
+      const { caseId } = data;
       return casesRef
-        .add(caseData)
-        .then((docRef) => {
+        .doc(caseId)
+        .get()
+        .then((res) => {
           return {
             message:
-              "Successfully created new case:" + docRef.id,
+              "Successfully get case:" + caseId,
             result: 200,
+            data:res.data()
           };
         })
         .catch((error) => {
-          console.error("Error adding case: ", error);
+          console.error("Error getting case: ", error);
           return {
             message:
               "Error created new case",
@@ -86,18 +88,19 @@ exports.createCase = functions
         "The function must be called " + "while authenticated."
       );
     } else {
-      const { caseData } = data;
+      const { caseId } = data;
       return casesRef
-        .add(caseData)
-        .then((docRef) => {
+        .doc(caseId)
+        .delete()
+        .then(() => {
           return {
             message:
-              "Successfully created new case:" + docRef.id,
+              "Successfully delete case: " + caseId,
             result: 200,
           };
         })
         .catch((error) => {
-          console.error("Error adding case: ", error);
+          console.error("Error delete case: ", error);
           return {
             message:
               "Error created new case",
@@ -117,13 +120,16 @@ exports.createCase = functions
         "The function must be called " + "while authenticated."
       );
     } else {
-      const { caseData } = data;
+      console.log('進入更新函數')
+      const { caseData , caseId } = data;
+      console.log('caseData','')
       return casesRef
-        .add(caseData)
-        .then((docRef) => {
+        .doc(caseId)
+        .update(caseData)
+        .then(() => {
           return {
             message:
-              "Successfully created new case:" + docRef.id,
+              "Successfully updateCase :" + caseId,
             result: 200,
           };
         })

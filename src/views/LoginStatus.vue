@@ -619,7 +619,15 @@
         <router-link :to="`/edit/${id}`">
           <button class="btn btn-light">修改</button>
         </router-link>
-        <button class="btn btn-danger" @click="deleteCase(id)">刪除</button>
+        <button class="btn btn-danger" @click="deleteCase(id)">
+          <div v-if="isDeleting" class="d-flex justify-content-center">
+            <div class="spinner-border" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <div class="p ms-2">刪除中...</div>
+          </div>
+          <div v-else class="">刪除</div>
+        </button>
       </div>
     </div>
   </div>
@@ -630,7 +638,6 @@
 import {
   logoutUser,
   loadCasesTarget,
-  deleteCase,
   loadUnitCasesByTimePeriod,
 } from "@/firebase";
 import { JSONToExcelConvertor } from "../util/downlaodCase";
@@ -645,6 +652,7 @@ export default {
     // Status,
   },
   setup() {
+    const $CaseAPI = inject("$CaseAPI");
     const userData = reactive({
       name: computed(() => {
         return store.state.name;
@@ -665,7 +673,10 @@ export default {
     const adminMode = computed(() => {
       return store.state.isAdmin;
     });
-
+    const tokenVuex = computed(() => {
+      return store.state.token;
+    });
+    const isDeleting = ref(false);
     const dateFormate = inject("dateFormate");
     const store = useStore();
     // const route = useRoute();
@@ -706,6 +717,18 @@ export default {
         "cls-1": exsist,
         "cls-2": exsist,
       };
+    };
+
+    const deleteCase = (id) => {
+      isDeleting.value = true;
+      let data = {
+        data: {
+          caseId: id,
+        },
+      };
+      $CaseAPI.deleteCase(data, tokenVuex.value).then(() => {
+        isDeleting.value = false;
+      });
     };
 
     const logout = () => {
@@ -767,6 +790,7 @@ export default {
       dateFormate,
       classAppend,
       deleteCase,
+      isDeleting,
       json_data,
       endTime,
       startTime,
