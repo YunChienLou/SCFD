@@ -1,5 +1,32 @@
 <template>
   <div class="bg-dark text-white mx-0 overflow-hidden">
+    <div aria-live="polite" aria-atomic="false" class="fixed-top mt-5">
+      <!-- Position it: -->
+      <!-- - `.toast-container` for spacing between toasts -->
+      <!-- - `.position-absolute`, `top-0` & `end-0` to position the toasts in the upper right corner -->
+      <!-- - `.p-3` to prevent the toasts from sticking to the edge of the container  -->
+      <div class="toast-container position-absolute top-0 end-0 p-3">
+        <!-- Then put toasts within -->
+        <div
+          v-for="(no, index) in notifications"
+          v-bind:key="index"
+          class="toast bg-dark"
+        >
+          <div class="toast-header bg-secondary text-light">
+            <div class="rounded me-2 bg-danger" alt="...">...</div>
+            <strong class="me-auto">SCFD-APP</strong>
+            <small class="text-light">{{ no.time }}</small>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="toast"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="toast-body">{{ no.msg }}</div>
+        </div>
+      </div>
+    </div>
     <!-- 浮水印 -->
     <div v-if="!isLoginPage" class="bg-filter" :data-text="name"></div>
     <div class="container">
@@ -7,7 +34,6 @@
         <div class="col-lg-6">
           <Status v-if="!isLoginPage" :uid="uid" :userData="userData" />
           <router-view />
-
           <Footer />
         </div>
       </div>
@@ -19,10 +45,11 @@
 <script>
 import Footer from "./components/Footer.vue";
 import Status from "./components/Status.vue";
+import { Toast } from "bootstrap";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
 import { reactive } from "@vue/reactivity";
-import { computed, onMounted, onUpdated } from "@vue/runtime-core";
+import { computed, onMounted, onUpdated, watch } from "@vue/runtime-core";
 
 export default {
   components: {
@@ -35,6 +62,10 @@ export default {
       return ["Login"].indexOf(route.name) > -1;
     });
     const store = useStore();
+    const notifications = computed(() => {
+      console.log('compute noti')
+      return store.state.notification;
+    });
     const name = computed(() => {
       let identify =
         store.state.unit + "分隊 " + store.state.rank + " " + store.state.name;
@@ -71,6 +102,19 @@ export default {
       await store.dispatch("verify");
     };
 
+    watch(notifications.value, () => {
+      // var toast
+      console.log("notifichange", notifications.value);
+      console.log("querySelectorAll",document.querySelectorAll(".toast"))
+      var toastElList = [].slice.call(document.querySelectorAll(".toast"));
+      var toastList = toastElList.map(function (toastEl) {
+        return new Toast(toastEl);
+      });
+      console.log('toastList',toastList)
+      console.log('toastElList',toastElList)
+      toastList.forEach((toast) => toast.show());
+    });
+
     onUpdated(() => {
       console.log("onUpdated");
       moreBg();
@@ -85,6 +129,7 @@ export default {
       userData,
       uid,
       name,
+      notifications,
     };
   },
 };

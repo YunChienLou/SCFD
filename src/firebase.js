@@ -1,12 +1,22 @@
 import axios from "axios";
 import firebase from "firebase/app";
 import "firebase/auth";
-import { ref, onUnmounted } from "vue";
+// import { ref, onUnmounted } from "vue";
 import router from "./router";
 require("firebase/firestore");
 require("firebase/functions");
 const urlBase = "https://asia-east1-scfd-app.cloudfunctions.net/";
 
+const query = {
+  queryTargetCases: (data, token) => {
+    return axios.post(urlBase + "queryTargetCases", data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+  },
+};
 const user = {
   createUser: (data, token) => {
     return axios.post(urlBase + "createUser", data, {
@@ -18,6 +28,14 @@ const user = {
   },
   getUsers: (data, token) => {
     return axios.post(urlBase + "getUsers", data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+  },
+  getUser: (data, token) => {
+    return axios.post(urlBase + "getUser", data, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
@@ -148,8 +166,16 @@ const cases = {
       },
     });
   },
+  getCases: (data, token) => {
+    return axios.post(urlBase + "getCases", data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+  },
 };
-export default { user, firefighter, admin, report, cases };
+export default { user, firefighter, admin, report, cases, query };
 
 // 即將廢除 改 axios post method call api
 const config = {
@@ -166,8 +192,8 @@ const firebaseApp = firebase.initializeApp(config);
 // const functions = firebaseApp.functions("asia-east1");
 const db = firebaseApp.firestore();
 const dailyCases = db.collection("cases");
-const users = db.collection("users");
-const orderCases = dailyCases.orderBy("time", "desc").limit(15);
+// const users = db.collection("users");
+// const orderCases = dailyCases.orderBy("time", "desc").limit(15);
 const auth = firebase.auth();
 
 // Cloud Function test
@@ -226,24 +252,24 @@ const auth = firebase.auth();
 // };
 
 //load whole collection in
-export const useLoadCases = () => {
-  const cases = ref([]);
-  const close = orderCases.onSnapshot((snapshot) => {
-    cases.value = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-  });
-  onUnmounted(close);
-  return cases;
-};
+// export const useLoadCases = () => {
+//   const cases = ref([]);
+//   const close = orderCases.onSnapshot((snapshot) => {
+//     cases.value = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+//   });
+//   onUnmounted(close);
+//   return cases;
+// };
 
 //load whole collection in
-export const useLoadUsers = () => {
-  const cases = ref([]);
-  const close = users.onSnapshot((snapshot) => {
-    cases.value = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-  });
-  onUnmounted(close);
-  return cases;
-};
+// export const useLoadUsers = () => {
+//   const cases = ref([]);
+//   const close = users.onSnapshot((snapshot) => {
+//     cases.value = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+//   });
+//   onUnmounted(close);
+//   return cases;
+// };
 
 export const loadCasesTarget = async (subject, value) => {
   const snapshot = dailyCases
@@ -253,29 +279,29 @@ export const loadCasesTarget = async (subject, value) => {
   return snapshot;
 };
 
-export const loadWhoCases = async (value) => {
-  var targetCases = [];
-  const snapshot = await dailyCases.orderBy("time", "desc").get();
-  snapshot.forEach((item) => {
-    if (item.data().who.indexOf(value) >= 0) {
-      targetCases.push(item.data());
-    }
-  });
-  return targetCases;
-};
+// export const loadWhoCases = async (value) => {
+//   var targetCases = [];
+//   const snapshot = await dailyCases.orderBy("time", "desc").get();
+//   snapshot.forEach((item) => {
+//     if (item.data().who.indexOf(value) >= 0) {
+//       targetCases.push(item.data());
+//     }
+//   });
+//   return targetCases;
+// };
 
-export const loadUnitCases = async (value) => {
-  var targetCases = [];
-  const snapshot = await dailyCases
-    .orderBy("time", "desc")
-    .where("unit", "==", value)
-    .get();
-  snapshot.forEach((item) => {
-    targetCases.push(item.data());
-  });
-  console.log(targetCases);
-  return targetCases;
-};
+// export const loadUnitCases = async (value) => {
+//   var targetCases = [];
+//   const snapshot = await dailyCases
+//     .orderBy("time", "desc")
+//     .where("unit", "==", value)
+//     .get();
+//   snapshot.forEach((item) => {
+//     targetCases.push(item.data());
+//   });
+//   console.log(targetCases);
+//   return targetCases;
+// };
 
 export const loadCasesByTimePeriod = async (start, end) => {
   var targetCases = [];
@@ -352,13 +378,12 @@ export const loadOtherContentCases = async (value) => {
   return targetCases;
   // 最後回傳收繳資料的矩陣
 };
-
+// 這支還沒用過
 export const loadSpecArrayCases = async (subject, value) => {
   var targetCases = [];
   // 記錄們(每個以物件為單位) 存放的陣列
   const snapshot = await dailyCases
     .where(subject, "array-contains", value)
-    .get()
     .get();
   snapshot.docs.forEach((item) => {
     targetCases.push(item.data());
@@ -372,7 +397,6 @@ export const loadSpecArrayCases = async (subject, value) => {
 };
 
 // 登入邏輯
-
 export const loginUser = (email, password) => {
   auth
     .signInWithEmailAndPassword(email, password)
@@ -422,16 +446,16 @@ export const forgetPasswords = (email) => {
 };
 
 // 載入用戶資料
-export const loadUser = async (uid) => {
-  var output = await db
-    .collection("users")
-    .doc(uid)
-    .get()
-    .then((doc) => {
-      var data = doc.data();
-      return data;
-    });
-  return output;
-};
+// export const loadUser = async (uid) => {
+//   var output = await db
+//     .collection("users")
+//     .doc(uid)
+//     .get()
+//     .then((doc) => {
+//       var data = doc.data();
+//       return data;
+//     });
+//   return output;
+// };
 
 // page refresh

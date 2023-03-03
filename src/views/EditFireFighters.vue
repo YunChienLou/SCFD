@@ -190,10 +190,6 @@ export default {
     const tokenVuex = computed(() => {
       return store.state.token;
     });
-    // const testGetters = computed(
-    //   () => store.getters["getUserData"]
-    // );
-
     const verifyVuex = () => {
       return store.dispatch("verify");
     };
@@ -223,12 +219,11 @@ export default {
           isLoading.value = false;
         })
         .catch((err) => {
-          failResponse(err);
+          store.dispatch("push2Notification", {
+            msg: "載入警消資料失敗: " + err,
+            time: new Date().toLocaleTimeString(),
+          });
         });
-    };
-    const failResponse = () => {
-      isLoading.value = false;
-      // alert(err + ";\n通知三重志工 羅云謙  0919539740");
     };
     const getUserData = async (index) => {
       let target = JSON.parse(JSON.stringify(firefighters.value))[index];
@@ -251,10 +246,16 @@ export default {
         .then(() => {
           create.name = "";
           afterGetUnit();
+          store.dispatch("push2Notification", {
+            msg: "成功新增警消",
+            time: new Date().toLocaleTimeString(),
+          });
         })
         .catch((err) => {
-          console.log(err);
-          failResponse(err);
+          store.dispatch("push2Notification", {
+            msg: "新增警消失敗: " + err,
+            time: new Date().toLocaleTimeString(),
+          });
         });
     };
     const editUser = () => {
@@ -270,13 +271,18 @@ export default {
       console.log(data.data, "update data");
       $FirefighterAPI
         .updateFirefighter(data, tokenVuex.value)
-        .then((res) => {
-          console.log(res);
+        .then(() => {
+          store.dispatch("push2Notification", {
+            msg: "成功修改警消資料",
+            time: new Date().toLocaleTimeString(),
+          });
           afterGetUnit();
         })
         .catch((err) => {
-          console.log(err);
-          failResponse(err);
+          store.dispatch("push2Notification", {
+            msg: "修改警消資料失敗: " + err,
+            time: new Date().toLocaleTimeString(),
+          });
         });
     };
     const deleUser = (id) => {
@@ -290,13 +296,18 @@ export default {
       };
       $FirefighterAPI
         .deleteFirefighter(data, tokenVuex.value)
-        .then((res) => {
-          console.log(res);
+        .then(() => {
           afterGetUnit();
+          store.dispatch("push2Notification", {
+            msg: "刪除警消資料成功",
+            time: new Date().toLocaleTimeString(),
+          });
         })
         .catch((err) => {
-          console.log(err);
-          failResponse(err);
+          store.dispatch("push2Notification", {
+            msg: "刪除警消資料失敗: " + err,
+            time: new Date().toLocaleTimeString(),
+          });
         });
     };
     verifyVuex();

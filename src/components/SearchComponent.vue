@@ -876,16 +876,7 @@
               :key="index"
             >
               <li
-                class="
-                  text-start
-                  list-group-item
-                  badge
-                  text-wrap
-                  p-1
-                  mb-1
-                  text-white
-                  transBg
-                "
+                class="text-start badge text-wrap p-1 mb-1 text-white transBg"
               >
                 {{ parts.whatPart }}<br />{{ parts.whatHappen }}
               </li>
@@ -991,16 +982,19 @@
 </template>
 <script>
 import {
-  loadUnitCases,
-  loadWhoCases,
+  // loadUnitCases,
+  // loadWhoCases,
   loadOtherContentCases,
   loadCasesByTimePeriod,
 } from "@/firebase";
 import { reactive, ref } from "@vue/reactivity";
 import { watch, inject } from "@vue/runtime-core";
+import { useStore } from "vuex";
 
 export default {
   setup() {
+    const $QueryAPI = inject("$QueryAPI");
+    const store = useStore();
     const keyCatagory = ref("who");
     const keyValue = ref("");
     const keyValueDisplay = ref("");
@@ -1013,8 +1007,21 @@ export default {
       let temp;
       switch (keyCatagory.value) {
         case "who":
-          temp = await loadWhoCases(keyValue.value);
-          searchList.push(...temp);
+          $QueryAPI
+            .queryTargetCases(
+              {
+                data: {
+                  subject: "who",
+                  value: keyValue.value,
+                },
+              },
+              store.state.token
+            )
+            .then((res) => {
+              let readyJson = JSON.parse(res.data.result.data);
+              console.log(readyJson)
+              searchList.push(...readyJson);
+            });
           break;
         case "otherContent":
           temp = await loadOtherContentCases(keyValue.value);
@@ -1026,10 +1033,21 @@ export default {
 
     const do_unit_search = async () => {
       searchList.length = 0;
-      let temp;
-      temp = await loadUnitCases(keyValue.value);
-      keyValueDisplay.value = keyValue.value;
-      searchList.push(...temp);
+      $QueryAPI
+            .queryTargetCases(
+              {
+                data: {
+                  subject: "unit",
+                  value: keyValue.value,
+                },
+              },
+              store.state.token
+            )
+            .then((res) => {
+              let readyJson = JSON.parse(res.data.result.data);
+              console.log(readyJson)
+              searchList.push(...readyJson);
+            });
     };
 
     const do_time_period_search = async () => {

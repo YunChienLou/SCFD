@@ -424,16 +424,7 @@
               :key="index"
             >
               <li
-                class="
-                  text-start
-                  list-group-item
-                  badge
-                  text-wrap
-                  p-1
-                  mb-1
-                  text-white
-                  transBg
-                "
+                class="text-start badge text-wrap p-1 mb-1 text-white transBg"
               >
                 {{ parts.whatPart }}<br />{{ parts.whatHappen }}
               </li>
@@ -542,24 +533,56 @@
 </template>
 
 <script>
-import { useLoadCases } from "@/firebase";
-import { inject } from "@vue/runtime-core";
+// import { useLoadCases } from "@/firebase";
+import { computed, inject, onMounted, ref, watch } from "@vue/runtime-core";
+import { useStore } from "vuex";
 
 export default {
   setup() {
-    const cases = useLoadCases();
+    const cases = ref([]);
     const dateFormate = inject("dateFormate");
+    const $CaseAPI = inject("$CaseAPI");
+    const store = useStore();
+    const tokenVuex = computed(() => {
+      return store.state.token;
+    });
+    const token = ref("");
     const classAppend = (selectedParts, value) => {
       var partsArray = selectedParts.map((a) => a.whatPart);
       var target = value;
       var exsist = partsArray.includes(target);
       // 回傳true or false
       return {
-        // "cls-1": exsist,
         "cls-2": exsist,
       };
     };
-    return { cases, classAppend, dateFormate };
+    watch(tokenVuex, () => {
+      let req = {
+        data: {
+          quantity: 15,
+        },
+      };
+      console.log("token change", tokenVuex.value);
+      cases.value = $CaseAPI.getCases(req, tokenVuex.value).then((res) => {
+        cases.value = res.data.result.data;
+      });
+    });
+    // const loading = async()=>{
+
+    // }
+    onMounted(() => {
+      if (tokenVuex.value != null) {
+        let req = {
+          data: {
+            quantity: 15,
+          },
+        };
+        cases.value = $CaseAPI.getCases(req, tokenVuex.value).then((res) => {
+          cases.value = res.data.result.data;
+        });
+      }
+    });
+    return { cases, classAppend, dateFormate, token };
   },
 };
 </script>

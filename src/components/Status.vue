@@ -12,11 +12,15 @@
         aria-expanded="false"
         aria-label="Toggle navigation"
       >
-        <i class="bi bi-list" style="font-size: 2rem"></i>
+        <span class="navbar-toggler-icon"></span>
       </button>
-      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-        <div class="navbar-nav text-center mt-5 fs-5">
-          <div class="row" style="font-size: 2rem; height: 30vh">
+      <div
+        class="collapse navbar-collapse"
+        id="navbarNavAltMarkup"
+        style="height: 90vh"
+      >
+        <div class="navbar-nav text-center mt-5 fs-5" style="height: 80vh">
+          <div class="row" style="font-size: 2rem; height: 30%">
             <div
               class="col-6 d-flex align-items-center"
               style="background: #ffcd35"
@@ -54,7 +58,7 @@
               </li>
             </div>
           </div>
-          <div class="row" style="font-size: 2rem; height: 30vh">
+          <div class="row" style="font-size: 2rem; height: 30%">
             <div
               class="col-6 d-flex align-items-center"
               style="background: #002c7f"
@@ -94,7 +98,7 @@
           </div>
           <div
             class="row"
-            style="font-size: 2rem; height: 30vh"
+            style="font-size: 2rem; height: 30%"
             @click="
               () => {
                 router.push(`/loginstatus/${uid}`);

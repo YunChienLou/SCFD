@@ -1,5 +1,5 @@
 import { createStore } from "vuex";
-import { loginUser, loadUser } from "../firebase";
+import { loginUser } from "../firebase";
 import firebase from "firebase/app";
 import ServerAPI from "../firebase";
 import router from "../router";
@@ -13,6 +13,7 @@ const store = createStore({
     emtlevel: null,
     rank: null,
     uid: null,
+    notification: [],
   },
 
   mutations: {
@@ -30,6 +31,10 @@ const store = createStore({
     },
     setIsAdmin(state, payload) {
       state.isAdmin = payload;
+    },
+    setNotification(state, payload) {
+      state.notification.length = 0;
+      state.notification.push(payload);
     },
   },
 
@@ -72,12 +77,22 @@ const store = createStore({
                 token: idToken,
               },
             };
+            let userData ={
+              data:{
+                token: idToken,
+                uid:user.uid
+              }
+            }
             context.commit("setUserToken", idToken);
             ServerAPI.user.verifyUser(data, idToken).then((res) => {
               context.commit("setIsAdmin", res.data.result.result);
             });
-            var user = await loadUser(this.state.uid);
-            context.commit("setUserData", user);
+            
+            ServerAPI.user.getUser(userData, idToken).then((res) => {
+              context.commit("setUserData", res.data.result.data);
+            }).catch((err)=>{
+              console.log("ServerAPI.user.getUser occurs an error : "+err)
+            });
           });
         } else {
           console.log("無登入");
@@ -85,6 +100,14 @@ const store = createStore({
         }
       });
     },
+    async push2Notification(context, msgObj) {
+      context.commit("setNotification", msgObj);
+    },
+    // getToken(context){
+    //   return new Promise((resolve, reject)=>{
+
+    //   })
+    // }
   },
 });
 

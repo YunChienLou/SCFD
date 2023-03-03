@@ -6,3 +6,4 @@ export const dateFormate = (time) => {
   answer = timeArray.join("");
   return answer;
 };
+

@@ -7,7 +7,6 @@
         id="carouselExampleIndicators"
         class="carousel slide"
         data-bs-ride="carousel"
-        data-bs-interval="false"
       >
         <div class="carousel-inner">
           <div class="carousel-item active">
@@ -336,30 +335,67 @@
         </div>
       </div>
       <div class="row m-2 mb-3">
-        <div class="col">
-          <label class="form-label col-2">B/P</label>
+        <div class="col-6">
+          <div class="d-flex justify-content-between">
+            <label class="form-label col-2">B/P</label>
+            <div class="form-check form-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="switch_vital_bp"
+                v-model="value_bp"
+                @change="
+                  () => {
+                    bp_no_input_func(value_bp);
+                  }
+                "
+              />
+              <label class="form-check-label" for="switch_vital_bp"
+                >未量測</label
+              >
+            </div>
+          </div>
           <div class="row">
             <div class="col-6 pe-0">
               <input
                 class="col form-control"
                 type="number"
                 v-model="form.vital.Bp.Systolic"
+                id="input_vital_bp_systolic"
+                required
               />
             </div>
             <div class="col-6 pe-0">
               <input
                 class="col form-control"
                 type="number"
+                id="input_vital_bp_diastolic"
                 v-model="form.vital.Bp.Diastolic"
+                required
               />
             </div>
           </div>
         </div>
-        <div class="col">
-          <label class="form-label col-2">SpO2</label>
+        <div class="col-6">
+          <div class="d-flex justify-content-between">
+            <label class="form-label col-2">SpO2</label>
+            <div class="form-check form-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="switch_vital_spo2"
+                v-model="value_spo2"
+                @change="no_input_func(value_spo2, 'input_vital_spo2', 'SpO2')"
+              />
+              <label class="form-check-label" for="switch_vital_spo2"
+                >未量測</label
+              >
+            </div>
+          </div>
           <input
             class="col form-control"
             type="number"
+            id="input_vital_spo2"
             v-model="form.vital.SpO2"
             required
           />
@@ -367,21 +403,58 @@
       </div>
       <div class="row m-2 mb-3">
         <div class="col">
-          <label class="form-label col-2">H/R</label>
+          <div class="d-flex justify-content-between">
+            <label class="form-label col-2 me-3">H/R</label>
+            <div class="form-check form-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="switch_vital_hr"
+                v-model="value_hr"
+                @change="no_input_func(value_hr, 'input_vital_Hr', 'Hr')"
+              />
+              <label class="form-check-label" for="switch_vital_hr"
+                >未量測</label
+              >
+            </div>
+          </div>
           <input
             class="col form-control"
+            id="input_vital_Hr"
             type="number"
             v-model="form.vital.Hr"
             required
           />
         </div>
         <div class="col">
-          <label class="form-label col-2">&deg;C</label>
+          <div class="d-flex justify-content-between">
+            <label class="form-label col-2 me-3">&deg;C</label>
+            <div class="form-check form-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="switch_vital_bodyTemp"
+                v-model="value_bodyTemp"
+                @change="
+                  no_input_func(
+                    value_bodyTemp,
+                    'input_vital_bodyTemp',
+                    'BodyTemp'
+                  )
+                "
+              />
+              <label class="form-check-label" for="switch_vital_bodyTemp"
+                >未量測</label
+              >
+            </div>
+          </div>
           <input
             class="col form-control"
+            id="input_vital_bodyTemp"
             type="number"
             step="0.1"
             v-model="form.vital.BodyTemp"
+            required
           />
         </div>
       </div>
@@ -1112,7 +1185,7 @@
         </div>
         <ul v-else class="col p-0 h-25 firefighter-list">
           <li
-            class="list-group-item text-center"
+            class="list-group-item text-center p-2"
             v-for="fireMan in firefighters"
             :key="fireMan.id"
           >
@@ -1306,6 +1379,43 @@ export default {
         console.log(selectedParts);
       }
     };
+
+    const no_input_func = (value, target, variable) => {
+      let dom = document.getElementById(target);
+      if (value) {
+        form.vital[variable] = null;
+        dom.disabled = true;
+        dom.classList.add("bg-light");
+        dom.placeholder = "未量測";
+      } else {
+        dom.disabled = false;
+        dom.classList.remove("bg-light");
+        dom.placeholder = "";
+      }
+    };
+
+    const bp_no_input_func = (value) => {
+      let dom1 = document.getElementById("input_vital_bp_systolic");
+      let dom2 = document.getElementById("input_vital_bp_diastolic");
+      if (value) {
+        form.vital.Bp.Systolic = null;
+        form.vital.Bp.Diastolic = null;
+        dom1.disabled = true;
+        dom1.classList.add("bg-light");
+        dom1.placeholder = "未量測";
+        dom2.disabled = true;
+        dom2.classList.add("bg-light");
+        dom2.placeholder = "未量測";
+      } else {
+        dom1.disabled = false;
+        dom1.classList.remove("bg-light");
+        dom1.placeholder = "";
+        dom2.disabled = false;
+        dom2.classList.remove("bg-light");
+        dom2.placeholder = "";
+      }
+    };
+
     onMounted(async () => {
       afterGetUnit();
     });
@@ -1336,6 +1446,10 @@ export default {
         },
       };
       $CaseAPI.updateCase(data, tokenVuex.value).then(() => {
+        store.dispatch("push2Notification", {
+          msg: "成功修改",
+          time: new Date().toLocaleTimeString(),
+        });
         isSending.value = false;
         router.push(`/LoginStatus/${form.uid}`);
       });
@@ -1354,6 +1468,8 @@ export default {
       updateParts,
       selectedParts,
       firefighters,
+      no_input_func,
+      bp_no_input_func,
     };
   },
 };

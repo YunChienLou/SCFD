@@ -1,8 +1,9 @@
 <template>
   <!-- <Status :uid="uid" :userData="userData" /> -->
   <div style="height: 100px"></div>
+  
   <div class="loginStatus text-center bg-dark m-4 rounded-3 transBg2">
-    <i class="bi bi-person-circle" style="font-size: 6rem"></i>
+    <div class="" style="height: 50px"></div>
     <h1>{{ userData.unit }}分隊</h1>
     <h4>{{ userData.name }} {{ userData.rank }}</h4>
     <h3>{{ userData.emtlevel }}</h3>
@@ -504,18 +505,7 @@
             v-for="(parts, index) in selectedParts"
             :key="index"
           >
-            <li
-              class="
-                text-start
-                list-group-item
-                badge
-                text-wrap
-                p-1
-                mb-1
-                text-white
-                transBg
-              "
-            >
+            <li class="text-start badge text-wrap p-1 mb-1 text-white transBg">
               {{ parts.whatPart }}<br />{{ parts.whatHappen }}
             </li>
           </div>
@@ -726,9 +716,41 @@ export default {
           caseId: id,
         },
       };
-      $CaseAPI.deleteCase(data, tokenVuex.value).then(() => {
-        isDeleting.value = false;
-      });
+      $CaseAPI
+        .deleteCase(data, tokenVuex.value)
+        .then(() => {
+          isDeleting.value = false;
+          store.dispatch("push2Notification", {
+            msg: "刪除成功",
+            time: new Date().toLocaleTimeString(),
+          });
+          loadCasesTarget("uid", store.state.uid).then((res) => {
+            targetCases.value = res.docs.map((doc) => ({
+              id: doc.id,
+              time: doc.data().time,
+              unit: doc.data().unit,
+              emtlevel: doc.data().emtlevel,
+              who: doc.data().who,
+              uid: doc.data().uid,
+              rank: doc.data().rank,
+              patient: doc.data().patient,
+              onScene: doc.data().onScene,
+              treatment: doc.data().treatment,
+              selectedParts: doc.data().selectedParts,
+              vital: doc.data().vital,
+              tp: doc.data().tp,
+              location: doc.data().location,
+              otherContent: doc.data().otherContent,
+              hospital: doc.data().hospital,
+            }));
+          });
+        })
+        .catch(() => {
+          store.dispatch("push2Notification", {
+            msg: "刪除失敗",
+            time: new Date().toLocaleTimeString(),
+          });
+        });
     };
 
     const logout = () => {

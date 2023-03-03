@@ -315,7 +315,10 @@ export default {
           isLoading.value = false;
         })
         .catch((err) => {
-          alert(err);
+          store.dispatch("push2Notification", {
+            msg: "載入失敗: " + err,
+            time: new Date().toLocaleTimeString(),
+          });
         });
     };
 
@@ -344,13 +347,20 @@ export default {
       $UserAPI
         .createUser(data, tokenVuex.value)
         .then(() => {
+          store.dispatch("push2Notification", {
+            msg: "新增成功: 已加入" + data.data.name,
+            time: new Date().toLocaleTimeString(),
+          });
           $UserAPI.getUsers(data, tokenVuex.value).then((res) => {
             users.value = res.data.result.data;
             isLoading.value = false;
           });
         })
         .catch((err) => {
-          alert("操作錯誤 : " + err);
+          store.dispatch("push2Notification", {
+            msg: "新增失敗: " + err,
+            time: new Date().toLocaleTimeString(),
+          });
           isLoading.value = false;
         });
       create.name = "";
@@ -376,23 +386,34 @@ export default {
         .updateUser(data, tokenVuex.value)
         .then((res) => {
           console.log(res.data.result.result);
+          store.dispatch("push2Notification", {
+            msg: "成功修改",
+            time: new Date().toLocaleTimeString(),
+          });
           $UserAPI.getUsers(data, tokenVuex.value).then((res) => {
             users.value = res.data.result.data;
             isLoading.value = false;
           });
         })
         .catch((err) => {
-          alert(err);
+          store.dispatch("push2Notification", {
+            msg: "修改失敗: " + err,
+            time: new Date().toLocaleTimeString(),
+          });
         });
     };
 
     const deleUser = (id) => {
       isLoading.value = true;
-      let data = { data: { uid: id, token: tokenVuex.value } };
-      console.log("received data ", data);
+      let data1 = { data: { uid: id, token: tokenVuex.value } };
+      console.log("received data ", data1);
       $UserAPI
-        .deleteUser(data, tokenVuex.value)
+        .deleteUser(data1, tokenVuex.value)
         .then((res) => {
+          store.dispatch("push2Notification", {
+            msg: "成功刪除: " + data1.data.uid,
+            time: new Date().toLocaleTimeString(),
+          });
           let data = {
             data: {
               token: tokenVuex.value,
@@ -406,7 +427,10 @@ export default {
           });
         })
         .catch((err) => {
-          alert(err);
+          store.dispatch("push2Notification", {
+            msg: "刪除失敗: " + err,
+            time: new Date().toLocaleTimeString(),
+          });
         });
     };
 

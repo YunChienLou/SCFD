@@ -1,19 +1,286 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
-const { unitNameEnum } = require("./Enum");
-
+require("firebase-functions/logger/compat");
 const serviceAccount = require("./apiKey.json");
+const { unitNameEnum } = require("./Enum");
+const { FireSQL } = require("firesql");
+
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
 const db = admin.firestore();
 const casesRef = db.collection("cases");
 const usersRef = db.collection("users");
-const recordRef = db.collection("records");
 const allStatsRef = db.collection("allStats");
+const fireSQL = new FireSQL(db);
 
 // search api
+// exports.queryTargetCases = functions.https.onRequest((req, res) => {
+//   const { subject, value } = req.body;
+//   casesRef
+//     .orderBy("time", "desc")
+//     .where(subject, "==", value)
+//     .get()
+//     .then((snapshot) => {
+//       let stuff = [];
+//       snapshot.forEach((doc) => {
+//         stuff = stuff.concat(doc.data());
+//       });
+//       res.send(stuff);
+//       return "";
+//     });
+// });
 
+exports.queryTargetCases = functions
+  .region("asia-east1")
+  .https.onCall(async (data, context) => {
+    if (!context.auth) {
+      // Throwing an HttpsError so that the client gets the error details.
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        "The function must be called " + "while authenticated."
+      );
+    } else {
+      const { subject, value } = data;
+      return casesRef
+        .orderBy("time", "desc")
+        .where(subject, "==", value)
+        .get()
+        .then((querySnapshot) => {
+          let arr = [];
+          querySnapshot.forEach((doc) => {
+            arr.push({
+              id: doc.id,
+              time: doc.data().time,
+              unit: doc.data().unit,
+              emtlevel: doc.data().emtlevel,
+              who: doc.data().who,
+              uid: doc.data().uid,
+              rank: doc.data().rank,
+              patient: doc.data().patient,
+              onScene: doc.data().onScene,
+              treatment: doc.data().treatment,
+              selectedParts: doc.data().selectedParts,
+              vital: doc.data().vital,
+              tp: doc.data().tp,
+              location: doc.data().location,
+              otherContent: doc.data().otherContent,
+              hospital: doc.data().hospital,
+            });
+          });
+          return {
+            message: "Successfully search case",
+            result: 200,
+            data: JSON.stringify(arr),
+          };
+        })
+        .catch((error) => {
+          console.error("Error searching case: ", error);
+          return {
+            message: "Error searching case",
+            result: 500,
+          };
+        });
+    }
+  });
+
+exports.queryOtherContentCases = functions
+  .region("asia-east1")
+  .https.onCall(async (data, context) => {
+    if (!context.auth) {
+      // Throwing an HttpsError so that the client gets the error details.
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        "The function must be called " + "while authenticated."
+      );
+    } else {
+      const { value } = data;
+      const OtherContentCasesPromise = fireSQL.query(`
+      SELECT * FROM cases
+      WHERE otherContent LIKE "${value}%"
+      `);
+
+      return OtherContentCasesPromise.then((cases) => {
+        return cases;
+      }).catch((err) => {
+        console.log(err);
+        throw new functions.https.HttpsError(
+          "500",
+          "queryOtherContentCases fail",
+          err
+        );
+      });
+    }
+  });
+
+exports.querySpecArrayCases = functions
+  .region("asia-east1")
+  .https.onCall(async (data, context) => {
+    if (!context.auth) {
+      // Throwing an HttpsError so that the client gets the error details.
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        "The function must be called " + "while authenticated."
+      );
+    } else {
+      const { array } = data;
+      console.log(array);
+      const SpecArrayCasesPromise = fireSQL.query(`
+      SELECT * FROM cases
+      WHERE onScene CONTAINS "${array}"
+      `);
+
+      return SpecArrayCasesPromise.then((cases) => {
+        return cases;
+      }).catch((err) => {
+        console.log(err);
+        throw new functions.https.HttpsError(
+          "500",
+          "querySpecArrayCases fail",
+          err
+        );
+      });
+    }
+  });
+
+exports.querySpecArrayCases2 = functions
+  .region("asia-east1")
+  .https.onCall(async (data, context) => {
+    if (!context.auth) {
+      // Throwing an HttpsError so that the client gets the error details.
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        "The function must be called " + "while authenticated."
+      );
+    } else {
+      const { array } = data;
+      console.log(array);
+      casesRef
+        .where("onScene", "in", array)
+        .get()
+        .then((snapshot) => {
+          snapshot.forEach((doc) => {
+            console.log(doc.data());
+          });
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+
+      // return SpecArrayCasesPromise.then((cases) => {
+
+      // }).catch((err) => {
+      //   console.log(err);
+      //   throw new functions.https.HttpsError(
+      //     "500",
+      //     "querySpecArrayCases fail",
+      //     err
+      //   );
+      // });
+    }
+  });
+
+exports.queryTimePeriodCases = functions
+  .region("asia-east1")
+  .https.onCall(async (data, context) => {
+    if (!context.auth) {
+      // Throwing an HttpsError so that the client gets the error details.
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        "The function must be called " + "while authenticated."
+      );
+    } else {
+      const { start, end, unit } = data;
+      console.log(start, end, unit);
+      if (unit != undefined) {
+        console.log("ssssssss");
+        return casesRef
+          .orderBy("time", "desc")
+          .where("unit", "==", unit)
+          .where("time", ">=", start)
+          .where("time", "<", end)
+          .get()
+          .then((querySnapshot) => {
+            let arr = [];
+            querySnapshot.forEach((doc) => {
+              arr.push({
+                id: doc.id,
+                time: doc.data().time,
+                unit: doc.data().unit,
+                emtlevel: doc.data().emtlevel,
+                who: doc.data().who,
+                uid: doc.data().uid,
+                rank: doc.data().rank,
+                patient: doc.data().patient,
+                onScene: doc.data().onScene,
+                treatment: doc.data().treatment,
+                selectedParts: doc.data().selectedParts,
+                vital: doc.data().vital,
+                tp: doc.data().tp,
+                location: doc.data().location,
+                otherContent: doc.data().otherContent,
+                hospital: doc.data().hospital,
+              });
+            });
+            return {
+              message: "Successfully search case",
+              result: 200,
+              data: JSON.stringify(arr),
+            };
+          })
+          .catch((error) => {
+            console.error("Error searching case: ", error);
+            return {
+              message: "Error searching case",
+              result: 500,
+            };
+          });
+      } else {
+        return casesRef
+          .orderBy("time", "desc")
+          .where("time", ">=", start)
+          .where("time", "<", end)
+          .get()
+          .then((querySnapshot) => {
+            let arr = [];
+            querySnapshot.forEach((doc) => {
+              arr.push({
+                id: doc.id,
+                time: doc.data().time,
+                unit: doc.data().unit,
+                emtlevel: doc.data().emtlevel,
+                who: doc.data().who,
+                uid: doc.data().uid,
+                rank: doc.data().rank,
+                patient: doc.data().patient,
+                onScene: doc.data().onScene,
+                treatment: doc.data().treatment,
+                selectedParts: doc.data().selectedParts,
+                vital: doc.data().vital,
+                tp: doc.data().tp,
+                location: doc.data().location,
+                otherContent: doc.data().otherContent,
+                hospital: doc.data().hospital,
+              });
+            });
+            return {
+              message: "Successfully search case",
+              result: 200,
+              data: JSON.stringify(arr),
+            };
+          })
+          .catch((error) => {
+            console.error("Error searching case: ", error);
+            return {
+              message: "Error searching case",
+              result: 500,
+            };
+          });
+      }
+    }
+  });
+
+// Case api
 exports.createCase = functions
   .region("asia-east1")
   .https.onCall(async (data, context) => {
@@ -29,23 +296,21 @@ exports.createCase = functions
         .add(caseData)
         .then((docRef) => {
           return {
-            message:
-              "Successfully created new case:" + docRef.id,
+            message: "Successfully created new case:" + docRef.id,
             result: 200,
           };
         })
         .catch((error) => {
           console.error("Error adding case: ", error);
           return {
-            message:
-              "Error created new case",
+            message: "Error created new case",
             result: 500,
           };
         });
     }
   });
 
-  exports.getCase = functions
+exports.getCase = functions
   .region("asia-east1")
   .https.onCall(async (data, context) => {
     if (!context.auth) {
@@ -61,24 +326,22 @@ exports.createCase = functions
         .get()
         .then((res) => {
           return {
-            message:
-              "Successfully get case:" + caseId,
+            message: "Successfully get case:" + caseId,
             result: 200,
-            data:res.data()
+            data: res.data(),
           };
         })
         .catch((error) => {
           console.error("Error getting case: ", error);
           return {
-            message:
-              "Error created new case",
+            message: "Error created new case",
             result: 500,
           };
         });
     }
   });
 
-  exports.deleteCase = functions
+exports.deleteCase = functions
   .region("asia-east1")
   .https.onCall(async (data, context) => {
     if (!context.auth) {
@@ -94,23 +357,21 @@ exports.createCase = functions
         .delete()
         .then(() => {
           return {
-            message:
-              "Successfully delete case: " + caseId,
+            message: "Successfully delete case: " + caseId,
             result: 200,
           };
         })
         .catch((error) => {
           console.error("Error delete case: ", error);
           return {
-            message:
-              "Error created new case",
+            message: "Error created new case",
             result: 500,
           };
         });
     }
   });
 
-  exports.updateCase = functions
+exports.updateCase = functions
   .region("asia-east1")
   .https.onCall(async (data, context) => {
     if (!context.auth) {
@@ -120,29 +381,60 @@ exports.createCase = functions
         "The function must be called " + "while authenticated."
       );
     } else {
-      console.log('進入更新函數')
-      const { caseData , caseId } = data;
-      console.log('caseData','')
+      console.log("進入更新函數");
+      const { caseData, caseId } = data;
+      console.log("caseData", "");
       return casesRef
         .doc(caseId)
         .update(caseData)
         .then(() => {
           return {
-            message:
-              "Successfully updateCase :" + caseId,
+            message: "Successfully updateCase :" + caseId,
             result: 200,
           };
         })
         .catch((error) => {
           console.error("Error adding case: ", error);
           return {
-            message:
-              "Error created new case",
+            message: "Error created new case",
             result: 500,
           };
         });
     }
   });
+
+exports.getCases = functions
+  .region("asia-east1")
+  .https.onCall(async (data, context) => {
+    if (!context.auth) {
+      // Throwing an HttpsError so that the client gets the error details.
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        "The function must be called " + "while authenticated."
+      );
+    } else {
+      const { quantity } = data;
+      return casesRef
+        .orderBy("time", "desc")
+        .limit(quantity)
+        .get()
+        .then((querySnapshot) => {
+          return {
+            message: "Successfully fetch Cases",
+            result: 200,
+            data: querySnapshot.docs.map((doc) => ({
+              id: doc.id,
+              ...doc.data(),
+            })),
+          };
+        })
+        .catch((err) => {
+          return err;
+        });
+    }
+  });
+
+// User api
 
 exports.createUser = functions
   .region("asia-east1")
@@ -177,11 +469,6 @@ exports.createUser = functions
                   .doc(userRecord.uid)
                   .set(userData)
                   .then(() => {
-                    serverRecord(
-                      token,
-                      "Successfully created new user:" + userRecord.uid,
-                      false
-                    );
                     return {
                       message:
                         "Successfully created new user:" + userRecord.uid,
@@ -189,11 +476,6 @@ exports.createUser = functions
                     };
                   })
                   .catch((error) => {
-                    serverRecord(
-                      token,
-                      "Error creating new doc , createUser",
-                      true
-                    );
                     throw new functions.https.HttpsError(
                       502,
                       "Error creating new doc:",
@@ -202,11 +484,6 @@ exports.createUser = functions
                   });
               })
               .catch((error) => {
-                serverRecord(
-                  token,
-                  "Error creating new user , createUser",
-                  true
-                );
                 throw new functions.https.HttpsError(
                   501,
                   "Error creating new user:",
@@ -214,7 +491,6 @@ exports.createUser = functions
                 );
               });
           } else {
-            serverRecord(token, "Not Admin can't access , createUser", true);
             throw new functions.https.HttpsError(
               500,
               "Not Admin can't access",
@@ -223,11 +499,6 @@ exports.createUser = functions
           }
         })
         .catch((error) => {
-          serverRecord(
-            token,
-            "you 're not even user can't access , createUser",
-            true
-          );
           throw new functions.https.HttpsError(
             501,
             "you 're not even user can't access , createUser",
@@ -258,14 +529,12 @@ exports.getUsers = functions
               id: doc.id,
               ...doc.data(),
             }));
-            serverRecord(token, "Successfully getUsers", false);
             return {
               message: "Successfully fetch users:",
               result: 200,
               data: data,
             };
           } else {
-            serverRecord(token, "Not Admin can't access , getUsers", true);
             throw new functions.https.HttpsError(
               500,
               "Not Admin can't access",
@@ -274,7 +543,60 @@ exports.getUsers = functions
           }
         })
         .catch((error) => {
-          serverRecord(token, "verifyIdToken process fail , getUsers", true);
+          throw new functions.https.HttpsError(
+            500,
+            "verifyIdToken process fail",
+            error
+          );
+        });
+    }
+  });
+
+exports.getUser = functions
+  .region("asia-east1")
+  .https.onCall(async (data, context) => {
+    if (!context.auth) {
+      // Throwing an HttpsError so that the client gets the error details.
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        "The function must be called " + "while authenticated."
+      );
+    } else {
+      const { token, uid } = data;
+      return admin
+        .auth()
+        .verifyIdToken(token)
+        .then(async (claims) => {
+          if (claims.isAdmin === true) {
+            const res = usersRef
+              .doc(uid)
+              .get()
+              .then((doc) => {
+                if (doc.exists) {
+                  console.log("Document data:", doc.data());
+                  return {
+                    message: "Successfully fetch users: " + uid,
+                    result: 200,
+                    data: doc.data(),
+                  };
+                } else {
+                  // doc.data() will be undefined in this case
+                  console.log("No such document!");
+                }
+              })
+              .catch((error) => {
+                console.log("Error getting document:", error);
+              });
+            return res;
+          } else {
+            throw new functions.https.HttpsError(
+              500,
+              "Not Admin can't access",
+              error
+            );
+          }
+        })
+        .catch((error) => {
           throw new functions.https.HttpsError(
             500,
             "verifyIdToken process fail",
@@ -313,13 +635,12 @@ exports.deleteUser = functions
               await admin.auth().deleteUser(uid);
             }
             await usersRef.doc(uid).delete();
-            serverRecord(token, "Successfully delete user:" + uid, false);
+
             return {
               message: "Successfully delete user:" + uid,
               result: 200,
             };
           } else {
-            serverRecord(token, "Not Admin can't access , deleteUser", true);
             throw new functions.https.HttpsError(
               500,
               "Not Admin can't access",
@@ -355,18 +676,12 @@ exports.updateUser = functions
               .doc(userId)
               .update(userData)
               .then(() => {
-                serverRecord(
-                  token,
-                  "Successfully update user:" + userId,
-                  false
-                );
                 return {
                   message: "Successfully update user:" + userId,
                   result: 200,
                 };
               })
               .catch(() => {
-                serverRecord(token, "fail at updating doc , updateUser", true);
                 throw new functions.https.HttpsError(
                   "failed-execute",
                   "fail at updating doc",
@@ -374,7 +689,6 @@ exports.updateUser = functions
                 );
               });
           } else {
-            serverRecord(token, "Not Admin can't access , updateUser", true);
             throw new functions.https.HttpsError(
               "failed-execute",
               "Not Admin can't access",
@@ -384,6 +698,8 @@ exports.updateUser = functions
         });
     }
   });
+
+//firefighter api
 
 exports.createFirefighter = functions
   .region("asia-east1")
@@ -410,18 +726,12 @@ exports.createFirefighter = functions
               .collection(unit + "/" + "unitFolder" + "/firefighters")
               .add(firefighterData)
               .then(() => {
-                serverRecord(
-                  token,
-                  "Successfully add firefighter:" + name,
-                  false
-                );
                 return {
                   message: "Successfully add firefighter:" + name,
                   result: 200,
                 };
               })
               .catch(() => {
-                serverRecord(token, "fail create new doc ", true);
                 throw new functions.https.HttpsError(
                   500,
                   "create new doc fail",
@@ -429,7 +739,6 @@ exports.createFirefighter = functions
                 );
               });
           } else {
-            serverRecord(token, "Not Admin can't access", true);
             throw new functions.https.HttpsError(
               500,
               "Not Admin can't access",
@@ -464,16 +773,14 @@ exports.getFirefighters = functions
             id: doc.id,
             ...doc.data(),
           }));
-          serverRecord(token, "Successfully fetch firefighters", false);
+
           return {
             message: "Successfully fetch firefighters",
             result: 200,
             data: data,
           };
-
         })
         .catch((error) => {
-          serverRecord(token, "verifyIdToken process fail", true);
           throw new functions.https.HttpsError(
             500,
             "verifyIdToken process fail",
@@ -543,18 +850,12 @@ exports.updateFirefighter = functions
               .doc(userId)
               .update(firefighterData)
               .then(() => {
-                serverRecord(
-                  token,
-                  "Successfully update firefighterData:" + userId,
-                  false
-                );
                 return {
                   message: "Successfully update firefighterData:" + userId,
                   result: 200,
                 };
               })
               .catch(() => {
-                serverRecord(token, "Not senior-admin can't access", true);
                 throw new functions.https.HttpsError(
                   "failed-execute",
                   "fail at updating doc",
@@ -562,7 +863,6 @@ exports.updateFirefighter = functions
                 );
               });
           } else {
-            serverRecord(token, "Not admin can't access", true);
             throw new functions.https.HttpsError(
               "failed-execute",
               "Not Admin can't access",
@@ -681,12 +981,7 @@ exports.createAdmin = functions
                               .doc("unitStatsCollection")
                               .collection("2month")
                               .add({});
-                            serverRecord(
-                              token,
-                              "Successfully created new admin & unit:" +
-                                unitEng,
-                              false
-                            );
+
                             return {
                               message:
                                 "Successfully created new admin & unit:" +
@@ -696,14 +991,6 @@ exports.createAdmin = functions
                           });
                       })
                       .catch((error) => {
-                        serverRecord(
-                          token,
-                          "Error creating new doc:" +
-                            unitEng +
-                            "; userData: " +
-                            userData,
-                          true
-                        );
                         throw new functions.https.HttpsError(
                           502,
                           "Error creating new doc:" + unitEng,
@@ -712,11 +999,6 @@ exports.createAdmin = functions
                       });
                   })
                   .catch((error) => {
-                    serverRecord(
-                      token,
-                      "Error setCustomUserClaims:" + unitEng,
-                      true
-                    );
                     throw new functions.https.HttpsError(
                       501,
                       "Error setCustomUserClaims:" + unitEng,
@@ -725,11 +1007,6 @@ exports.createAdmin = functions
                   });
               })
               .catch((error) => {
-                serverRecord(
-                  token,
-                  "Error creating new admin:" + unitEng,
-                  true
-                );
                 throw new functions.https.HttpsError(
                   501,
                   "Error creating new admin:" + unitEng,
@@ -737,7 +1014,6 @@ exports.createAdmin = functions
                 );
               });
           } else {
-            serverRecord(token, "Not YunChien can't access" + unitEng, true);
             throw new functions.https.HttpsError(
               500,
               "Not YunChien can't access" + unitEng,
@@ -777,7 +1053,7 @@ exports.getAdmins = functions
                 let adminList = userRecords.users.filter((user) => {
                   return user.customClaims != null;
                 });
-                serverRecord(token, "Successfully fetch admins", false);
+
                 return {
                   message: "Successfully fetch admins",
                   result: 200,
@@ -785,7 +1061,6 @@ exports.getAdmins = functions
                 };
               })
               .catch((error) => {
-                serverRecord(token, "fail on fetch all admins-list", true);
                 throw new functions.https.HttpsError(
                   500,
                   "Not YunChien can't access",
@@ -793,11 +1068,6 @@ exports.getAdmins = functions
                 );
               });
           } else {
-            serverRecord(
-              token,
-              "Not senior-admin can't access getAdmins function",
-              true
-            );
             throw new functions.https.HttpsError(
               500,
               "Not YunChien can't access",
@@ -831,14 +1101,12 @@ exports.setAdmin = functions
               .auth()
               .setCustomUserClaims(uid, { isAdmin: true })
               .then(() => {
-                serverRecord(token, "Successfully set admin", false);
                 return {
                   message: "Successfully set " + uid + " admin",
                   result: 200,
                 };
               });
           } else {
-            serverRecord(token, "Not senior-admin can't access", true);
             throw new functions.https.HttpsError(
               500,
               "Not YunChien can't access",
@@ -851,40 +1119,40 @@ exports.setAdmin = functions
 
 // server msg record
 // sendType : intruder , user , admin , senior-admin
-const serverRecord = (token, msg, isBug) => {
-  let recordData = {
-    uid: "",
-    msg: msg,
-    isBug: isBug,
-    time: new Date(),
-  };
-  admin
-    .auth()
-    .verifyIdToken(token)
-    .then((claims) => {
-      recordData.uid = claims.uid;
-      if (
-        claims.isAdmin === true &&
-        claims.uid !== "R3S5c6JQEWZzVDGqMXCGCV2bNrg1"
-      ) {
-        recordData.sendType = "admin";
-      } else if (
-        claims.isAdmin === true &&
-        claims.uid == "R3S5c6JQEWZzVDGqMXCGCV2bNrg1"
-      ) {
-        recordData.sendType = "senior-admin";
-      } else {
-        recordData.sendType = "user";
-      }
-      recordRef.add(recordData);
-      console.log(recordData, "recordData");
-    })
-    .catch(() => {
-      recordRef.add(recordData);
-      recordData.uid = "not autherize user";
-      recordData.sendType = "intruder";
-    });
-};
+// const serverRecord = (token, msg, isBug) => {
+//   let recordData = {
+//     uid: "",
+//     msg: msg,
+//     isBug: isBug,
+//     time: new Date(),
+//   };
+//   admin
+//     .auth()
+//     .verifyIdToken(token)
+//     .then((claims) => {
+//       recordData.uid = claims.uid;
+//       if (
+//         claims.isAdmin === true &&
+//         claims.uid !== "R3S5c6JQEWZzVDGqMXCGCV2bNrg1"
+//       ) {
+//         recordData.sendType = "admin";
+//       } else if (
+//         claims.isAdmin === true &&
+//         claims.uid == "R3S5c6JQEWZzVDGqMXCGCV2bNrg1"
+//       ) {
+//         recordData.sendType = "senior-admin";
+//       } else {
+//         recordData.sendType = "user";
+//       }
+//       recordRef.add(recordData);
+//       console.log(recordData, "recordData");
+//     })
+//     .catch(() => {
+//       recordRef.add(recordData);
+//       recordData.uid = "not autherize user";
+//       recordData.sendType = "intruder";
+//     });
+// };
 
 const missionStatsByPersonal = (cases) => {
   let ResultStats = {
@@ -1293,16 +1561,16 @@ exports.twoMonthReport = functions.pubsub
     }
   });
 
-  /// log Event
-  // exports.login = functions
-  // .region("asia-east1")
-  // .https.onCall(async (data, context) => {
-  //   if (!context.auth) {
-  //     // Throwing an HttpsError so that the client gets the error details.
-  //     throw new functions.https.HttpsError(
-  //       "failed-precondition",
-  //       "The function must be called " + "while authenticated."
-  //     );
-  //   } else {
+/// log Event
+// exports.login = functions
+// .region("asia-east1")
+// .https.onCall(async (data, context) => {
+//   if (!context.auth) {
+//     // Throwing an HttpsError so that the client gets the error details.
+//     throw new functions.https.HttpsError(
+//       "failed-precondition",
+//       "The function must be called " + "while authenticated."
+//     );
+//   } else {
 
-  //   }})
+//   }})

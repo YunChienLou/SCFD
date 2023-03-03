@@ -5,7 +5,6 @@
         id="carouselExampleIndicators"
         class="carousel slide"
         data-bs-ride="carousel"
-        data-bs-interval="false"
       >
         <div class="carousel-inner">
           <div class="carousel-item active">
@@ -1198,7 +1197,7 @@
           </button>
           <li
             v-else
-            class="list-group-item text-center"
+            class="list-group-item text-center p-2"
             v-for="fireMan in firefighters"
             :key="fireMan.id"
           >
@@ -1256,7 +1255,6 @@
             <div class="p ms-2">送出中...</div>
           </div>
           <div v-else class="">送出</div>
-          
         </button>
       </div>
     </form>
@@ -1273,7 +1271,7 @@ export default {
     const $FirefighterAPI = inject("$FirefighterAPI");
     const $CaseAPI = inject("$CaseAPI");
     const store = useStore();
-    const isCreating = ref(false)
+    const isCreating = ref(false);
     const tokenVuex = computed(() => {
       return store.state.token;
     });
@@ -1361,8 +1359,6 @@ export default {
           whatPart: selectParts,
           whatHappen: partsDescrip,
         });
-      } else {
-        alert("錯誤!!! 該部位需輸入描述");
       }
     };
 
@@ -1403,31 +1399,45 @@ export default {
     };
 
     const onSubmit = async () => {
-      isCreating.value = true
+      isCreating.value = true;
       let data = {
         data: {
           caseData: { ...form, selectedParts },
         },
       };
-      $CaseAPI.createCase(data, tokenVuex.value).then(() => {
-        isCreating.value = false
-      });
-      // v-model傳進資料後，展開物件，丟進createCase()函試
-      form.treatment = [];
-      form.onScene = [];
-      form.time = "";
-      form.patient = "";
-      form.location = "";
-      form.tp = "";
-      form.otherContent = "";
-      form.vital.Bp.Systolic = null;
-      form.vital.Bp.Diastolic = null;
-      form.vital.Hr = null;
-      form.vital.SpO2 = null;
-      form.hospital = "";
-      form.vital.BodyTemp = null;
-      // 輸入框歸零 從第0項 刪除到第(陣列數量)項
-      selectedParts.splice(0, selectedParts.length);
+      $CaseAPI
+        .createCase(data, tokenVuex.value)
+        .then(() => {
+          isCreating.value = false;
+          // v-model傳進資料後，展開物件，丟進createCase()函試
+          form.treatment = [];
+          form.onScene = [];
+          form.time = "";
+          form.patient = "";
+          form.location = "";
+          form.tp = [];
+          form.otherContent = "";
+          form.vital.Bp.Systolic = null;
+          form.vital.Bp.Diastolic = null;
+          form.vital.Hr = null;
+          form.vital.SpO2 = null;
+          form.hospital = "";
+          form.vital.BodyTemp = null;
+          // 輸入框歸零 從第0項 刪除到第(陣列數量)項
+          selectedParts.splice(0, selectedParts.length);
+
+          store.dispatch("push2Notification", {
+            msg: "成功上傳",
+            time: new Date().toLocaleTimeString(),
+          });
+        })
+        .catch(() => {
+          store.dispatch("push2Notification", {
+            msg: "上傳失敗",
+            time: new Date().toLocaleTimeString(),
+          });
+        });
+
       // 跳出成功通知
     };
     // 更新部位暫時選擇之結果
@@ -1448,8 +1458,8 @@ export default {
     onMounted(() => {
       afterGetUnit();
     }),
-      // 監測selectedParts是否變動 變動執行更新
-      watch(selectedParts, updateParts);
+    // 監測selectedParts是否變動 變動執行更新
+    watch(selectedParts, updateParts);
     watch(unit, afterGetUnit);
     return {
       form,
