@@ -981,12 +981,11 @@
   </div>
 </template>
 <script>
-import {
-  // loadUnitCases,
-  // loadWhoCases,
-  loadOtherContentCases,
-  loadCasesByTimePeriod,
-} from "@/firebase";
+import // loadUnitCases,
+// loadWhoCases,
+// loadOtherContentCases,
+// loadCasesByTimePeriod,
+"@/firebase";
 import { reactive, ref } from "@vue/reactivity";
 import { watch, inject } from "@vue/runtime-core";
 import { useStore } from "vuex";
@@ -1004,7 +1003,6 @@ export default {
     const dateFormate = inject("dateFormate");
     const do_search = async () => {
       searchList.length = 0;
-      let temp;
       switch (keyCatagory.value) {
         case "who":
           $QueryAPI
@@ -1019,13 +1017,24 @@ export default {
             )
             .then((res) => {
               let readyJson = JSON.parse(res.data.result.data);
-              console.log(readyJson)
               searchList.push(...readyJson);
             });
           break;
         case "otherContent":
-          temp = await loadOtherContentCases(keyValue.value);
-          searchList.push(...temp);
+          $QueryAPI
+            .queryOtherContentCases(
+              {
+                data: {
+                  value: keyValue.value,
+                },
+              },
+              store.state.token
+            )
+            .then((res) => {
+              let readyJson = res.data.result.data;
+              searchList.push(...readyJson);
+            });
+
           break;
       }
       keyValueDisplay.value = keyValue.value;
@@ -1034,28 +1043,38 @@ export default {
     const do_unit_search = async () => {
       searchList.length = 0;
       $QueryAPI
-            .queryTargetCases(
-              {
-                data: {
-                  subject: "unit",
-                  value: keyValue.value,
-                },
-              },
-              store.state.token
-            )
-            .then((res) => {
-              let readyJson = JSON.parse(res.data.result.data);
-              console.log(readyJson)
-              searchList.push(...readyJson);
-            });
+        .queryTargetCases(
+          {
+            data: {
+              subject: "unit",
+              value: keyValue.value,
+            },
+          },
+          store.state.token
+        )
+        .then((res) => {
+          let readyJson = JSON.parse(res.data.result.data);
+          console.log(readyJson);
+          searchList.push(...readyJson);
+        });
     };
 
     const do_time_period_search = async () => {
       searchList.length = 0;
-      let temp;
       keyValueDisplay.value = startTime.value + " ~ " + endTime.value;
-      temp = await loadCasesByTimePeriod(startTime.value, endTime.value);
-      searchList.push(...temp);
+      $QueryAPI
+        .queryTimePeriodCases(
+          {
+            data: {
+              start: startTime.value,
+              end: endTime.value,
+            },
+          },
+          store.state.token
+        )
+        .then((res) => {
+          searchList.push(...JSON.parse(res.data.result.data));
+        });
     };
 
     watch(keyCatagory, () => {

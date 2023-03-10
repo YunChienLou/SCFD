@@ -16,6 +16,22 @@ const query = {
       },
     });
   },
+  queryOtherContentCases: (data, token) => {
+    return axios.post(urlBase + "queryOtherContentCases", data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+  },
+  queryTimePeriodCases: (data, token) => {
+    return axios.post(urlBase + "queryTimePeriodCases", data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+  },
 };
 const user = {
   createUser: (data, token) => {
@@ -196,188 +212,89 @@ const dailyCases = db.collection("cases");
 // const orderCases = dailyCases.orderBy("time", "desc").limit(15);
 const auth = firebase.auth();
 
-// Cloud Function test
-
-// add doc to firebase collection
-// export const createCase = (Case) => {
-//   return dailyCases
-//     .add(Case)
-//     .then((docRef) => {
-//       console.log("Document written with ID: ", docRef.id);
-//       alert("上傳成功");
-//     })
-//     .catch((error) => {
-//       console.error("Error adding document: ", error);
-//       alert("上傳失敗");
-//     });
+// export const loadCasesTarget = async (subject, value) => {
+//   const snapshot = dailyCases
+//     .orderBy("time", "desc")
+//     .where(subject, "==", value)
+//     .get();
+//   return snapshot;
 // };
 
-// get specific doc that match id
-// export const getCase = async (id) => {
-//   const Case = await dailyCases.doc(id).get();
-//   return Case.exists ? Case.data() : null;
-// };
-
-// export const updateCases = (id, Case) => {
-//   return dailyCases
-//     .doc(id)
-//     .update(Case)
-//     .then((docRef) => {
-//       console.log("Document updating with ID: ", docRef);
-//       alert("更新成功");
-//     })
-//     .catch((error) => {
-//       console.error("Error updating document: ", error);
-//       alert("更新失敗");
-//     });
-// };
-
-// export const deleteCase = async (id) => {
-//   var deleteBoolean = confirm("確認刪除?");
-//   if (deleteBoolean) {
-//     await dailyCases
-//       .doc(id)
-//       .delete()
-//       .then((msg) => {
-//         console.log(msg);
-//         alert("刪除成功");
-//       })
-//       .catch((error) => {
-//         console.log(error);
-//         alert("刪除失敗");
-//       });
-//     // refresh route to origin page
-//     return router.go();
-//   }
-// };
-
-//load whole collection in
-// export const useLoadCases = () => {
-//   const cases = ref([]);
-//   const close = orderCases.onSnapshot((snapshot) => {
-//     cases.value = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-//   });
-//   onUnmounted(close);
-//   return cases;
-// };
-
-//load whole collection in
-// export const useLoadUsers = () => {
-//   const cases = ref([]);
-//   const close = users.onSnapshot((snapshot) => {
-//     cases.value = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-//   });
-//   onUnmounted(close);
-//   return cases;
-// };
-
-export const loadCasesTarget = async (subject, value) => {
-  const snapshot = dailyCases
-    .orderBy("time", "desc")
-    .where(subject, "==", value)
-    .get();
-  return snapshot;
-};
-
-// export const loadWhoCases = async (value) => {
+// export const loadCasesByTimePeriod = async (start, end) => {
 //   var targetCases = [];
+//   const snapshot = await dailyCases
+//     .orderBy("time", "desc")
+//     .where("time", ">=", start)
+//     .where("time", "<", end)
+//     .get();
+
+//   snapshot.forEach((doc) => {
+//     targetCases.push({
+//       id: doc.id,
+//       time: doc.data().time,
+//       unit: doc.data().unit,
+//       emtlevel: doc.data().emtlevel,
+//       who: doc.data().who,
+//       uid: doc.data().uid,
+//       rank: doc.data().rank,
+//       patient: doc.data().patient,
+//       onScene: doc.data().onScene,
+//       treatment: doc.data().treatment,
+//       selectedParts: doc.data().selectedParts,
+//       vital: doc.data().vital,
+//       tp: doc.data().tp,
+//       location: doc.data().location,
+//       otherContent: doc.data().otherContent,
+//       hospital: doc.data().hospital,
+//     });
+//   });
+//   return targetCases;
+// };
+
+// export const loadUnitCasesByTimePeriod = async (start, end, unit) => {
+//   var targetCases = [];
+//   const snapshot = await dailyCases
+//     .orderBy("time", "asc")
+//     .where("unit", "==", unit)
+//     .where("time", ">=", start)
+//     .where("time", "<", end)
+//     .get();
+
+//   snapshot.forEach((doc) => {
+//     targetCases.push({
+//       id: doc.id,
+//       time: doc.data().time,
+//       unit: doc.data().unit,
+//       emtlevel: doc.data().emtlevel,
+//       who: doc.data().who,
+//       uid: doc.data().uid,
+//       rank: doc.data().rank,
+//       patient: doc.data().patient,
+//       onScene: doc.data().onScene,
+//       treatment: doc.data().treatment,
+//       selectedParts: doc.data().selectedParts,
+//       vital: doc.data().vital,
+//       tp: doc.data().tp,
+//       location: doc.data().location,
+//       otherContent: doc.data().otherContent,
+//       hospital: doc.data().hospital,
+//     });
+//   });
+//   return targetCases;
+// };
+
+// export const loadOtherContentCases = async (value) => {
+//   var targetCases = [];
+//   // 記錄們(每個以物件為單位) 存放的陣列
 //   const snapshot = await dailyCases.orderBy("time", "desc").get();
 //   snapshot.forEach((item) => {
-//     if (item.data().who.indexOf(value) >= 0) {
+//     if (item.data().otherContent?.indexOf(value) >= 0) {
 //       targetCases.push(item.data());
 //     }
 //   });
 //   return targetCases;
+//   // 最後回傳收繳資料的矩陣
 // };
-
-// export const loadUnitCases = async (value) => {
-//   var targetCases = [];
-//   const snapshot = await dailyCases
-//     .orderBy("time", "desc")
-//     .where("unit", "==", value)
-//     .get();
-//   snapshot.forEach((item) => {
-//     targetCases.push(item.data());
-//   });
-//   console.log(targetCases);
-//   return targetCases;
-// };
-
-export const loadCasesByTimePeriod = async (start, end) => {
-  var targetCases = [];
-  const snapshot = await dailyCases
-    .orderBy("time", "desc")
-    .where("time", ">=", start)
-    .where("time", "<", end)
-    .get();
-
-  snapshot.forEach((doc) => {
-    targetCases.push({
-      id: doc.id,
-      time: doc.data().time,
-      unit: doc.data().unit,
-      emtlevel: doc.data().emtlevel,
-      who: doc.data().who,
-      uid: doc.data().uid,
-      rank: doc.data().rank,
-      patient: doc.data().patient,
-      onScene: doc.data().onScene,
-      treatment: doc.data().treatment,
-      selectedParts: doc.data().selectedParts,
-      vital: doc.data().vital,
-      tp: doc.data().tp,
-      location: doc.data().location,
-      otherContent: doc.data().otherContent,
-      hospital: doc.data().hospital,
-    });
-  });
-  return targetCases;
-};
-
-export const loadUnitCasesByTimePeriod = async (start, end, unit) => {
-  var targetCases = [];
-  const snapshot = await dailyCases
-    .orderBy("time", "asc")
-    .where("unit", "==", unit)
-    .where("time", ">=", start)
-    .where("time", "<", end)
-    .get();
-
-  snapshot.forEach((doc) => {
-    targetCases.push({
-      id: doc.id,
-      time: doc.data().time,
-      unit: doc.data().unit,
-      emtlevel: doc.data().emtlevel,
-      who: doc.data().who,
-      uid: doc.data().uid,
-      rank: doc.data().rank,
-      patient: doc.data().patient,
-      onScene: doc.data().onScene,
-      treatment: doc.data().treatment,
-      selectedParts: doc.data().selectedParts,
-      vital: doc.data().vital,
-      tp: doc.data().tp,
-      location: doc.data().location,
-      otherContent: doc.data().otherContent,
-      hospital: doc.data().hospital,
-    });
-  });
-  return targetCases;
-};
-
-export const loadOtherContentCases = async (value) => {
-  var targetCases = [];
-  // 記錄們(每個以物件為單位) 存放的陣列
-  const snapshot = await dailyCases.orderBy("time", "desc").get();
-  snapshot.forEach((item) => {
-    if (item.data().otherContent?.indexOf(value) >= 0) {
-      targetCases.push(item.data());
-    }
-  });
-  return targetCases;
-  // 最後回傳收繳資料的矩陣
-};
 // 這支還沒用過
 export const loadSpecArrayCases = async (subject, value) => {
   var targetCases = [];
@@ -412,13 +329,6 @@ export const loginUser = (email, password) => {
     });
 };
 
-// Auth before api calls
-
-// export const verifyIsAdmin = (idToken) => {
-//   var verifyAdmin = functions.httpsCallable("verifyAdmin");
-//   return verifyAdmin({ token: idToken });
-// };
-
 // 登出邏輯
 export const logoutUser = () => {
   auth.signOut().then(() => {
@@ -445,17 +355,3 @@ export const forgetPasswords = (email) => {
     });
 };
 
-// 載入用戶資料
-// export const loadUser = async (uid) => {
-//   var output = await db
-//     .collection("users")
-//     .doc(uid)
-//     .get()
-//     .then((doc) => {
-//       var data = doc.data();
-//       return data;
-//     });
-//   return output;
-// };
-
-// page refresh

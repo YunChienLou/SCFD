@@ -100,8 +100,34 @@ exports.queryOtherContentCases = functions
       WHERE otherContent LIKE "${value}%"
       `);
 
-      return OtherContentCasesPromise.then((cases) => {
-        return cases;
+      return OtherContentCasesPromise.then((querySnapshot) => {
+        console.log(querySnapshot);
+        // let arr = [];
+        // querySnapshot.forEach((doc) => {
+        //   arr.push({
+        //     id: doc.id,
+        //     time: doc.data().time,
+        //     unit: doc.data().unit,
+        //     emtlevel: doc.data().emtlevel,
+        //     who: doc.data().who,
+        //     uid: doc.data().uid,
+        //     rank: doc.data().rank,
+        //     patient: doc.data().patient,
+        //     onScene: doc.data().onScene,
+        //     treatment: doc.data().treatment,
+        //     selectedParts: doc.data().selectedParts,
+        //     vital: doc.data().vital,
+        //     tp: doc.data().tp,
+        //     location: doc.data().location,
+        //     otherContent: doc.data().otherContent,
+        //     hospital: doc.data().hospital,
+        //   });
+        // });
+        return {
+          message: "Successfully search case",
+          result: 200,
+          data: querySnapshot,
+        };
       }).catch((err) => {
         console.log(err);
         throw new functions.https.HttpsError(
@@ -127,10 +153,11 @@ exports.querySpecArrayCases = functions
       console.log(array);
       const SpecArrayCasesPromise = fireSQL.query(`
       SELECT * FROM cases
-      WHERE onScene CONTAINS "${array}"
+      WHERE onScene IN ('因交通事故')
       `);
 
       return SpecArrayCasesPromise.then((cases) => {
+        console.log(cases);
         return cases;
       }).catch((err) => {
         console.log(err);
@@ -155,8 +182,8 @@ exports.querySpecArrayCases2 = functions
     } else {
       const { array } = data;
       console.log(array);
-      casesRef
-        .where("onScene", "in", array)
+      return casesRef
+        .where("onScene", "in", [["非交通事故", "其他非創傷機轉"]])
         .get()
         .then((snapshot) => {
           snapshot.forEach((doc) => {
