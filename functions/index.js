@@ -3,7 +3,6 @@ const admin = require("firebase-admin");
 require("firebase-functions/logger/compat");
 const serviceAccount = require("./apiKey.json");
 const { unitNameEnum } = require("./Enum");
-const { FireSQL } = require("firesql");
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -12,7 +11,6 @@ const db = admin.firestore();
 const casesRef = db.collection("cases");
 const usersRef = db.collection("users");
 const allStatsRef = db.collection("allStats");
-const fireSQL = new FireSQL(db);
 
 // search api
 // exports.queryTargetCases = functions.https.onRequest((req, res) => {
@@ -30,6 +28,36 @@ const fireSQL = new FireSQL(db);
 //       return "";
 //     });
 // });
+
+exports.loginUser = functions
+  .region("asia-east1")
+  .https.onCall(async (data, context) => {
+    if (!context.auth) {
+      // Throwing an HttpsError so that the client gets the error details.
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        "The function must be called " + "while authenticated."
+      );
+    } else {
+      const { array } = data;
+      console.log(array);
+    }
+  });
+
+  exports.logOutUser = functions
+  .region("asia-east1")
+  .https.onCall(async (data, context) => {
+    if (!context.auth) {
+      // Throwing an HttpsError so that the client gets the error details.
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        "The function must be called " + "while authenticated."
+      );
+    } else {
+      const { array } = data;
+      console.log(array);
+    }
+  });
 
 exports.queryTargetCases = functions
   .region("asia-east1")
@@ -95,38 +123,19 @@ exports.queryOtherContentCases = functions
       );
     } else {
       const { value } = data;
-      const OtherContentCasesPromise = fireSQL.query(`
-      SELECT * FROM cases
-      WHERE otherContent LIKE "${value}%"
-      `);
+      const OtherContentCasesPromise = casesRef.orderBy("time", "desc").get();
 
       return OtherContentCasesPromise.then((querySnapshot) => {
-        console.log(querySnapshot);
-        // let arr = [];
-        // querySnapshot.forEach((doc) => {
-        //   arr.push({
-        //     id: doc.id,
-        //     time: doc.data().time,
-        //     unit: doc.data().unit,
-        //     emtlevel: doc.data().emtlevel,
-        //     who: doc.data().who,
-        //     uid: doc.data().uid,
-        //     rank: doc.data().rank,
-        //     patient: doc.data().patient,
-        //     onScene: doc.data().onScene,
-        //     treatment: doc.data().treatment,
-        //     selectedParts: doc.data().selectedParts,
-        //     vital: doc.data().vital,
-        //     tp: doc.data().tp,
-        //     location: doc.data().location,
-        //     otherContent: doc.data().otherContent,
-        //     hospital: doc.data().hospital,
-        //   });
-        // });
+        var targetCases = [];
+        querySnapshot.forEach((item) => {
+          if (item.data().otherContent?.indexOf(value) >= 0) {
+            targetCases.push(item.data());
+          }
+        });
         return {
           message: "Successfully search case",
           result: 200,
-          data: querySnapshot,
+          data: targetCases,
         };
       }).catch((err) => {
         console.log(err);
@@ -151,22 +160,6 @@ exports.querySpecArrayCases = functions
     } else {
       const { array } = data;
       console.log(array);
-      const SpecArrayCasesPromise = fireSQL.query(`
-      SELECT * FROM cases
-      WHERE onScene IN ('因交通事故')
-      `);
-
-      return SpecArrayCasesPromise.then((cases) => {
-        console.log(cases);
-        return cases;
-      }).catch((err) => {
-        console.log(err);
-        throw new functions.https.HttpsError(
-          "500",
-          "querySpecArrayCases fail",
-          err
-        );
-      });
     }
   });
 
@@ -1587,17 +1580,3 @@ exports.twoMonthReport = functions.pubsub
         .then(console.log("success run twoMonthReport"));
     }
   });
-
-/// log Event
-// exports.login = functions
-// .region("asia-east1")
-// .https.onCall(async (data, context) => {
-//   if (!context.auth) {
-//     // Throwing an HttpsError so that the client gets the error details.
-//     throw new functions.https.HttpsError(
-//       "failed-precondition",
-//       "The function must be called " + "while authenticated."
-//     );
-//   } else {
-
-//   }})

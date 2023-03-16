@@ -13,7 +13,10 @@ const store = createStore({
     emtlevel: null,
     rank: null,
     uid: null,
-    notification: [],
+    notification: [{
+      msg: "",
+      time: ""
+    }],
   },
 
   mutations: {

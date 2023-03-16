@@ -20,9 +20,9 @@
         style="height: 90vh"
       >
         <div class="navbar-nav text-center mt-5 fs-5" style="height: 80vh">
-          <div class="row" style="font-size: 2rem; height: 30%">
+          <div class="row" style="font-size: 1.3rem; height: 30%">
             <div
-              class="col-6 d-flex align-items-center"
+              class="col-6 d-flex justify-content-center align-items-center align-middle"
               style="background: #ffcd35"
               @click="
                 () => {
@@ -40,7 +40,7 @@
               </li>
             </div>
             <div
-              class="col-6 d-flex align-items-center"
+              class="col-6 d-flex justify-content-center align-items-center"
               style="background: #eddf6b"
               @click="
                 () => {
@@ -58,9 +58,9 @@
               </li>
             </div>
           </div>
-          <div class="row" style="font-size: 2rem; height: 30%">
+          <div class="row" style="font-size: 1.3rem; height: 30%">
             <div
-              class="col-6 d-flex align-items-center"
+              class="col-6 d-flex justify-content-center align-items-center"
               style="background: #002c7f"
               @click="
                 () => {
@@ -78,7 +78,7 @@
               </li>
             </div>
             <div
-              class="col-6 d-flex align-items-center"
+              class="col-6 d-flex justify-content-center align-items-center"
               style="background: #00659f"
               @click="
                 () => {
@@ -98,7 +98,7 @@
           </div>
           <div
             class="row"
-            style="font-size: 2rem; height: 30%"
+            style="font-size: 1.3rem; height: 30%"
             @click="
               () => {
                 router.push(`/loginstatus/${uid}`);
@@ -107,7 +107,7 @@
             "
           >
             <div
-              class="col d-flex align-items-center justify-content-center"
+              class="col d-flex justify-content-center align-items-center justify-content-center"
               style="background: #00b3c5"
             >
               <li class="p-3">

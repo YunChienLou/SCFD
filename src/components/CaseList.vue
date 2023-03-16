@@ -1,7 +1,18 @@
 <template>
   <div class="caseList">
     <h1 class="fw-bold m-4">即時救護案件</h1>
+    <div v-if="isLoading" class="text-center mt-5 text-white">
+      <div class="h1 text-center">資料處理中 .....</div>
+      <div
+        class="spinner-border text-primary"
+        style="width: 5rem; height: 5rem"
+        role="status"
+      >
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
     <div
+      v-else
       class="card text-white bg-dark m-4 rounded-3"
       v-for="{
         id,
@@ -539,6 +550,7 @@ import { useStore } from "vuex";
 
 export default {
   setup() {
+    const isLoading = ref(false);
     const cases = ref([]);
     const dateFormate = inject("dateFormate");
     const $CaseAPI = inject("$CaseAPI");
@@ -577,12 +589,14 @@ export default {
             quantity: 15,
           },
         };
+        isLoading.value = true;
         cases.value = $CaseAPI.getCases(req, tokenVuex.value).then((res) => {
           cases.value = res.data.result.data;
+          isLoading.value = false;
         });
       }
     });
-    return { cases, classAppend, dateFormate, token };
+    return { cases, classAppend, dateFormate, token, isLoading };
   },
 };
 </script>

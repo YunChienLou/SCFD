@@ -1,7 +1,7 @@
 <template>
   <!-- <Status :uid="uid" :userData="userData" /> -->
   <div style="height: 100px"></div>
-
+  
   <div class="loginStatus text-center bg-dark m-4 rounded-3 transBg2">
     <div class="" style="height: 50px"></div>
     <h1>{{ userData.unit }}分隊</h1>
@@ -83,7 +83,19 @@
     </div>
   </div>
 
+  <div v-if="user_isLoading" class="text-center mt-5 text-white">
+    <div class="h1 text-center">資料處理中 .....</div>
+    <div
+      class="spinner-border text-primary"
+      style="width: 5rem; height: 5rem"
+      role="status"
+    >
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
   <div
+    v-else
     class="loginStatus card text-white bg-dark m-4"
     v-for="{
       id,
@@ -641,6 +653,7 @@ export default {
     // Status,
   },
   setup() {
+    const user_isLoading = ref(false);
     const $CaseAPI = inject("$CaseAPI");
     const $QueryAPI = inject("$QueryAPI");
     const userData = reactive({
@@ -681,7 +694,6 @@ export default {
     };
 
     const downloadExcel = () => {
-      console.log(targetCases.value);
       JSONToExcelConvertor(
         targetCases.value,
         userData.unit + "分隊_" + userData.name + "的救護紀錄"
@@ -751,34 +763,48 @@ export default {
         });
     };
 
+    // const notification = () => {
+    //   store.dispatch("push2Notification", {
+    //         msg: "刪除失敗",
+    //         time: new Date().toLocaleTimeString(),
+    //       });
+    // }
     const logout = () => {
       logoutUser(), store.dispatch("logout");
     };
 
     onMounted(() => {
-      verifyVuex();
-      $QueryAPI
-        .queryTargetCases(
-          { data: { subject: "uid", value: store.state.uid } },
-          tokenVuex.value
-        )
-        .then((res) => {
-          targetCases.value = JSON.parse(res.data.result.data);
-        });
+      if (store.state.uid != null) {
+        user_isLoading.value = true;
+        verifyVuex();
+        $QueryAPI
+          .queryTargetCases(
+            { data: { subject: "uid", value: store.state.uid } },
+            tokenVuex.value
+          )
+          .then((res) => {
+            user_isLoading.value = false;
+            targetCases.value = JSON.parse(res.data.result.data);
+          });
+      }
     });
+
     watch(userData, () => {
       console.log("userData update");
+      user_isLoading.value = true;
       $QueryAPI
         .queryTargetCases(
           { data: { subject: "uid", value: store.state.uid } },
           tokenVuex.value
         )
         .then((res) => {
+          user_isLoading.value = false;
           targetCases.value = JSON.parse(res.data.result.data);
         });
     });
 
     return {
+      user_isLoading,
       logout,
       userData,
       uid,
@@ -798,11 +824,8 @@ export default {
 };
 </script>
 <style>
-.modal-backdrop {
-  z-index: -1;
-}
 .loginStatus {
-  z-index: 2;
+  z-index: 3;
   opacity: 0.8;
 }
 .transBg {

@@ -204,14 +204,13 @@ const config = {
   appId: "1:642588500666:web:5d7893ea746847bde31883",
 };
 
-const firebaseApp = firebase.initializeApp(config);
+firebase.initializeApp(config);
 // const functions = firebaseApp.functions("asia-east1");
-const db = firebaseApp.firestore();
-const dailyCases = db.collection("cases");
+// const db = firebaseApp.firestore();
+// const dailyCases = db.collection("cases");
 // const users = db.collection("users");
 // const orderCases = dailyCases.orderBy("time", "desc").limit(15);
-const auth = firebase.auth();
-
+const auth = firebase.auth();   
 // export const loadCasesTarget = async (subject, value) => {
 //   const snapshot = dailyCases
 //     .orderBy("time", "desc")
@@ -295,23 +294,24 @@ const auth = firebase.auth();
 //   return targetCases;
 //   // 最後回傳收繳資料的矩陣
 // };
+
 // 這支還沒用過
-export const loadSpecArrayCases = async (subject, value) => {
-  var targetCases = [];
-  // 記錄們(每個以物件為單位) 存放的陣列
-  const snapshot = await dailyCases
-    .where(subject, "array-contains", value)
-    .get();
-  snapshot.docs.forEach((item) => {
-    targetCases.push(item.data());
-    targetCases.sort(function (a, b) {
-      return new Date(b.time) - new Date(a.time);
-    });
-  });
-  console.log(targetCases);
-  return targetCases;
-  // 最後回傳收繳資料的矩陣
-};
+// export const loadSpecArrayCases = async (subject, value) => {
+//   var targetCases = [];
+//   // 記錄們(每個以物件為單位) 存放的陣列
+//   const snapshot = await dailyCases
+//     .where(subject, "array-contains", value)
+//     .get();
+//   snapshot.docs.forEach((item) => {
+//     targetCases.push(item.data());
+//     targetCases.sort(function (a, b) {
+//       return new Date(b.time) - new Date(a.time);
+//     });
+//   });
+//   console.log(targetCases);
+//   return targetCases;
+//   // 最後回傳收繳資料的矩陣
+// };
 
 // 登入邏輯
 export const loginUser = (email, password) => {

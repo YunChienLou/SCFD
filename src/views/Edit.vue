@@ -1259,6 +1259,11 @@ import { useStore } from "vuex";
 
 export default {
   setup() {
+    const value_spo2 = ref();
+    const value_bp = ref();
+    const value_hr = ref();
+    const value_bodyTemp = ref();
+    
     const form = reactive({
       time: "",
       who: "",
@@ -1470,6 +1475,10 @@ export default {
       firefighters,
       no_input_func,
       bp_no_input_func,
+      value_bp,
+      value_spo2,
+      value_hr,
+      value_bodyTemp,
     };
   },
 };

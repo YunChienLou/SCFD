@@ -33,13 +33,16 @@
       <div class="row d-flex justify-content-center">
         <div class="col-lg-6">
           <Status v-if="!isLoginPage" :uid="uid" :userData="userData" />
-          <router-view />
+          <div class="min-height">
+            <router-view />
+          </div>
           <Footer />
         </div>
       </div>
     </div>
     <!-- 內容 -->
   </div>
+  
 </template>
 
 <script>
@@ -63,7 +66,7 @@ export default {
     });
     const store = useStore();
     const notifications = computed(() => {
-      console.log('compute noti')
+      console.log("compute notification");
       return store.state.notification;
     });
     const name = computed(() => {
@@ -104,14 +107,12 @@ export default {
 
     watch(notifications.value, () => {
       // var toast
-      console.log("notifichange", notifications.value);
-      console.log("querySelectorAll",document.querySelectorAll(".toast"))
       var toastElList = [].slice.call(document.querySelectorAll(".toast"));
       var toastList = toastElList.map(function (toastEl) {
         return new Toast(toastEl);
       });
-      console.log('toastList',toastList)
-      console.log('toastElList',toastElList)
+      console.log("toastList", toastList);
+      console.log("toastElList", toastElList);
       toastList.forEach((toast) => toast.show());
     });
 
@@ -135,6 +136,12 @@ export default {
 };
 </script>
 <style scoped>
+/* .modal-backdrop {
+  z-index: -1 !important;
+} */
+.min-height {
+  min-height: 80%;
+}
 .bg-filter {
   position: fixed;
   top: -60%;
