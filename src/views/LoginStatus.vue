@@ -1,7 +1,7 @@
 <template>
   <!-- <Status :uid="uid" :userData="userData" /> -->
   <div style="height: 100px"></div>
-  
+
   <div class="loginStatus text-center bg-dark m-4 rounded-3 transBg2">
     <div class="" style="height: 50px"></div>
     <h1>{{ userData.unit }}分隊</h1>
@@ -738,29 +738,32 @@ export default {
           caseId: id,
         },
       };
-      $CaseAPI
-        .deleteCase(data, tokenVuex.value)
-        .then(() => {
-          isDeleting.value = false;
-          store.dispatch("push2Notification", {
-            msg: "刪除成功",
-            time: new Date().toLocaleTimeString(),
-          });
-          $QueryAPI
-            .queryTargetCases(
-              { data: { subject: "uid", value: store.state.uid } },
-              tokenVuex.value
-            )
-            .then((res) => {
-              targetCases.value = JSON.parse(res.data.result.data);
+      let yes = confirm("你確定刪除嗎？");
+      if (yes) {
+        $CaseAPI
+          .deleteCase(data, tokenVuex.value)
+          .then(() => {
+            isDeleting.value = false;
+            store.dispatch("push2Notification", {
+              msg: "刪除成功",
+              time: new Date().toLocaleTimeString(),
             });
-        })
-        .catch(() => {
-          store.dispatch("push2Notification", {
-            msg: "刪除失敗",
-            time: new Date().toLocaleTimeString(),
+            $QueryAPI
+              .queryTargetCases(
+                { data: { subject: "uid", value: store.state.uid } },
+                tokenVuex.value
+              )
+              .then((res) => {
+                targetCases.value = JSON.parse(res.data.result.data);
+              });
+          })
+          .catch(() => {
+            store.dispatch("push2Notification", {
+              msg: "刪除失敗",
+              time: new Date().toLocaleTimeString(),
+            });
           });
-        });
+      }
     };
 
     // const notification = () => {
@@ -825,7 +828,7 @@ export default {
 </script>
 <style>
 .loginStatus {
-  z-index: 3;
+  z-index: 1;
   opacity: 0.8;
 }
 .transBg {

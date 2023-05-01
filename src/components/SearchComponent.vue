@@ -1000,7 +1000,7 @@ import { useStore } from "vuex";
 export default {
   setup() {
     const $QueryAPI = inject("$QueryAPI");
-    const isLoading = ref(false)
+    const isLoading = ref(false);
     const store = useStore();
     const keyCatagory = ref("who");
     const keyValue = ref("");
@@ -1010,7 +1010,7 @@ export default {
     const endTime = ref();
     const dateFormate = inject("dateFormate");
     const do_search = async () => {
-      isLoading.value = true
+      isLoading.value = true;
       searchList.length = 0;
       switch (keyCatagory.value) {
         case "who":
@@ -1025,7 +1025,7 @@ export default {
               store.state.token
             )
             .then((res) => {
-              isLoading.value = false
+              isLoading.value = false;
               let readyJson = JSON.parse(res.data.result.data);
               searchList.push(...readyJson);
             });
@@ -1041,7 +1041,7 @@ export default {
               store.state.token
             )
             .then((res) => {
-              isLoading.value = false
+              isLoading.value = false;
               let readyJson = res.data.result.data;
               searchList.push(...readyJson);
             });
@@ -1052,7 +1052,7 @@ export default {
     };
 
     const do_unit_search = async () => {
-      isLoading.value = true
+      isLoading.value = true;
       searchList.length = 0;
       $QueryAPI
         .queryTargetCases(
@@ -1065,14 +1065,14 @@ export default {
           store.state.token
         )
         .then((res) => {
-          isLoading.value = false
+          isLoading.value = false;
           let readyJson = JSON.parse(res.data.result.data);
           searchList.push(...readyJson);
         });
     };
 
     const do_time_period_search = async () => {
-      isLoading.value = true
+      isLoading.value = true;
       searchList.length = 0;
       keyValueDisplay.value = startTime.value + " ~ " + endTime.value;
       $QueryAPI
@@ -1086,7 +1086,7 @@ export default {
           store.state.token
         )
         .then((res) => {
-          isLoading.value = false
+          isLoading.value = false;
           searchList.push(...JSON.parse(res.data.result.data));
         });
     };

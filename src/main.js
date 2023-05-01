@@ -1,4 +1,3 @@
-
 import { createApp } from "vue";
 import App from "./App.vue";
 import router from "./router";
@@ -6,8 +5,8 @@ import { dateFormate } from "./mixin/formator";
 import ServerAPI from "./firebase";
 import store from "./store/index";
 
-import 'bootstrap/dist/css/bootstrap.min.css'
-import "bootstrap"
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap";
 
 const app = createApp(App);
 app.provide("dateFormate", dateFormate);
@@ -21,4 +20,3 @@ app.use(router);
 app.use(store);
 
 app.mount("#app");
-

@@ -6,7 +6,6 @@ import router from "./router";
 require("firebase/firestore");
 require("firebase/functions");
 const urlBase = "https://asia-east1-scfd-app.cloudfunctions.net/";
-
 const query = {
   queryTargetCases: (data, token) => {
     return axios.post(urlBase + "queryTargetCases", data, {
@@ -205,12 +204,13 @@ const config = {
 };
 
 firebase.initializeApp(config);
+// firebase.initializeApp();
 // const functions = firebaseApp.functions("asia-east1");
 // const db = firebaseApp.firestore();
 // const dailyCases = db.collection("cases");
 // const users = db.collection("users");
 // const orderCases = dailyCases.orderBy("time", "desc").limit(15);
-const auth = firebase.auth();   
+const auth = firebase.auth();
 // export const loadCasesTarget = async (subject, value) => {
 //   const snapshot = dailyCases
 //     .orderBy("time", "desc")
@@ -354,4 +354,3 @@ export const forgetPasswords = (email) => {
       // ..
     });
 };
-

@@ -42,7 +42,6 @@
     </div>
     <!-- 內容 -->
   </div>
-  
 </template>
 
 <script>

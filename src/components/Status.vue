@@ -22,7 +22,12 @@
         <div class="navbar-nav text-center mt-5 fs-5" style="height: 80vh">
           <div class="row" style="font-size: 1.3rem; height: 30%">
             <div
-              class="col-6 d-flex justify-content-center align-items-center align-middle"
+              class="
+                col-6
+                d-flex
+                justify-content-center
+                align-items-center align-middle
+              "
               style="background: #ffcd35"
               @click="
                 () => {
@@ -107,7 +112,13 @@
             "
           >
             <div
-              class="col d-flex justify-content-center align-items-center justify-content-center"
+              class="
+                col
+                d-flex
+                justify-content-center
+                align-items-center
+                justify-content-center
+              "
               style="background: #00b3c5"
             >
               <li class="p-3">
@@ -181,11 +192,6 @@ export default {
   z-index: 3;
 }
 .navBg2 {
-  /* background: linear-gradient(
-    110deg,
-    rgba(108, 117, 125, 1),
-    rgba(0, 53, 107, 0.5)
-  ); */
   background-color: #212121;
   border-bottom: rgb(13, 110, 253) 3px solid;
   box-shadow: 0px 6px 30px 5px rgba(13, 109, 253, 0.614);

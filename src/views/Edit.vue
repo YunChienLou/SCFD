@@ -471,335 +471,6 @@
         </button>
 
         <!-- Modal -->
-        <div
-          class="modal fade text-dark h-75 mt-5"
-          id="exampleModal"
-          tabindex="-1"
-          aria-labelledby="exampleModalLabel"
-          aria-hidden="true"
-        >
-          <div
-            class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
-          >
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">
-                  處置項目(可複選)
-                </h5>
-                <button
-                  type="button"
-                  class="btn-close"
-                  data-bs-dismiss="modal"
-                  aria-label="Close"
-                ></button>
-              </div>
-              <div class="modal-body">
-                <div class="list-group">
-                  <label class="fs-4 fw-bold">基本呼吸道處置/呼吸處置</label>
-                  <ul class="p-0">
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="口咽呼吸道"
-                        v-model="form.treatment"
-                      />口咽呼吸道
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="鼻咽呼吸道"
-                        v-model="form.treatment"
-                      />鼻咽呼吸道
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="抽吸"
-                        v-model="form.treatment"
-                      />抽吸
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="哈姆立克法"
-                        v-model="form.treatment"
-                      />哈姆立克法
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="LMA／ILMA"
-                        v-model="form.treatment"
-                      />LMA／ILMA
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="鼻管"
-                        v-model="form.treatment"
-                      />鼻管
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="面罩"
-                        v-model="form.treatment"
-                      />面罩
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="非再呼吸型面罩"
-                        v-model="form.treatment"
-                      />非再呼吸型面罩
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="BVM(正壓輔助呼吸)"
-                        v-model="form.treatment"
-                      />BVM(正壓輔助呼吸)
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="其他呼吸處置"
-                        v-model="form.treatment"
-                      />其他
-                    </li>
-                  </ul>
-                </div>
-                <div class="list-group">
-                  <label class="fs-4 fw-bold">創傷處置</label>
-                  <ul class="p-0">
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="頸圈"
-                        v-model="form.treatment"
-                      />頸圈
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="清洗傷口"
-                        v-model="form.treatment"
-                      />清洗傷口
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="止血、包紮"
-                        v-model="form.treatment"
-                      />止血、包紮
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="SAM護木固定"
-                        v-model="form.treatment"
-                      />SAM護木固定
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="長背板固定"
-                        v-model="form.treatment"
-                      />長背板固定
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="KED固定"
-                        v-model="form.treatment"
-                      />KED固定
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="抽吸式護木"
-                        v-model="form.treatment"
-                      />抽吸式護木
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="其他創傷處置"
-                        v-model="form.treatment"
-                      />其他
-                    </li>
-                  </ul>
-                </div>
-                <div class="list-group">
-                  <label class="fs-4 fw-bold">心肺復甦術</label>
-                  <ul class="p-0">
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="CPR"
-                        v-model="form.treatment"
-                      />CPR
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="使用AED電擊去顫"
-                        v-model="form.treatment"
-                      />使用AED 電擊去顫
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="使用AED不建議電擊"
-                        v-model="form.treatment"
-                      />使用AED 不建議電擊
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="LUCAS"
-                        v-model="form.treatment"
-                      />LUCAS
-                    </li>
-                  </ul>
-                </div>
-                <div class="list-group">
-                  <label class="fs-4 fw-bold">藥物處置</label>
-                  <ul class="p-0">
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="IV"
-                        v-model="form.treatment"
-                      />IV
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="IO"
-                        v-model="form.treatment"
-                      />IO
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="Adrenalin(Bosmin)"
-                        v-model="form.treatment"
-                      />Adrenalin(Bosmin)
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="Epinephrine"
-                        v-model="form.treatment"
-                      />Epinephrine
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="0.9% N/S"
-                        v-model="form.treatment"
-                      />0.9% N/S
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="L/R"
-                        v-model="form.treatment"
-                      />L/R
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="葡萄糖液"
-                        v-model="form.treatment"
-                      />葡萄糖液
-                    </li>
-
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="給予口服阿茲匹靈"
-                        v-model="form.treatment"
-                      />給予口服阿茲匹靈
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="協助使用NTG含片"
-                        v-model="form.treatment"
-                      />協助使用NTG含片
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="協助使用支氣管擴張劑"
-                        v-model="form.treatment"
-                      />協助使用支氣管擴張劑
-                    </li>
-                  </ul>
-                </div>
-                <div class="list-group">
-                  <label class="fs-4 fw-bold">其他處置</label>
-                  <ul class="p-0">
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="保暖"
-                        v-model="form.treatment"
-                      />保暖
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="心理支持"
-                        v-model="form.treatment"
-                      />心理支持
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="量測血糖"
-                        v-model="form.treatment"
-                      />量測血糖
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="EKG"
-                        v-model="form.treatment"
-                      />EKG
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="急產接生"
-                        v-model="form.treatment"
-                      />急產接生
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="其他處置"
-                        v-model="form.treatment"
-                      />其他
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <div class="modal-footer">
-                <button
-                  type="button"
-                  class="btn btn-secondary"
-                  data-bs-dismiss="modal"
-                >
-                  關閉
-                </button>
-                <!-- <button type="button" class="btn btn-primary">儲存</button> -->
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
       <div class="row m-2">
         <label class="col-4 form-label">現場狀況</label>
@@ -814,344 +485,6 @@
         </button>
 
         <!-- Modal -->
-        <div
-          class="modal fade text-dark"
-          id="SceneModal"
-          tabindex="-1"
-          aria-labelledby="exampleModalLabel"
-          aria-hidden="true"
-        >
-          <div
-            class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
-          >
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">
-                  現場狀況(可複選)
-                </h5>
-                <button
-                  type="button"
-                  class="btn-close"
-                  data-bs-dismiss="modal"
-                  aria-label="Close"
-                ></button>
-              </div>
-              <div class="modal-body">
-                <div class="list-group">
-                  <label class="fs-4 fw-bold">非創傷</label>
-                  <ul class="p-0">
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="呼吸問題（喘／呼吸急促）"
-                        v-model="form.onScene"
-                      />呼吸問題（喘／呼吸急促）
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="呼吸道問題（異物哽塞）"
-                        v-model="form.onScene"
-                      />呼吸道問題（異物哽塞）
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="胸痛／悶"
-                        v-model="form.onScene"
-                      />胸痛／悶
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="腹痛"
-                        v-model="form.onScene"
-                      />腹痛
-                    </li>
-                    <li class="list-group-item">
-                      <p>一般疾病</p>
-                      <ul class="list-group">
-                        <li class="list-group-item list-group-item-secondary">
-                          <input
-                            type="checkbox"
-                            value="頭痛／頭暈／昏倒／昏厥"
-                            v-model="form.onScene"
-                          />頭痛／頭暈／昏倒／昏厥
-                        </li>
-                        <li class="list-group-item list-group-item-secondary">
-                          <input
-                            type="checkbox"
-                            value="發燒"
-                            v-model="form.onScene"
-                          />發燒
-                        </li>
-                        <li class="list-group-item list-group-item-secondary">
-                          <input
-                            type="checkbox"
-                            value="噁心／嘔吐／腹瀉"
-                            v-model="form.onScene"
-                          />噁心／嘔吐／腹瀉
-                        </li>
-                        <li class="list-group-item list-group-item-secondary">
-                          <input
-                            type="checkbox"
-                            value="肢體無力"
-                            v-model="form.onScene"
-                          />肢體無力
-                        </li>
-                      </ul>
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="疑似毒藥物中毒"
-                        v-model="form.onScene"
-                      />疑似毒藥物中毒
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="疑似一氧化碳中毒"
-                        v-model="form.onScene"
-                      />疑似一氧化碳中毒
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="癲癇／抽搐"
-                        v-model="form.onScene"
-                      />癲癇／抽搐
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="路倒"
-                        v-model="form.onScene"
-                      />路倒
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="行為急症/精神異常"
-                        v-model="form.onScene"
-                      />行為急症/精神異常
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="孕婦急產"
-                        v-model="form.onScene"
-                      />孕婦急產
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="溺水"
-                        v-model="form.onScene"
-                      />溺水
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="到院前心肺功能停止"
-                        v-model="form.onScene"
-                      />到院前心肺功能停止
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="其他非創傷機轉"
-                        v-model="form.onScene"
-                      />其他
-                    </li>
-                  </ul>
-                  <label class="fs-4 fw-bold">創傷</label>
-                  <ul class="p-0">
-                    <li class="list-group-item">
-                      <p>一般外傷</p>
-                      <ul class="list-group">
-                        <li class="list-group-item list-group-item-secondary">
-                          <input
-                            type="checkbox"
-                            value="頭部外傷"
-                            v-model="form.onScene"
-                          />頭部外傷
-                        </li>
-                        <li class="list-group-item list-group-item-secondary">
-                          <input
-                            type="checkbox"
-                            value="胸部外傷"
-                            v-model="form.onScene"
-                          />胸部外傷
-                        </li>
-                        <li class="list-group-item list-group-item-secondary">
-                          <input
-                            type="checkbox"
-                            value="腹部外傷"
-                            v-model="form.onScene"
-                          />腹部外傷
-                        </li>
-                        <li class="list-group-item list-group-item-secondary">
-                          <input
-                            type="checkbox"
-                            value="背部外傷"
-                            v-model="form.onScene"
-                          />背部外傷
-                        </li>
-                        <li class="list-group-item list-group-item-secondary">
-                          <input
-                            type="checkbox"
-                            value="肢體外傷"
-                            v-model="form.onScene"
-                          />肢體外傷
-                        </li>
-                      </ul>
-                    </li>
-                    <li class="list-group-item">
-                      <p>受傷機轉</p>
-                      <ul class="list-group">
-                        <li class="list-group-item list-group-item-secondary">
-                          <input
-                            type="checkbox"
-                            value="因交通事故"
-                            v-model="form.onScene"
-                          />因交通事故
-                        </li>
-                        <li class="list-group-item list-group-item-secondary">
-                          <input
-                            type="checkbox"
-                            value="非交通事故"
-                            v-model="form.onScene"
-                          />非交通事故
-                        </li>
-                      </ul>
-                    </li>
-                    <li class="list-group-item">
-                      <p>事故類別(以傷病患為主)</p>
-                      <ul class="list-group">
-                        <li class="list-group-item list-group-item-secondary">
-                          <input
-                            type="checkbox"
-                            value="汽車"
-                            v-model="form.onScene"
-                          />汽車
-                        </li>
-                        <li class="list-group-item list-group-item-secondary">
-                          <input
-                            type="checkbox"
-                            value="機車"
-                            v-model="form.onScene"
-                          />機車
-                        </li>
-                        <li class="list-group-item list-group-item-secondary">
-                          <input
-                            type="checkbox"
-                            value="腳踏車"
-                            v-model="form.onScene"
-                          />腳踏車
-                        </li>
-                        <li class="list-group-item list-group-item-secondary">
-                          <input
-                            type="checkbox"
-                            value="行人"
-                            v-model="form.onScene"
-                          />行人
-                        </li>
-                        <li class="list-group-item list-group-item-secondary">
-                          <input
-                            type="checkbox"
-                            value="其他交通事故"
-                            v-model="form.onScene"
-                          />其他
-                        </li>
-                      </ul>
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="墜落傷"
-                        v-model="form.onScene"
-                      />墜落傷
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="肢體疼痛"
-                        v-model="form.onScene"
-                      />肢體疼痛
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="挫傷"
-                        v-model="form.onScene"
-                      />挫傷
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="血腫"
-                        v-model="form.onScene"
-                      />血腫
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="穿刺傷"
-                        v-model="form.onScene"
-                      />穿刺傷
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="燒燙傷"
-                        v-model="form.onScene"
-                      />燒燙傷
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="電擊傷"
-                        v-model="form.onScene"
-                      />電擊傷
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="生物咬螫傷"
-                        v-model="form.onScene"
-                      />生物咬螫傷
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="到院前心肺功能停止"
-                        v-model="form.onScene"
-                      />到院前心肺功能停止
-                    </li>
-                    <li class="list-group-item">
-                      <input
-                        type="checkbox"
-                        value="其他創傷機轉"
-                        v-model="form.onScene"
-                      />其他
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <div class="modal-footer">
-                <button
-                  type="button"
-                  class="btn btn-secondary"
-                  data-bs-dismiss="modal"
-                >
-                  關閉
-                </button>
-                <!-- <button type="button" class="btn btn-primary">儲存</button> -->
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
       <div class="row m-2">
         <label class="col-4 form-label">時間</label>
@@ -1249,6 +582,658 @@
       </div>
     </form>
   </div>
+  <div
+    class="modal fade text-dark"
+    id="SceneModal"
+    tabindex="-1"
+    aria-labelledby="exampleModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">現場狀況(可複選)</h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <div class="list-group">
+            <label class="fs-4 fw-bold">非創傷</label>
+            <ul class="p-0">
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="呼吸問題（喘／呼吸急促）"
+                  v-model="form.onScene"
+                />呼吸問題（喘／呼吸急促）
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="呼吸道問題（異物哽塞）"
+                  v-model="form.onScene"
+                />呼吸道問題（異物哽塞）
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="胸痛／悶"
+                  v-model="form.onScene"
+                />胸痛／悶
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="腹痛"
+                  v-model="form.onScene"
+                />腹痛
+              </li>
+              <li class="list-group-item">
+                <p>一般疾病</p>
+                <ul class="list-group">
+                  <li class="list-group-item list-group-item-secondary">
+                    <input
+                      type="checkbox"
+                      value="頭痛／頭暈／昏倒／昏厥"
+                      v-model="form.onScene"
+                    />頭痛／頭暈／昏倒／昏厥
+                  </li>
+                  <li class="list-group-item list-group-item-secondary">
+                    <input
+                      type="checkbox"
+                      value="發燒"
+                      v-model="form.onScene"
+                    />發燒
+                  </li>
+                  <li class="list-group-item list-group-item-secondary">
+                    <input
+                      type="checkbox"
+                      value="噁心／嘔吐／腹瀉"
+                      v-model="form.onScene"
+                    />噁心／嘔吐／腹瀉
+                  </li>
+                  <li class="list-group-item list-group-item-secondary">
+                    <input
+                      type="checkbox"
+                      value="肢體無力"
+                      v-model="form.onScene"
+                    />肢體無力
+                  </li>
+                </ul>
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="疑似毒藥物中毒"
+                  v-model="form.onScene"
+                />疑似毒藥物中毒
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="疑似一氧化碳中毒"
+                  v-model="form.onScene"
+                />疑似一氧化碳中毒
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="癲癇／抽搐"
+                  v-model="form.onScene"
+                />癲癇／抽搐
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="路倒"
+                  v-model="form.onScene"
+                />路倒
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="行為急症/精神異常"
+                  v-model="form.onScene"
+                />行為急症/精神異常
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="孕婦急產"
+                  v-model="form.onScene"
+                />孕婦急產
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="溺水"
+                  v-model="form.onScene"
+                />溺水
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="到院前心肺功能停止"
+                  v-model="form.onScene"
+                />到院前心肺功能停止
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="其他非創傷機轉"
+                  v-model="form.onScene"
+                />其他
+              </li>
+            </ul>
+            <label class="fs-4 fw-bold">創傷</label>
+            <ul class="p-0">
+              <li class="list-group-item">
+                <p>一般外傷</p>
+                <ul class="list-group">
+                  <li class="list-group-item list-group-item-secondary">
+                    <input
+                      type="checkbox"
+                      value="頭部外傷"
+                      v-model="form.onScene"
+                    />頭部外傷
+                  </li>
+                  <li class="list-group-item list-group-item-secondary">
+                    <input
+                      type="checkbox"
+                      value="胸部外傷"
+                      v-model="form.onScene"
+                    />胸部外傷
+                  </li>
+                  <li class="list-group-item list-group-item-secondary">
+                    <input
+                      type="checkbox"
+                      value="腹部外傷"
+                      v-model="form.onScene"
+                    />腹部外傷
+                  </li>
+                  <li class="list-group-item list-group-item-secondary">
+                    <input
+                      type="checkbox"
+                      value="背部外傷"
+                      v-model="form.onScene"
+                    />背部外傷
+                  </li>
+                  <li class="list-group-item list-group-item-secondary">
+                    <input
+                      type="checkbox"
+                      value="肢體外傷"
+                      v-model="form.onScene"
+                    />肢體外傷
+                  </li>
+                </ul>
+              </li>
+              <li class="list-group-item">
+                <p>受傷機轉</p>
+                <ul class="list-group">
+                  <li class="list-group-item list-group-item-secondary">
+                    <input
+                      type="checkbox"
+                      value="因交通事故"
+                      v-model="form.onScene"
+                    />因交通事故
+                  </li>
+                  <li class="list-group-item list-group-item-secondary">
+                    <input
+                      type="checkbox"
+                      value="非交通事故"
+                      v-model="form.onScene"
+                    />非交通事故
+                  </li>
+                </ul>
+              </li>
+              <li class="list-group-item">
+                <p>事故類別(以傷病患為主)</p>
+                <ul class="list-group">
+                  <li class="list-group-item list-group-item-secondary">
+                    <input
+                      type="checkbox"
+                      value="汽車"
+                      v-model="form.onScene"
+                    />汽車
+                  </li>
+                  <li class="list-group-item list-group-item-secondary">
+                    <input
+                      type="checkbox"
+                      value="機車"
+                      v-model="form.onScene"
+                    />機車
+                  </li>
+                  <li class="list-group-item list-group-item-secondary">
+                    <input
+                      type="checkbox"
+                      value="腳踏車"
+                      v-model="form.onScene"
+                    />腳踏車
+                  </li>
+                  <li class="list-group-item list-group-item-secondary">
+                    <input
+                      type="checkbox"
+                      value="行人"
+                      v-model="form.onScene"
+                    />行人
+                  </li>
+                  <li class="list-group-item list-group-item-secondary">
+                    <input
+                      type="checkbox"
+                      value="其他交通事故"
+                      v-model="form.onScene"
+                    />其他
+                  </li>
+                </ul>
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="墜落傷"
+                  v-model="form.onScene"
+                />墜落傷
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="肢體疼痛"
+                  v-model="form.onScene"
+                />肢體疼痛
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="挫傷"
+                  v-model="form.onScene"
+                />挫傷
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="血腫"
+                  v-model="form.onScene"
+                />血腫
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="穿刺傷"
+                  v-model="form.onScene"
+                />穿刺傷
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="燒燙傷"
+                  v-model="form.onScene"
+                />燒燙傷
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="電擊傷"
+                  v-model="form.onScene"
+                />電擊傷
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="生物咬螫傷"
+                  v-model="form.onScene"
+                />生物咬螫傷
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="到院前心肺功能停止"
+                  v-model="form.onScene"
+                />到院前心肺功能停止
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="其他創傷機轉"
+                  v-model="form.onScene"
+                />其他
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            關閉
+          </button>
+          <!-- <button type="button" class="btn btn-primary">儲存</button> -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="modal fade text-dark h-75 mt-5"
+    id="exampleModal"
+    tabindex="-1"
+    aria-labelledby="exampleModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">處置項目(可複選)</h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <div class="list-group">
+            <label class="fs-4 fw-bold">基本呼吸道處置/呼吸處置</label>
+            <ul class="p-0">
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="口咽呼吸道"
+                  v-model="form.treatment"
+                />口咽呼吸道
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="鼻咽呼吸道"
+                  v-model="form.treatment"
+                />鼻咽呼吸道
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="抽吸"
+                  v-model="form.treatment"
+                />抽吸
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="哈姆立克法"
+                  v-model="form.treatment"
+                />哈姆立克法
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="LMA／ILMA"
+                  v-model="form.treatment"
+                />LMA／ILMA
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="鼻管"
+                  v-model="form.treatment"
+                />鼻管
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="面罩"
+                  v-model="form.treatment"
+                />面罩
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="非再呼吸型面罩"
+                  v-model="form.treatment"
+                />非再呼吸型面罩
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="BVM(正壓輔助呼吸)"
+                  v-model="form.treatment"
+                />BVM(正壓輔助呼吸)
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="其他呼吸處置"
+                  v-model="form.treatment"
+                />其他
+              </li>
+            </ul>
+          </div>
+          <div class="list-group">
+            <label class="fs-4 fw-bold">創傷處置</label>
+            <ul class="p-0">
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="頸圈"
+                  v-model="form.treatment"
+                />頸圈
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="清洗傷口"
+                  v-model="form.treatment"
+                />清洗傷口
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="止血、包紮"
+                  v-model="form.treatment"
+                />止血、包紮
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="SAM護木固定"
+                  v-model="form.treatment"
+                />SAM護木固定
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="長背板固定"
+                  v-model="form.treatment"
+                />長背板固定
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="KED固定"
+                  v-model="form.treatment"
+                />KED固定
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="抽吸式護木"
+                  v-model="form.treatment"
+                />抽吸式護木
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="其他創傷處置"
+                  v-model="form.treatment"
+                />其他
+              </li>
+            </ul>
+          </div>
+          <div class="list-group">
+            <label class="fs-4 fw-bold">心肺復甦術</label>
+            <ul class="p-0">
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="CPR"
+                  v-model="form.treatment"
+                />CPR
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="使用AED電擊去顫"
+                  v-model="form.treatment"
+                />使用AED 電擊去顫
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="使用AED不建議電擊"
+                  v-model="form.treatment"
+                />使用AED 不建議電擊
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="LUCAS"
+                  v-model="form.treatment"
+                />LUCAS
+              </li>
+            </ul>
+          </div>
+          <div class="list-group">
+            <label class="fs-4 fw-bold">藥物處置</label>
+            <ul class="p-0">
+              <li class="list-group-item">
+                <input type="checkbox" value="IV" v-model="form.treatment" />IV
+              </li>
+              <li class="list-group-item">
+                <input type="checkbox" value="IO" v-model="form.treatment" />IO
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="Adrenalin(Bosmin)"
+                  v-model="form.treatment"
+                />Adrenalin(Bosmin)
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="Epinephrine"
+                  v-model="form.treatment"
+                />Epinephrine
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="0.9% N/S"
+                  v-model="form.treatment"
+                />0.9% N/S
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="L/R"
+                  v-model="form.treatment"
+                />L/R
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="葡萄糖液"
+                  v-model="form.treatment"
+                />葡萄糖液
+              </li>
+
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="給予口服阿茲匹靈"
+                  v-model="form.treatment"
+                />給予口服阿茲匹靈
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="協助使用NTG含片"
+                  v-model="form.treatment"
+                />協助使用NTG含片
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="協助使用支氣管擴張劑"
+                  v-model="form.treatment"
+                />協助使用支氣管擴張劑
+              </li>
+            </ul>
+          </div>
+          <div class="list-group">
+            <label class="fs-4 fw-bold">其他處置</label>
+            <ul class="p-0">
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="保暖"
+                  v-model="form.treatment"
+                />保暖
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="心理支持"
+                  v-model="form.treatment"
+                />心理支持
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="量測血糖"
+                  v-model="form.treatment"
+                />量測血糖
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="EKG"
+                  v-model="form.treatment"
+                />EKG
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="急產接生"
+                  v-model="form.treatment"
+                />急產接生
+              </li>
+              <li class="list-group-item">
+                <input
+                  type="checkbox"
+                  value="其他處置"
+                  v-model="form.treatment"
+                />其他
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            關閉
+          </button>
+          <!-- <button type="button" class="btn btn-primary">儲存</button> -->
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -1263,7 +1248,7 @@ export default {
     const value_bp = ref();
     const value_hr = ref();
     const value_bodyTemp = ref();
-    
+
     const form = reactive({
       time: "",
       who: "",
@@ -1484,6 +1469,9 @@ export default {
 };
 </script>
 <style scoped>
+.modal-backdrop {
+  z-index: -1 !important;
+}
 .edit {
   z-index: 2;
   opacity: 0.8;

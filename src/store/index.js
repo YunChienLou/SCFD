@@ -13,10 +13,12 @@ const store = createStore({
     emtlevel: null,
     rank: null,
     uid: null,
-    notification: [{
-      msg: "",
-      time: ""
-    }],
+    notification: [
+      {
+        msg: "",
+        time: "",
+      },
+    ],
   },
 
   mutations: {
@@ -80,22 +82,25 @@ const store = createStore({
                 token: idToken,
               },
             };
-            let userData ={
-              data:{
+            let userData = {
+              data: {
                 token: idToken,
-                uid:user.uid
-              }
-            }
+                uid: user.uid,
+              },
+            };
             context.commit("setUserToken", idToken);
             ServerAPI.user.verifyUser(data, idToken).then((res) => {
               context.commit("setIsAdmin", res.data.result.result);
             });
-            
-            ServerAPI.user.getUser(userData, idToken).then((res) => {
-              context.commit("setUserData", res.data.result.data);
-            }).catch((err)=>{
-              console.log("ServerAPI.user.getUser occurs an error : "+err)
-            });
+
+            ServerAPI.user
+              .getUser(userData, idToken)
+              .then((res) => {
+                context.commit("setUserData", res.data.result.data);
+              })
+              .catch((err) => {
+                console.log("ServerAPI.user.getUser occurs an error : " + err);
+              });
           });
         } else {
           console.log("無登入");

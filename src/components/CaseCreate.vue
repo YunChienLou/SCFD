@@ -588,7 +588,7 @@
           <div v-else class="">送出</div>
         </button>
       </div>
-      <div class="" style="height:50px"></div>
+      <div class="" style="height: 50px"></div>
     </form>
   </div>
   <div
@@ -905,7 +905,6 @@
           >
             關閉
           </button>
-          <!-- <button type="button" class="btn btn-primary">儲存</button> -->
         </div>
       </div>
     </div>
